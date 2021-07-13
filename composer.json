@@ -1,0 +1,18 @@
+{
+    "name": "toom1996/yiis",
+    "description": "Lightweight framework based on Yii2 and Swoole for web rendering",
+    "type": "library",
+    "license": "BSD-3-Clause",
+    "authors": [
+        {
+            "name": "toom1996",
+            "email": "1023150697@qq.com"
+        }
+    ],
+    "require": {},
+    "autoload": {
+        "psr-4": {
+            "toom1996\\": "src/"
+        }
+    }
+}
