@@ -9,7 +9,7 @@
             "email": "1023150697@qq.com"
         }
     ],
-    "minimum-stability": "dev",
+    "minimum-stability": "dev-master",
     "autoload": {
         "psr-4": {
             "toom1996\\": "src/"
