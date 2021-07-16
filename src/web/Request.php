@@ -3,6 +3,7 @@
 namespace toom1996\web;
 
 use toom1996\base\Component;
+use toom1996\YiiS;
 
 /**
  * Class Request
@@ -95,7 +96,7 @@ class Request extends Component
      */
     public function resolve()
     {
-        $result = Toom::$app->getUrlManager()->parseRequest($this);
+        $result = YiiS::$app->getUrlManager()->parseRequest($this);
         if ($result !== false) {
             return [$result, $this->getQueryParams()];
         }
