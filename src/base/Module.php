@@ -2,6 +2,7 @@
 
 namespace toom1996\base;
 
+use app\controllers\SiteController;
 use yii\base\Controller;
 use yii\base\InvalidRouteException;
 
@@ -47,7 +48,7 @@ class Module extends Component
      */
     public $controllerMap = [];
 
-    public $controllerNamespace;
+    public $controllerNamespace = 'app\\controllers';
 
     public function __construct($id, $params = null)
     {
@@ -105,8 +106,8 @@ class Module extends Component
             $id = $route;
             $route = '';
         }
-        var_dump($id);
-        var_dump($route);
+        echo ('id -> ' . $id);
+        echo ('route -> ' . $route);
         // module and controller map take precedence
         if (isset($this->controllerMap[$id])) {
             $controller = Toom::createObject($this->controllerMap[$id], [$id, $this]);
@@ -114,6 +115,7 @@ class Module extends Component
         }
 
         $module = $this->getModule($id);
+        echo 'module' . PHP_EOL;
         var_dump($module);
 //        if ($module !== null) {
 //            return $module->createController($route);
@@ -203,8 +205,10 @@ class Module extends Component
                 return ucfirst($matches[1]);
             }, ucfirst($className)) . 'Controller';
         $className = ltrim($this->controllerNamespace . '\\' . str_replace('/', '\\', $prefix) . $className, '\\');
+        echo 'className' . PHP_EOL;
         var_dump($className);
-        var_dump(class_exists($className));
+        var_dump(new SiteController());
+        var_dump(class_exists('app\controllers\SiteController'));
         if (strpos($className, '-') !== false || !class_exists($className)) {
             return null;
         }

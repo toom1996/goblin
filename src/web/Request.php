@@ -2,6 +2,7 @@
 
 namespace toom1996\web;
 
+use Swoole\Coroutine;
 use toom1996\base\Component;
 use toom1996\YiiS;
 
@@ -145,7 +146,6 @@ class Request extends Component
         ) {
             $pathInfo = $this->utf8Encode($pathInfo);
         }
-        var_dump($pathInfo);
         return (string) $pathInfo;
     }
 

@@ -5,6 +5,7 @@ namespace toom1996;
 
 use toom1996\base\Module;
 use toom1996\web\Request;
+use toom1996\web\UrlManager;
 
 /**
  * Class Application
@@ -125,7 +126,7 @@ class YiiS extends BaseYiiS
 
     /**
      * Returens the urlManager component.
-     * @return \UrlManager
+     * @return UrlManager
      */
     public function getUrlManager()
     {
@@ -179,7 +180,6 @@ class YiiS extends BaseYiiS
 
     public function init()
     {
-        self::$config =
         self::$app = $this;
     }
 
@@ -195,7 +195,6 @@ class YiiS extends BaseYiiS
         if (isset(self::$config['components'][$id])) {
             echo "create {$id} component" . PHP_EOL;
             $className = self::$config['components'][$id]['class'];
-            var_dump($className);
             return $this->component[$id] = new $className($id, $value);
         }else{
             echo "can't find {$id} component";
@@ -211,6 +210,10 @@ class YiiS extends BaseYiiS
         }
     }
 
+    /**
+     * Returns the configuration of core application components.
+     * @return array
+     */
    public function coreComponents()
    {
        return array_merge(parent::coreComponents(), [

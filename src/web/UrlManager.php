@@ -19,7 +19,7 @@ class UrlManager extends Component
 
     /**
      *
-     * @param \Request $request
+     * @param Request $request
      */
     public function parseRequest($request)
     {
@@ -41,12 +41,13 @@ class UrlManager extends Component
         $suffix = (string) $this->suffix;
         $pathInfo = $request->getPathInfo();
 
+        var_dump('path info', $pathInfo);
+
         // pathInfo 应该永远不会为空
         if ($suffix !== '' && $pathInfo !== '') {
             $n = strlen($this->suffix);
             if (substr_compare($pathInfo, $this->suffix, -$n, $n) === 0) {
                 $pathInfo = substr($pathInfo, 0, -$n);
-                var_dump($pathInfo);
                 if ($pathInfo === '/') {
                     // suffix alone is not allowed
                     return false;
