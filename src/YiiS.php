@@ -1,23 +1,20 @@
 <?php
 
-namespace toom1996;
-
-
-use toom1996\base\Module;
 use toom1996\web\Request;
 use toom1996\web\UrlManager;
+use toom1996\BaseYiiS;
 
 /**
  * Class Application
  *
  * @author: TOOM <1023150697@qq.com>
- * @property-read Request $request
- * @property-read ErrorHandler $errorHandler
+ * @property-read \toom1996\web\Request $request
+ * @property-read \toom1996\web\ErrorHandler $errorHandler
  */
 class YiiS extends BaseYiiS
 {
     /**
-     * the requested route
+     * The requested route
      * @var string
      */
     public $requestedRoute;
@@ -34,11 +31,6 @@ class YiiS extends BaseYiiS
      */
     public static $config;
 
-    /**
-     * Application component
-     * @var
-     */
-    protected $component;
 
     /**
      * YiiS constructor.
@@ -50,16 +42,8 @@ class YiiS extends BaseYiiS
         self::$config = $config;
     }
 
-    /**
-     * 
-     * @param $name
-     *
-     * @return mixed
-     */
-    public function __get($name)
-    {
-        return $this->component($name);
-    }
+
+
 
     /**
      *  运行app
@@ -105,7 +89,7 @@ class YiiS extends BaseYiiS
     /**
      * Returns the errorHandler component.
      *
-     * @return ErrorHandler
+     * @return \toom1996\web\ErrorHandler
      */
     public function getErrorHandler()
     {
@@ -117,7 +101,7 @@ class YiiS extends BaseYiiS
      *
      * @param  null  $response
      *
-     * @return Response
+     * @return \toom1996\web\Response
      */
     public function getResponse($response = null)
     {
@@ -137,9 +121,9 @@ class YiiS extends BaseYiiS
     /**
      * Handles the specified request.
      *
-     * @param Request $request
+     * @param \toom1996\web\Request $request
      *
-     * @return \Response
+     * @return \toom1996\web\Response
      */
     public function handleRequest($request)
     {
@@ -180,27 +164,16 @@ class YiiS extends BaseYiiS
 
     public function init()
     {
+        // merge core components with custom components
+        foreach ($this->coreComponents() as $id => $component) {
+            if (!isset(self::$config['components'][$id])) {
+                self::$config['components'][$id] = $component;
+            } elseif (is_array(self::$config['components'][$id]) && !isset(self::$config['components'][$id]['class'])) {
+                self::$config['components'][$id]['class'] = $component['class'];
+            }
+        }
+
         self::$app = $this;
-    }
-
-
-    public function component($id, $value = null)
-    {
-        echo "instance component {$id}" . PHP_EOL;
-        if (isset($this->component[$id])) {
-            echo "is instance component {$id}" . PHP_EOL;
-            return $this->component[$id];
-        }
-
-        if (isset(self::$config['components'][$id])) {
-            echo "create {$id} component" . PHP_EOL;
-            $className = self::$config['components'][$id]['class'];
-            return $this->component[$id] = new $className($id, $value);
-        }else{
-            echo "can't find {$id} component";
-//            throw new Error("can't find {$id} component");
-        }
-
     }
 
     public function createObject($type)
@@ -217,11 +190,9 @@ class YiiS extends BaseYiiS
    public function coreComponents()
    {
        return array_merge(parent::coreComponents(), [
-           'request' => ['class' => 'yii\web\Request'],
-           'response' => ['class' => 'yii\web\Response'],
-           'session' => ['class' => 'yii\web\Session'],
-           'user' => ['class' => 'yii\web\User'],
-           'errorHandler' => ['class' => 'yii\web\ErrorHandler'],
+           'request' => ['class' => 'toom1996\web\Request'],
+           'response' => ['class' => 'toom1996\web\Response'],
+           'errorHandler' => ['class' => 'toom1996\web\ErrorHandler'],
        ]);
    }
 }

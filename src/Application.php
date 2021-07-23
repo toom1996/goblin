@@ -1,15 +1,16 @@
 <?php
-
 namespace toom1996;
 
 use Swoole\Coroutine;
 use toom1996\base\Module;
+
 
 /**
  * This constant defines the framework installation directory.
  */
 defined('APP_PATH') or define('APP_PATH', __DIR__);
 
+spl_autoload_register(['toom1996\Application', 'autoload'], true, true);
 /**
  * Class BaseApplication
  *
@@ -30,6 +31,10 @@ class Application
     {
         $this->config = $config;
         self::$_config = $config;
+        $class = new \ReflectionClass($this);
+        $b = dirname($class->getFileName());
+        var_dump($b);
+        \YiiS::setAlias('@app', '/www/wwwroot/yiis-test');
     }
 
     public static function get($key)
@@ -68,12 +73,30 @@ class Application
      *
      * @param $app
      *
-     * @return \toom1996\Applicaiton
+     * @return \YiiS
      */
     public function load($app)
     {
         return new $app($this->config);
     }
 
+    public static function autoload($className)
+    {
+        if (strpos($className, '\\') !== false) {
+            $classFile = \YiiS::getAlias('@' . str_replace('\\', '/', $className) . '.php', false);
+            var_dump($classFile);
+            if ($classFile === false || !is_file($classFile)) {
+                return;
+            }
+        } else {
+            return;
+        }
+        var_dump($classFile);
+        include $classFile;
 
+//        if (YII_DEBUG && !class_exists($className, false) && !interface_exists($className, false) && !trait_exists($className, false)) {
+//            throw new UnknownClassException("Unable to find '$className' in file: $classFile. Namespace missing?");
+//        }
+    }
 }
+

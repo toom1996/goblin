@@ -4,7 +4,7 @@ namespace toom1996\web;
 
 use Swoole\Coroutine;
 use toom1996\base\Component;
-use toom1996\YiiS;
+use YiiS;
 
 /**
  * Class Request

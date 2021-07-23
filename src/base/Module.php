@@ -207,8 +207,7 @@ class Module extends Component
         $className = ltrim($this->controllerNamespace . '\\' . str_replace('/', '\\', $prefix) . $className, '\\');
         echo 'className' . PHP_EOL;
         var_dump($className);
-        var_dump(new SiteController());
-        var_dump(class_exists('app\controllers\SiteController'));
+
         if (strpos($className, '-') !== false || !class_exists($className)) {
             return null;
         }
