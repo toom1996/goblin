@@ -33,7 +33,7 @@ class Application
         self::$_config = $config;
         $class = new \ReflectionClass($this);
         $b = dirname($class->getFileName());
-        var_dump($b);
+//        var_dump($b);
         \YiiS::setAlias('@app', '/www/wwwroot/yiis-test');
     }
 
@@ -84,14 +84,14 @@ class Application
     {
         if (strpos($className, '\\') !== false) {
             $classFile = \YiiS::getAlias('@' . str_replace('\\', '/', $className) . '.php', false);
-            var_dump($classFile);
+//            var_dump($classFile);
             if ($classFile === false || !is_file($classFile)) {
                 return;
             }
         } else {
             return;
         }
-        var_dump($classFile);
+//        var_dump($classFile);
         include $classFile;
 
 //        if (YII_DEBUG && !class_exists($className, false) && !interface_exists($className, false) && !trait_exists($className, false)) {

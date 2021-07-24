@@ -41,7 +41,7 @@ class UrlManager extends Component
         $suffix = (string) $this->suffix;
         $pathInfo = $request->getPathInfo();
 
-        var_dump('path info', $pathInfo);
+//        var_dump('path info', $pathInfo);
 
         // pathInfo 应该永远不会为空
         if ($suffix !== '' && $pathInfo !== '') {

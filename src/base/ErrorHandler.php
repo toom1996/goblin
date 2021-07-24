@@ -7,6 +7,6 @@ class ErrorHandler
 
     public function handleException($exception)
     {
-        var_dump($exception);
+//        var_dump($exception);
     }
 }

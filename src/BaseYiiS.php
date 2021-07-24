@@ -35,7 +35,7 @@ class BaseYiiS extends Module
 
     public static function getAlias($alias, $throwException = true)
     {
-        var_dump(self::$aliases);
+//        var_dump(self::$aliases);
         if (strpos($alias, '@') !== 0) {
             // not an alias
             return $alias;
