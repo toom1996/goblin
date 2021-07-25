@@ -4,7 +4,6 @@ namespace toom1996\web;
 
 use Swoole\Coroutine;
 use toom1996\base\Component;
-use toom1996\YiiS;
 
 /**
  * Class Request
@@ -91,13 +90,12 @@ class Request extends Component
 
 
     /**
-     * 将当前请求解析为路由和相关参数。
      * Resolves the current request into a route and the associated parameters.
      * @return array the first element is the route, and the second is the associated parameters.
      */
     public function resolve()
     {
-        $result = YiiS::$app->getUrlManager()->parseRequest($this);
+        $result = \YiiS::$app->getUrlManager()->parseRequest($this);
         if ($result !== false) {
             return [$result, $this->getQueryParams()];
         }

@@ -68,7 +68,7 @@ class Module extends Component
     public function runAction($route)
     {
         $parts = $this->createController($route);
-        var_dump($parts);
+//        var_dump($parts);
 //        if (is_array($parts)) {
 //            /* @var $controller Controller */
 //            list($controller, $actionID) = $parts;
@@ -106,8 +106,8 @@ class Module extends Component
             $id = $route;
             $route = '';
         }
-        echo ('id -> ' . $id);
-        echo ('route -> ' . $route);
+//        echo ('id -> ' . $id);
+//        echo ('route -> ' . $route);
         // module and controller map take precedence
         if (isset($this->controllerMap[$id])) {
             $controller = Toom::createObject($this->controllerMap[$id], [$id, $this]);
@@ -115,8 +115,8 @@ class Module extends Component
         }
 
         $module = $this->getModule($id);
-        echo 'module' . PHP_EOL;
-        var_dump($module);
+//        echo 'module' . PHP_EOL;
+//        var_dump($module);
 //        if ($module !== null) {
 //            return $module->createController($route);
 //        }
@@ -127,8 +127,8 @@ class Module extends Component
         }
 //
         $controller = $this->createControllerByID($id);
-        var_dump($controller);
-        var_dump($route);
+//        var_dump($controller);
+//        var_dump($route);
 //        if ($controller === null && $route !== '') {
 //            echo 'llll';
 //            $controller = $this->createControllerByID($id . '/' . $route);
@@ -197,7 +197,7 @@ class Module extends Component
         }
 
         if ($this->isIncorrectClassNameOrPrefix($className, $prefix)) {
-            echo 'isIncorrectClassNameOrPrefix';
+//            echo 'isIncorrectClassNameOrPrefix';
             return null;
         }
 
@@ -205,10 +205,9 @@ class Module extends Component
                 return ucfirst($matches[1]);
             }, ucfirst($className)) . 'Controller';
         $className = ltrim($this->controllerNamespace . '\\' . str_replace('/', '\\', $prefix) . $className, '\\');
-        echo 'className' . PHP_EOL;
-        var_dump($className);
-        var_dump(new SiteController());
-        var_dump(class_exists('app\controllers\SiteController'));
+//        echo 'className' . PHP_EOL;
+//        var_dump($className);
+
         if (strpos($className, '-') !== false || !class_exists($className)) {
             return null;
         }

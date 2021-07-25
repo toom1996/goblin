@@ -30,7 +30,7 @@ class Response
 
     public function sendContent()
     {
-        return '12';
+        return 'send content';
     }
 
 }
