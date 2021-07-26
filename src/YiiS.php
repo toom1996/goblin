@@ -1,5 +1,8 @@
 <?php
 
+namespace toom1996;
+
+use toom1996\base\UnknownClassException;
 use toom1996\web\Request;
 use toom1996\web\UrlManager;
 use toom1996\BaseYiiS;
@@ -42,18 +45,16 @@ class YiiS extends BaseYiiS
         self::$config = $config;
     }
 
-
-
-
+    
     /**
-     *  运行app
-     *  Run application
+     * Run application
      *
      * @param  \Swoole\Http\Request   $request
      * @param  \Swoole\Http\Response  $response
      *
      * @return mixed
      */
+    #[See("https://xxxxxxxx/xxxx/xxx.html")]
     public function run($request, \Swoole\Http\Response &$response)
     {
         try {
@@ -66,7 +67,6 @@ class YiiS extends BaseYiiS
     }
 
     /**
-     * 初始化并引到部分组件
      * Initializes and executes bootstrap components.
      */
     public function bootstrap()
@@ -119,7 +119,7 @@ class YiiS extends BaseYiiS
 
 
     /**
-     * Handles the specified request.
+     * Handles request.
      *
      * @param \toom1996\web\Request $request
      *
@@ -130,7 +130,8 @@ class YiiS extends BaseYiiS
 
         try {
             list($route, $params) = $request->resolve();
-        } catch (UrlNormalizerRedirectException $e) {
+        } catch (\toom1996\base\NotFoundHttpException $e) {
+
 //                $url = $e->url;
 //                if (is_array($url)) {
 //                    if (isset($url[0])) {
@@ -142,6 +143,7 @@ class YiiS extends BaseYiiS
 //
 //                return $this->getResponse()->redirect(Url::to($url, $e->scheme), $e->statusCode);
         }
+        echo 'sdfsdfsdfsd';
 //        try {
 //            Yii::debug("Route requested: '$route'", __METHOD__);
             $this->requestedRoute = $route;
@@ -184,7 +186,7 @@ class YiiS extends BaseYiiS
     }
 
     /**
-     * Returns the configuration of core application components.
+     * Returns default YIIS core component.
      * @return array
      */
    public function coreComponents()

@@ -3,6 +3,9 @@
 namespace toom1996\web;
 
 use toom1996\base\Component;
+use yii\base\InvalidConfigException;
+use yii\web\UrlRule;
+use yii\web\UrlRuleInterface;
 
 /**
  * Class UrlManager
@@ -11,40 +14,78 @@ use toom1996\base\Component;
  */
 class UrlManager extends Component
 {
+    public $enablePrettyUrl = false;
 
-    public $rules = [];
+    public $rules = [
+
+    ];
 
 
-    public $suffix;
+    public $suffix = '';
 
     /**
+     * Init UrlManager
+     */
+    public function init()
+    {
+        parent::init();
+
+//        $this->rules = $this->buildRules($this->rules);
+
+    }
+
+    /**
+     * Builds URL rule objects from the given rule declarations.
      *
-     * @param Request $request
+     * @param array $ruleDeclarations the rule declarations. Each array element represents a single rule declaration.
+     * Please refer to [[rules]] for the acceptable rule formats.
+     * @return UrlRuleInterface[] the rule objects built from the given rule declarations
+     * @throws InvalidConfigException if a rule declaration is invalid
+     */
+    protected function buildRules($ruleDeclarations)
+    {
+        $builtRules = [];
+        $verbs = 'GET|HEAD|POST|PUT|PATCH|DELETE|OPTIONS';
+        foreach ($ruleDeclarations as $key => $rule) {
+            if (is_string($rule)) {
+                $rule = ['route' => $rule];
+                if (preg_match("/^((?:($verbs),)*($verbs))\\s+(.*)$/", $key, $matches)) {
+                    $rule['verb'] = explode(',', $matches[1]);
+                    // rules that are not applicable for GET requests should not be used to create URLs
+                    if (!in_array('GET', $rule['verb'], true)) {
+                        $rule['mode'] = UrlRule::PARSING_ONLY;
+                    }
+                    $key = $matches[4];
+                }
+                $rule['pattern'] = $key;
+            }
+            if (is_array($rule)) {
+                $rule = Yii::createObject(array_merge($this->ruleConfig, $rule));
+            }
+            if (!$rule instanceof UrlRuleInterface) {
+                throw new InvalidConfigException('URL rule class must implement UrlRuleInterface.');
+            }
+            $builtRules[] = $rule;
+        }
+
+        $this->setBuiltRulesCache($ruleDeclarations, $builtRules);
+
+        return $builtRules;
+    }
+
+    /**
+     * /hello/{id}/{sdfsdf}/
+     * @param  Request  $request
+     *
+     * @return bool|false|string
      */
     public function parseRequest($request)
     {
-//        /* @var $rule UrlRule */
-//        foreach ($this->rules as $rule) {
-//            $result = $rule->parseRequest($this, $request);
-//            if (YII_DEBUG) {
-//                Yii::debug([
-//                    'rule' => method_exists($rule, '__toString') ? $rule->__toString() : get_class($rule),
-//                    'match' => $result !== false,
-//                    'parent' => null,
-//                ], __METHOD__);
-//            }
-//            if ($result !== false) {
-//                return $result;
-//            }
-//        }
-
+        // The url suffix. (e.g http://abc.com/1.html).
         $suffix = (string) $this->suffix;
         $pathInfo = $request->getPathInfo();
 
-//        var_dump('path info', $pathInfo);
-
-        // pathInfo 应该永远不会为空
-        if ($suffix !== '' && $pathInfo !== '') {
+        if ($pathInfo !== '/' && $this->suffix !== '') {
             $n = strlen($this->suffix);
             if (substr_compare($pathInfo, $this->suffix, -$n, $n) === 0) {
                 $pathInfo = substr($pathInfo, 0, -$n);
@@ -52,17 +93,10 @@ class UrlManager extends Component
                     // suffix alone is not allowed
                     return false;
                 }
-            } else {
-                // suffix doesn't match
-                return false;
             }
+        }else{
+            return false;
         }
-//
-//        if ($normalized) {
-//            // pathInfo was changed by normalizer - we need also normalize route
-//            return $this->normalizer->normalizeRoute([$pathInfo, []]);
-//        }
-//
         return $pathInfo;
     }
 }

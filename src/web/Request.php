@@ -2,9 +2,10 @@
 
 namespace toom1996\web;
 
+use app\controllers\SiteController;
 use Swoole\Coroutine;
 use toom1996\base\Component;
-use YiiS;
+use toom1996\base\NotFoundHttpException;
 
 /**
  * Class Request
@@ -91,18 +92,34 @@ class Request extends Component
 
 
     /**
-     * 将当前请求解析为路由和相关参数。
      * Resolves the current request into a route and the associated parameters.
-     * @return array the first element is the route, and the second is the associated parameters.
+     *
+     * @return array the first element is the route, and the second is the
+     *     associated parameters.
+     * @throws \toom1996\base\NotFoundHttpException
      */
+    #[See("https://xxxxxxxx/xxxx/xxx.html")]
+    #[Foo("https://xxxxxxxx/xxxx/xxx.html2")]
     public function resolve()
     {
-        $result = YiiS::$app->getUrlManager()->parseRequest($this);
+        $controller = new \ReflectionClass(Request::class);
+        $methods = $controller->getMethod('resolve');
+        var_dump($methods->getAttributes()[1]->getName());
+
+
+
+        $result = \YiiS::$app->getUrlManager()->parseRequest($this);
         if ($result !== false) {
             return [$result, $this->getQueryParams()];
         }
 
-        throw new NotFoundHttpException(Yii::t('yii', 'Page not found.'));
+        throw new NotFoundHttpException('Page not found');
+    }
+
+    #[Params("Foo", "argument")]
+    #[Params("Foo1", "argument1")]
+    public function test (){
+
     }
 
 
@@ -117,36 +134,10 @@ class Request extends Component
     public function getPathInfo()
     {
         if ($this->_pathInfo === null) {
-            $this->_pathInfo = $this->resolvePathInfo();
+            $this->_pathInfo = $this->server['path_info'];
         }
 
         return $this->_pathInfo;
-    }
-
-    public function resolvePathInfo()
-    {
-        $pathInfo = $this->getUrl();
-
-
-        $pathInfo = urldecode($pathInfo);
-
-        // 不知道是干嘛的, 编码??
-        // try to encode in UTF8 if not so
-        // http://w3.org/International/questions/qa-forms-utf-8.html
-        if (!preg_match('%^(?:
-            [\x09\x0A\x0D\x20-\x7E]              # ASCII
-            | [\xC2-\xDF][\x80-\xBF]             # non-overlong 2-byte
-            | \xE0[\xA0-\xBF][\x80-\xBF]         # excluding overlongs
-            | [\xE1-\xEC\xEE\xEF][\x80-\xBF]{2}  # straight 3-byte
-            | \xED[\x80-\x9F][\x80-\xBF]         # excluding surrogates
-            | \xF0[\x90-\xBF][\x80-\xBF]{2}      # planes 1-3
-            | [\xF1-\xF3][\x80-\xBF]{3}          # planes 4-15
-            | \xF4[\x80-\x8F][\x80-\xBF]{2}      # plane 16
-            )*$%xs', $pathInfo)
-        ) {
-            $pathInfo = $this->utf8Encode($pathInfo);
-        }
-        return (string) $pathInfo;
     }
 
     /**
@@ -158,6 +149,7 @@ class Request extends Component
      */
     public function getUrl()
     {
+        var_dump($this);
         $requestUri = $this->server['request_uri'];
         if ($requestUri !== '' && $requestUri[0] !== '/') {
             $requestUri = preg_replace('/^(http|https):\/\/[^\/]+/i', '', $requestUri);
@@ -219,7 +211,8 @@ class Request extends Component
     /**
      * Returns the request parameters given in the [[queryString]].
      *
-     * This method will return the contents of `$_GET` if params where not explicitly set.
+     * This method will return the contents of
+     * This method will return the contents of swoole `$_GET` if params where not explicitly set.
      * @return array the request GET parameter values.
      * @see setQueryParams()
      */

@@ -33,9 +33,16 @@ class BaseYiiS extends Module
         ];
     }
 
+    /**
+     * Get Alias
+     *
+     * @param        $alias
+     * @param  bool  $throwException
+     *
+     * @return bool|string
+     */
     public static function getAlias($alias, $throwException = true)
     {
-//        var_dump(self::$aliases);
         if (strpos($alias, '@') !== 0) {
             // not an alias
             return $alias;
@@ -55,8 +62,6 @@ class BaseYiiS extends Module
                 }
             }
         }
-
-
         return false;
     }
 
