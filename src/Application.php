@@ -2,8 +2,11 @@
 namespace toom1996;
 
 use Swoole\Coroutine;
+use toom1996\base\AnnotationScanner;
+use toom1996\base\Exception;
 use toom1996\base\Module;
 use toom1996\base\UnknownClassException;
+use toom1996\helpers\BaseFileHelper;
 
 
 /**
@@ -34,7 +37,20 @@ class Application
     {
         $this->config = $config;
         \YiiS::setAlias('@app', $config['basePath']);
+        $this->initConfig();
     }
+
+    public function initConfig()
+    {
+        $this->scanRouter();
+    }
+
+    private function scanRouter()
+    {
+        var_dump($this->config['basePath'] . '/controllers');
+        $scan = (new AnnotationScanner($this->config['basePath'] . '/controllers'))->scan();
+    }
+    
     
     /**
      * Load a new YIIS object from application.

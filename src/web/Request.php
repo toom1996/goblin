@@ -98,8 +98,7 @@ class Request extends Component
      *     associated parameters.
      * @throws \toom1996\base\NotFoundHttpException
      */
-    #[See("https://xxxxxxxx/xxxx/xxx.html")]
-    #[Foo("https://xxxxxxxx/xxxx/xxx.html2")]
+    #[Url('api/v1/test/{$dd}', "xxx")]
     public function resolve()
     {
         $controller = new \ReflectionClass(Request::class);
