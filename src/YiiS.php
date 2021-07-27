@@ -1,7 +1,5 @@
 <?php
 
-namespace toom1996;
-
 use toom1996\base\UnknownClassException;
 use toom1996\web\Request;
 use toom1996\web\UrlManager;

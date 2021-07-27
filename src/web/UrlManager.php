@@ -3,6 +3,7 @@
 namespace toom1996\web;
 
 use toom1996\base\Component;
+use toom1996\helpers\BaseFileHelper;
 use yii\base\InvalidConfigException;
 use yii\web\UrlRule;
 use yii\web\UrlRuleInterface;
@@ -19,6 +20,8 @@ class UrlManager extends Component
     public $rules = [
 
     ];
+
+    public $route = [];
 
 
     public $suffix = '';
@@ -98,5 +101,46 @@ class UrlManager extends Component
             return false;
         }
         return $pathInfo;
+    }
+
+
+    /**
+     * Parse router for scanner arguments
+     * @param  array  $config
+     */
+    public static function buildRoute(array $config)
+    {
+        $urlManagerRoute = [];
+        $verbs = ['GET', 'HEAD', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'];
+        $route = [];
+        foreach ($config['scanner']['arguments'] as $className => $method) {
+            foreach ($method as $methodName => $function) {
+                foreach ($function as $annotationName => $arguments) {
+                    if ($annotationName === 'Url') {
+                        $route = explode(' ', current($arguments));
+                        if (count($route) >= 2) {
+                            list($verb, $url) = $route;
+                        }else{
+                            $url = $route;
+                        }
+                        var_dump($url);
+                        $route[$url] = [
+                            'class' => $className,
+                            'func' => $methodName,
+                            'url' => $function['Url'],
+                            'verbs' => $verb ?? $verbs,
+                        ];
+                    }
+                }
+            }
+        }
+
+        var_dump($route);
+//        // overwrite annotation if set urlManager route
+//        foreach ($config['components']['urlManager']['route'] as $route) {
+//            list($verb, $url) = explode(' ', key($route));
+//            var_dump($verb);
+//            var_dump($url);
+//        }
     }
 }
