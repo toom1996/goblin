@@ -98,27 +98,14 @@ class Request extends Component
      *     associated parameters.
      * @throws \toom1996\base\NotFoundHttpException
      */
-    #[Url('api/v1/test/{$dd}', "xxx")]
     public function resolve()
     {
-        $controller = new \ReflectionClass(Request::class);
-        $methods = $controller->getMethod('resolve');
-        var_dump($methods->getAttributes()[1]->getName());
-
-
-
         $result = \YiiS::$app->getUrlManager()->parseRequest($this);
         if ($result !== false) {
             return [$result, $this->getQueryParams()];
         }
 
         throw new NotFoundHttpException('Page not found');
-    }
-
-    #[Params("Foo", "argument")]
-    #[Params("Foo1", "argument1")]
-    public function test (){
-
     }
 
 
@@ -148,7 +135,6 @@ class Request extends Component
      */
     public function getUrl()
     {
-        var_dump($this);
         $requestUri = $this->server['request_uri'];
         if ($requestUri !== '' && $requestUri[0] !== '/') {
             $requestUri = preg_replace('/^(http|https):\/\/[^\/]+/i', '', $requestUri);

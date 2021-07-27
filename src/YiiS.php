@@ -128,6 +128,8 @@ class YiiS extends BaseYiiS
 
         try {
             list($route, $params) = $request->resolve();
+            var_dump($route);
+            var_dump($params);
         } catch (\toom1996\base\NotFoundHttpException $e) {
 
 //                $url = $e->url;

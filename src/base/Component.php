@@ -49,19 +49,15 @@ class Component
 
     public function component($id, $value = null)
     {
-//        echo "instance component {$id}" . PHP_EOL;
         if (isset($this->component[$id])) {
-//            echo "is instance component {$id}" . PHP_EOL;
             return $this->component[$id];
         }
 
         if (isset(YiiS::$config['components'][$id])) {
-//            echo "create {$id} component" . PHP_EOL;
             $className = YiiS::$config['components'][$id]['class'];
             return $this->component[$id] = new $className($id, $value);
         }else{
-//            echo "can't find {$id} component";
-            //            throw new Error("can't find {$id} component");
+            // TODO 
         }
 
     }

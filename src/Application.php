@@ -7,6 +7,7 @@ use toom1996\base\Exception;
 use toom1996\base\Module;
 use toom1996\base\UnknownClassException;
 use toom1996\helpers\BaseFileHelper;
+use toom1996\web\UrlManager;
 
 
 /**
@@ -32,23 +33,43 @@ class Application
      * @var array 
      */
     public $config;
-    
+
+    /**
+     * Application constructor.
+     *
+     * @param  array  $config
+     *
+     * @throws \ReflectionException
+     * @throws \toom1996\base\Exception
+     */
     public function __construct($config = [])
     {
-        $this->config = $config;
         \YiiS::setAlias('@app', $config['basePath']);
+        $this->config = $config;
         $this->initConfig();
     }
 
+    /**
+     * Init config for Application
+     * @throws \ReflectionException
+     * @throws \toom1996\base\Exception
+     */
     public function initConfig()
     {
-        $this->scanRouter();
+        $this->config['scanner']['arguments'] = $this->scanRouter();
+
+        $this->config['components']['urlManager']['route'] = UrlManager::buildRoute($this->config);
     }
 
-    private function scanRouter()
+    /**
+     * Scan all route
+     * @return array
+     * @throws \ReflectionException
+     * @throws \toom1996\base\Exception
+     */
+    private function scanRouter(): array
     {
-        var_dump($this->config['basePath'] . '/controllers');
-        $scan = (new AnnotationScanner($this->config['basePath'] . '/controllers'))->scan();
+        return (new AnnotationScanner($this->config))->scan();
     }
     
     
@@ -82,9 +103,9 @@ class Application
 
         include $classFile;
 
-        if (YIIS_DEBUG && !class_exists($className, false) && !interface_exists($className, false) && !trait_exists($className, false)) {
-            throw new UnknownClassException("Unable to find '$className' in file: $classFile. Namespace missing?");
-        }
+//        if (YIIS_DEBUG && !class_exists($className, false) && !interface_exists($className, false) && !trait_exists($className, false)) {
+//            throw new UnknownClassException("Unable to find '$className' in file: $classFile. Namespace missing?");
+//        }
     }
 }
 

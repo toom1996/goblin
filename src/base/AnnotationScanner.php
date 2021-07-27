@@ -6,6 +6,12 @@ namespace toom1996\base;
 
 use toom1996\helpers\BaseFileHelper;
 
+/**
+ * Class AnnotationScanner
+ *
+ * @author TOOM <1023150697@qq.com>
+ * 
+ */
 class AnnotationScanner
 {
     /**
@@ -13,26 +19,40 @@ class AnnotationScanner
      * @var directory 
      */
     private $_scanDir;
-    
+
+    /**
+     * @var string[]
+     */
     private $_annotation;
+
+    /**
+     * Default scan attributes
+     * @var array|string[]
+     */
+    private $_attributes = ['Url'];
+
+    private $_arguments = [];
 
     /**
      * AnnotationScanner constructor.
      *
-     * @param $dir directory to be scanned
+     * @param  array  $config
      */
-    public function __construct($dir)
+    public function __construct(array $config)
     {
-        $this->_scanDir = $dir;
+        $this->_scanDir = $config['basePath'];
+        $this->_attributes = $config['scanner']['attributes'];
     }
 
 
     /**
-     * 
+     * Scan controller annotation
+     * @return array
+     * @throws \ReflectionException
+     * @throws \toom1996\base\Exception
      */
     public function scan()
     {
-        $route = [];
         $controllers = BaseFileHelper::findFiles($this->_scanDir, ['only' => ['*Controller.php']]);
         foreach ($controllers as $controller) {
             $className = '\\' . $this->getNameSpace($controller) . '\\' . basename(str_replace('.php', '', $controller));
@@ -40,12 +60,15 @@ class AnnotationScanner
             foreach ($ref->getMethods() as $method) {
                 $attr = $method->getAttributes();
                 foreach ($attr as $arg) {
-                    if ($arg->getName() === '')
-                    var_dump($arg->getArguments());
-                    var_dump($arg->getName());
+                    $attributesName = explode('\\',$arg->getName());
+                    $attributesName = array_pop($attributesName);
+                    if (in_array($attributesName, $this->_attributes )) {
+                        $this->_annotation[$className][$method->getName()][$attributesName] = $arg->getArguments();
+                    }
                 }
             }
         }
+        return $this->_annotation;
     }
 
 
