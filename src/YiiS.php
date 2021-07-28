@@ -52,7 +52,6 @@ class YiiS extends BaseYiiS
      *
      * @return mixed
      */
-    #[See("https://xxxxxxxx/xxxx/xxx.html")]
     public function run($request, \Swoole\Http\Response &$response)
     {
         try {
@@ -60,6 +59,7 @@ class YiiS extends BaseYiiS
             return $this->handleRequest($this->getRequest($request))
                 ->send($response);
         } catch (Throwable $e) {
+            echo 'Throwable';
             $this->getErrorHandler()->handleException($e);
         }
     }
@@ -131,6 +131,7 @@ class YiiS extends BaseYiiS
             var_dump($route);
             var_dump($params);
         } catch (\toom1996\base\NotFoundHttpException $e) {
+            // TODO 跳转到404页面
 
 //                $url = $e->url;
 //                if (is_array($url)) {
