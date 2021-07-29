@@ -132,6 +132,7 @@ class YiiS extends BaseYiiS
             var_dump($params);
         } catch (\toom1996\base\NotFoundHttpException $e) {
             // TODO 跳转到404页面
+            var_dump($e->getMessage());
 
 //                $url = $e->url;
 //                if (is_array($url)) {
