@@ -5,8 +5,10 @@ namespace toom1996\web;
 use Psr\Container\ContainerInterface;
 use toom1996\base\Component;
 use toom1996\base\NotFoundHttpException;
+use toom1996\helpers\BaseArrayHelper;
 use toom1996\helpers\BaseFileHelper;
 use yii\base\InvalidConfigException;
+use yii\helpers\ArrayHelper;
 use yii\web\UrlRule;
 use yii\web\UrlRuleInterface;
 
@@ -18,6 +20,7 @@ use yii\web\UrlRuleInterface;
 class UrlManager extends Component
 {
     private static $_verbs = 'GET|HEAD|POST|PUT|PATCH|DELETE|OPTIONS';
+
 
     public $rules = [
 
@@ -61,6 +64,8 @@ class UrlManager extends Component
 //            }
 //        }
 
+        var_dump(\YiiS::$app->request);
+        $this->matchRoute($pathInfo);
         if (!isset($this->route[$pathInfo])) {
             // TODO new Exception
             throw new NotFoundHttpException("Page not found~");
@@ -85,60 +90,42 @@ class UrlManager extends Component
         foreach ($config['scanner']['arguments'] as $className => $method) {
             foreach ($method as $methodName => $function) {
                 if (isset($function['Url'])) {
-                    list($verbs, $url) = self::buildNode($function['Url']);
-                    $buildRoute[$url] = [
-                        'verbs' => $verbs,
-                        'func' => $className . '\\' . $methodName
-                    ];
+                    $node = self::buildNode(self::parseRoute($function['Url']), $className . '\\' . $methodName);
+                    $buildRoute = BaseArrayHelper::merge($buildRoute, $node);
                 }
             }
         }
         // overwrite annotation if set urlManager route
         foreach ($config['components']['urlManager']['route'] as $routes) {
-
             foreach ($routes as $route => $path) {
                 if (is_array($path)) {
                     // Route group
-                    foreach ($path as $childRoute => $childPath) {
-                        list($verbs, $url) = self::buildNode($childRoute);
-                        $buildRoute[self::trimSlashes($route . $url)] = [
-                            'verbs' => $verbs,
-                            'func' => $childPath
-                        ];
+                    foreach ($path as $childRoute => $method) {
+                        list($verbs, $url) = self::parseRoute($childRoute);
+                        $node = self::buildNode([$verbs, $route . $url], $method);
+                        $buildRoute = BaseArrayHelper::merge($buildRoute, $node);
                     }
                 }else{
-                    list($verbs, $url) = self::buildNode($route);
-                    $buildRoute[$url] = [
-                        'verbs' => $verbs,
-                        'func' => $path
-                    ];
+                    $node = self::buildNode(self::parseRoute($route), $path);
+                    $buildRoute = BaseArrayHelper::merge($buildRoute, $node);
                 }
             }
-
-//            foreach ($routes as $route) {
-//                var_dump($route);
-//                list($verbs, $url) = self::buildNode(key($route));
-//                $buildRoute[$url] = [
-//                    'verbs' => $verbs,
-//                    'func' => current($route)
-//                ];
-//            }
         }
-
-        var_dump($buildRoute);
         return $buildRoute;
     }
 
 
     /**
-     * Build urlManager route
+     * Build urlManager route.
+     * It can return route verbs and trim url.
      *
-     * @param $route
+     * @param $route `(e.g GET /xxx)`
      *
      * @return array
      */
-    private static function buildNode($route) : array
+    private static function parseRoute($route) : array
     {
+        // Compatible with routing in the configuration
         if (is_array($route)) {
             if (isset($route[0])) {
                 $route = $route[0];
@@ -179,5 +166,59 @@ class UrlManager extends Component
             $url = rtrim($url, '/');
         }
         return preg_replace('#/+#', '/', $url);
+    }
+
+    /**
+     * Build route tree node.
+     * When route is /xx/dd/ff. it's will be build to ` xx => [ dd => [ ff => [] ]]`
+     *
+     * @param $url
+     *
+     * @param $class
+     *
+     * @return array
+     */
+    private static function buildNode($url, $class): array
+    {
+        if (!is_array($url)) {
+            // TODO throw new Exception
+        }
+        list($verbs, $url) = $url;
+        $ex = array_filter(explode('/', $url));
+        $node = $tmp = [];
+        foreach ($ex as $pattern) {
+            if ($pattern) {
+                array_push($tmp, $pattern);
+                $path = implode('@', $tmp);
+                if (end($ex) === $pattern) {
+                    BaseArrayHelper::setValue($node, "{$path}", [
+                        'verbs' => $verbs,
+                        'method' => $class,
+                    ], '@');
+                }else{
+                    BaseArrayHelper::setValue($node, "{$path}", [], '@');
+                }
+            }
+        }
+        return $node;
+    }
+
+
+    /**
+     * Match route.
+     * @param $route
+     *
+     * @throws \Exception
+     */
+    private function matchRoute($route)
+    {
+        // Match url manager route
+        $pattern = explode('/', ltrim($route, '/'));
+        if (isset(BaseArrayHelper::getValue($this->route, $pattern)['method'])) {
+            echo BaseArrayHelper::getValue($this->route, $pattern)['method'];
+        }
+        // Match url manager route with preg
+
+        // Match url manager route with action
     }
 }
