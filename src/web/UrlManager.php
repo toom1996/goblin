@@ -218,6 +218,27 @@ class UrlManager extends Component
             echo BaseArrayHelper::getValue($this->route, $pattern)['method'];
         }
         // Match url manager route with preg
+        $tmp = [];
+        foreach ($pattern as $k => $p) {
+            $tmp[] = $p;
+            if (!BaseArrayHelper::getValue($this->route, $tmp)) {
+                $c = $tmp;
+                array_pop($c);
+                var_dump(BaseArrayHelper::getValue($this->route, end($tmp)));
+                var_dump(BaseArrayHelper::getValue($this->route, $c));
+                foreach (BaseArrayHelper::getValue($this->route, $c) as $preg => $value) {
+                    preg_match('/<.*:.*>/', $preg, $res);
+                    if (isset($res[0])) {
+                        preg_match("/{$res[0]}/", $preg, $pattern);
+                        var_dump("/{$res[0]}/");
+                        var_dump($pattern);
+                    }
+                }
+
+                var_dump($c);
+                echo '没找到' . $p;
+            }
+        }
 
         // Match url manager route with action
     }

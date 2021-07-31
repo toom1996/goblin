@@ -59,6 +59,7 @@ class Application
         $this->config['scanner']['arguments'] = $this->scanRouter();
 
         $this->config['components']['urlManager']['route'] = UrlManager::buildRouteTree($this->config);
+        var_dump($this->config);
     }
 
     /**
