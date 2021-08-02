@@ -11,6 +11,7 @@ use toom1996\BaseYiiS;
  * @author: TOOM <1023150697@qq.com>
  * @property-read \toom1996\web\Request $request
  * @property-read \toom1996\web\ErrorHandler $errorHandler
+ * @property-read \toom1996\web\Response $response
  */
 class YiiS extends BaseYiiS
 {
@@ -132,6 +133,7 @@ class YiiS extends BaseYiiS
             var_dump($params);
         } catch (\toom1996\base\NotFoundHttpException $e) {
             // TODO 跳转到404页面
+            YiiS::$app->response->setStatusCode(403);
             var_dump($e->getMessage());
 
 //                $url = $e->url;

@@ -65,11 +65,11 @@ class UrlManager extends Component
 //        }
 
         var_dump(\YiiS::$app->request);
-        $this->matchRoute($pathInfo);
-        if (!isset($this->route[$pathInfo])) {
-            // TODO new Exception
-            throw new NotFoundHttpException("Page not found~");
-        }
+        $pathInfo = $this->matchRoute($pathInfo);
+//        if (!isset($this->route[$pathInfo])) {
+//            // TODO new Exception
+//            throw new NotFoundHttpException("Page not found~");
+//        }
 
         var_dump($this->route[$pathInfo]);
         var_dump($pathInfo);
@@ -241,5 +241,7 @@ class UrlManager extends Component
         }
 
         // Match url manager route with action
+
+       return false;
     }
 }
