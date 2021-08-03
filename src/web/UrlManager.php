@@ -64,15 +64,22 @@ class UrlManager extends Component
 //            }
 //        }
 
-        var_dump(\YiiS::$app->request);
+        // PathInfo will be return action path (e.g `\app\controllers\api\v1\GoodsController\actionIndex`)
         $pathInfo = $this->matchRoute($pathInfo);
+        var_dump($pathInfo);
 //        if (!isset($this->route[$pathInfo])) {
 //            // TODO new Exception
 //            throw new NotFoundHttpException("Page not found~");
 //        }
-
-        var_dump($this->route[$pathInfo]);
-        var_dump($pathInfo);
+//        $a = explode('\\',$pathInfo);
+//        var_dump($a);
+//        $action = array_pop($a);
+//        var_dump($action);
+//        var_dump($a);
+//        $ref = new \ReflectionClass(implode('\\',$a));
+//        var_dump($ref->getMethod($action));
+//        $n = (new (implode('\\',$a)));
+//        call_user_func([$n, $action]);
         return $pathInfo;
     }
 
@@ -206,37 +213,43 @@ class UrlManager extends Component
 
     /**
      * Match route.
+     *
      * @param $route
      *
+     * @return bool|mixed
      * @throws \Exception
      */
     private function matchRoute($route)
     {
         // Match url manager route
         $pattern = explode('/', ltrim($route, '/'));
-        if (isset(BaseArrayHelper::getValue($this->route, $pattern)['method'])) {
-            echo BaseArrayHelper::getValue($this->route, $pattern)['method'];
+        $r = BaseArrayHelper::getValue($this->route, $pattern);
+        if (isset($r['method'])) {
+            return $r['method'];
         }
+
         // Match url manager route with preg
-        $tmp = [];
-        foreach ($pattern as $k => $p) {
-            $tmp[] = $p;
-            if (!BaseArrayHelper::getValue($this->route, $tmp)) {
-                $c = $tmp;
+        $key = [];
+        foreach ($pattern as $k => $childPattern) {
+            $key[] = $childPattern;
+            var_dump($key);
+            if (!BaseArrayHelper::getValue($this->route, $key)) {
+                $c = $key;
                 array_pop($c);
                 var_dump(BaseArrayHelper::getValue($this->route, end($tmp)));
+                var_dump($this->route);
                 var_dump(BaseArrayHelper::getValue($this->route, $c));
-                foreach (BaseArrayHelper::getValue($this->route, $c) as $preg => $value) {
-                    preg_match('/<.*:.*>/', $preg, $res);
-                    if (isset($res[0])) {
-                        preg_match("/{$res[0]}/", $preg, $pattern);
-                        var_dump("/{$res[0]}/");
-                        var_dump($pattern);
-                    }
-                }
+//                foreach (BaseArrayHelper::getValue($this->route, $c) as $preg => $value) {
+//                    preg_match('/<.*:.*>/', $preg, $res);
+//                    if (isset($res[0])) {
+//                        preg_match("/{$res[0]}/", $preg, $pattern);
+//                        var_dump("/{$res[0]}/");
+//                        var_dump($pattern);
+//                    }
+//                }
 
                 var_dump($c);
-                echo '没找到' . $p;
+                echo '没找到' . $childPattern;
             }
         }
 

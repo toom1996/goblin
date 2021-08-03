@@ -15,9 +15,17 @@ use yii\base\InvalidArgumentException;
  */
 class BaseYiiS extends Module
 {
+
+    /**
+     * Aliases.
+     * @var
+     */
     public static $aliases;
 
-    public static $config;
+    /**
+     * @var
+     */
+    protected static $config;
 
     public function coreComponents()
     {
@@ -34,7 +42,7 @@ class BaseYiiS extends Module
     }
 
     /**
-     * Get Alias
+     * Get alias.
      *
      * @param        $alias
      * @param  bool  $throwException

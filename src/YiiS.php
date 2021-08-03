@@ -31,7 +31,7 @@ class YiiS extends BaseYiiS
      * Application config
      * @var array
      */
-    public static $config;
+    protected static $config;
 
 
     /**
@@ -53,15 +53,21 @@ class YiiS extends BaseYiiS
      *
      * @return mixed
      */
-    public function run($request, \Swoole\Http\Response &$response)
+    public function run($request, \Swoole\Http\Response $response)
     {
         try {
+            ob_start();
             $this->bootstrap();
+            $response->detach();
+            $this->getResponse([
+                'fd' => $response->fd
+            ]);
+            var_dump(memory_get_usage());
             return $this->handleRequest($this->getRequest($request))
-                ->send($response);
+                ->send();
         } catch (Throwable $e) {
-            echo 'Throwable';
-            $this->getErrorHandler()->handleException($e);
+            return $this->end($e->getMessage());
+//            $this->getErrorHandler()->handleException($e);
         }
     }
 
@@ -129,8 +135,6 @@ class YiiS extends BaseYiiS
 
         try {
             list($route, $params) = $request->resolve();
-            var_dump($route);
-            var_dump($params);
         } catch (\toom1996\base\NotFoundHttpException $e) {
             // TODO 跳转到404页面
             YiiS::$app->response->setStatusCode(403);
@@ -151,21 +155,22 @@ class YiiS extends BaseYiiS
 //        try {
 //            Yii::debug("Route requested: '$route'", __METHOD__);
             $this->requestedRoute = $route;
-            $result = $this->runAction($route, $params);
+            $result = $this->runAction($route);
+//            var_dump($result);
 //            if ($result instanceof Response) {
 //                return $result;
 //            }
 //
-//            $response = $this->getResponse();
+            $response = $this->getResponse();
 //            if ($result !== null) {
-//                $response->data = $result;
+            $response->content = ob_get_clean();
 //            }
 //
 //            return $response;
 //        } catch (InvalidRouteException $e) {
 //            throw new NotFoundHttpException(Yii::t('yii', 'Page not found.'), $e->getCode(), $e);
 //        }
-        return $this->getResponse();
+        return $response;
     }
 
     public function init()
@@ -200,5 +205,13 @@ class YiiS extends BaseYiiS
            'response' => ['class' => 'toom1996\web\Response'],
            'errorHandler' => ['class' => 'toom1996\web\ErrorHandler'],
        ]);
+   }
+
+
+   public function end($content)
+   {
+       $response = $this->getResponse();
+       $response->content = $content;
+       return $response->send();
    }
 }

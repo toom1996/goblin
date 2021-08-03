@@ -20,12 +20,14 @@ class Component
      * @param $id
      * @param  null  $params
      */
-    public function __construct($id, $params = null)
+    public function __construct($id = null, $params = null)
     {
-        $config = array_merge(YiiS::$config['components'][$id], (array)$params);
-        foreach ($config as $name => $value) {
-            if (property_exists($this, $name)) {
-                $this->{$name} = $value;
+        if ($id) {
+            $config = array_merge(YiiS::$config['components'][$id], (array)$params);
+            foreach ($config as $name => $value) {
+                if (property_exists($this, $name)) {
+                    $this->{$name} = $value;
+                }
             }
         }
         $this->init();

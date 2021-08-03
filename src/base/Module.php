@@ -13,13 +13,12 @@ use yii\base\InvalidRouteException;
  */
 class Module extends Component
 {
-
     /**
      * 默认的应用路由。(e.g. www.xx.com => SiteController)
      * the default route of this application. Defaults to 'site'.
      * @var string
      */
-    public $defaultRoute = 'site';
+    public $defaultRoute = '@controllers/site/index';
 
     /**
      * @var array child modules of this module
@@ -50,7 +49,7 @@ class Module extends Component
 
     public $controllerNamespace = 'app\\controllers';
 
-    public function __construct($id, $params = null)
+    public function __construct($id = null, $params = null)
     {
         parent::__construct($id, $params);
     }
@@ -67,8 +66,7 @@ class Module extends Component
 
     public function runAction($route)
     {
-        $parts = $this->createController($route);
-//        var_dump($parts);
+        //        var_dump($parts);
 //        if (is_array($parts)) {
 //            /* @var $controller Controller */
 //            list($controller, $actionID) = $parts;
@@ -81,6 +79,7 @@ class Module extends Component
 //
 //            return $result;
 //        }
+        return $this->createController($route);
 //
 //        $id = $this->getUniqueId();
 //        throw new InvalidRouteException('Unable to resolve the request "' . ($id === '' ? $route : $id . '/' . $route) . '".');
@@ -89,53 +88,62 @@ class Module extends Component
 
     public function createController($route, $params = [])
     {
-        // 根目录
-        if ($route === '/') {
-            $route = $this->defaultRoute;
-        }
-        // double slashes or leading/ending slashes may cause substr problem
-        $route = trim($route, '/');
-        if (strpos($route, '//') !== false) {
-            return false;
-        }
 
-        // 不知道干啥的
-        if (strpos($route, '/') !== false) {
-            list($id, $route) = explode('/', $route, 2);
-        } else {
-            $id = $route;
-            $route = '';
-        }
-//        echo ('id -> ' . $id);
-//        echo ('route -> ' . $route);
-        // module and controller map take precedence
-        if (isset($this->controllerMap[$id])) {
-            $controller = Toom::createObject($this->controllerMap[$id], [$id, $this]);
-            return [$controller, $route];
-        }
+        $a = explode('\\', $route);
 
-        $module = $this->getModule($id);
-//        echo 'module' . PHP_EOL;
-//        var_dump($module);
-//        if ($module !== null) {
-//            return $module->createController($route);
+        $action = array_pop($a);
+        $ref = new \ReflectionClass(implode('\\',$a));
+        $n = (new (implode('\\',$a)));
+        return call_user_func([$n, $action]);
+//
+//
+//        // 根目录
+//        if ($route === '/') {
+//            $route = $this->defaultRoute;
+//        }
+//        // double slashes or leading/ending slashes may cause substr problem
+//        $route = trim($route, '/');
+//        if (strpos($route, '//') !== false) {
+//            return false;
 //        }
 //
-        if (($pos = strrpos($route, '/')) !== false) {
-            $id .= '/' . substr($route, 0, $pos);
-            $route = substr($route, $pos + 1);
-        }
-//
-        $controller = $this->createControllerByID($id);
-//        var_dump($controller);
-//        var_dump($route);
-//        if ($controller === null && $route !== '') {
-//            echo 'llll';
-//            $controller = $this->createControllerByID($id . '/' . $route);
+//        // 不知道干啥的
+//        if (strpos($route, '/') !== false) {
+//            list($id, $route) = explode('/', $route, 2);
+//        } else {
+//            $id = $route;
 //            $route = '';
 //        }
+////        echo ('id -> ' . $id);
+////        echo ('route -> ' . $route);
+//        // module and controller map take precedence
+//        if (isset($this->controllerMap[$id])) {
+//            $controller = Toom::createObject($this->controllerMap[$id], [$id, $this]);
+//            return [$controller, $route];
+//        }
 //
-        return $controller === null ? false : [$controller, $route];
+//        $module = $this->getModule($id);
+////        echo 'module' . PHP_EOL;
+////        var_dump($module);
+////        if ($module !== null) {
+////            return $module->createController($route);
+////        }
+////
+//        if (($pos = strrpos($route, '/')) !== false) {
+//            $id .= '/' . substr($route, 0, $pos);
+//            $route = substr($route, $pos + 1);
+//        }
+////
+//        $controller = $this->createControllerByID($id);
+////        var_dump($controller);
+////        var_dump($route);
+////        if ($controller === null && $route !== '') {
+////            echo 'llll';
+////            $controller = $this->createControllerByID($id . '/' . $route);
+////            $route = '';
+////        }
+////
+//        return $controller === null ? false : [$controller, $route];
     }
 
     /**
