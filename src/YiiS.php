@@ -62,11 +62,11 @@ class YiiS extends BaseYiiS
             $this->getResponse([
                 'fd' => $response->fd
             ]);
-            var_dump(memory_get_usage());
             return $this->handleRequest($this->getRequest($request))
                 ->send();
         } catch (Throwable $e) {
-            return $this->end($e->getMessage());
+
+            return $this->end();
 //            $this->getErrorHandler()->handleException($e);
         }
     }
@@ -89,6 +89,15 @@ class YiiS extends BaseYiiS
     public function getRequest($request = null)
     {
         return $this->component('request', $request);
+    }
+
+    /**
+     *
+     * @return \toom1996\web\View
+     */
+    public function getView()
+    {
+        return $this->component('view');
     }
 
     /**
@@ -208,10 +217,9 @@ class YiiS extends BaseYiiS
    }
 
 
-   public function end($content)
+   public function end()
    {
        $response = $this->getResponse();
-       $response->content = $content;
        return $response->send();
    }
 }

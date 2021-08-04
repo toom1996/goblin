@@ -83,6 +83,7 @@ class Application
      */
     public function load($app)
     {
+        var_dump(memory_get_usage());
         return new $app($this->config);
     }
 

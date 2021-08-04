@@ -12,4 +12,10 @@ class Controller extends Module
     {
 
     }
+
+    public function render($view, $params = [])
+    {
+        $content = \YiiS::$app->getView()->render($view, $params, $this);
+        return $this->renderContent($content);
+    }
 }
