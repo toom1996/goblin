@@ -59,7 +59,6 @@ class Application
         $this->config['scanner']['arguments'] = $this->scanRouter();
 
         $this->config['components']['urlManager']['route'] = UrlManager::buildRouteTree($this->config);
-        var_dump($this->config);
     }
 
     /**
@@ -83,7 +82,6 @@ class Application
      */
     public function load($app)
     {
-        var_dump(memory_get_usage());
         return new $app($this->config);
     }
 

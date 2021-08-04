@@ -5,6 +5,7 @@ namespace toom1996\web;
 use toom1996\base\Component;
 use toom1996\base\NotFoundHttpException;
 use yii\web\HeadersAlreadySentException;
+use YiiS;
 
 /**
  * Class Response
@@ -35,7 +36,7 @@ class Response extends Component
 
     /**
      * Swoole response.
-     * @var
+     * @var \Swoole\Http\Response
      */
     private $response;
 
@@ -130,9 +131,8 @@ class Response extends Component
     public function init()
     {
         $this->response = \Swoole\Http\Response::create($this->fd);
-        var_dump(\YiiS::$app->request);
         if ($this->version === null) {
-            if (isset($_SERVER['SERVER_PROTOCOL']) && $_SERVER['SERVER_PROTOCOL'] === 'HTTP/1.0') {
+            if (isset(YiiS::$app->request->server['server_protocol']) && YiiS::$app->request->server['server_protocol'] === 'HTTP/1.0') {
                 $this->version = '1.0';
             } else {
                 $this->version = '1.1';
@@ -158,7 +158,7 @@ class Response extends Component
     public function sendHeaders()
     {
         if (headers_sent($file, $line)) {
-            // TODO throw new exception
+             // TODO throw new exception
             throw new NotFoundHttpException("header is send");
         }
         if ($this->_headers) {
@@ -173,8 +173,8 @@ class Response extends Component
             }
         }
         $statusCode = $this->getStatusCode();
-        header("HTTP/{$this->version} {$statusCode} {$this->statusText}");
-        $this->sendCookies();
+        $this->response->header("x-debug", '1');
+        //        $this->sendCookies();
     }
 
     public function prepare()
@@ -247,6 +247,11 @@ class Response extends Component
     public function getStatusCode()
     {
         return $this->_statusCode;
+    }
+    
+    public function setHeader()
+    {
+        
     }
 
 }

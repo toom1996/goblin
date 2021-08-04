@@ -90,6 +90,11 @@ class Request extends Component
      */
     public $tmpfiles;
 
+    public function __construct($id = null, $params = null)
+    {
+        parent::__construct($id, $params);
+    }
+
 
     /**
      * Resolves the current request into a route and the associated parameters.

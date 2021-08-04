@@ -58,14 +58,14 @@ class YiiS extends BaseYiiS
         try {
             ob_start();
             $this->bootstrap();
+            $res = $this->getRequest($request);
             $response->detach();
             $this->getResponse([
                 'fd' => $response->fd
             ]);
-            return $this->handleRequest($this->getRequest($request))
+            return $this->handleRequest($res)
                 ->send();
         } catch (Throwable $e) {
-
             return $this->end();
 //            $this->getErrorHandler()->handleException($e);
         }
@@ -147,7 +147,6 @@ class YiiS extends BaseYiiS
         } catch (\toom1996\base\NotFoundHttpException $e) {
             // TODO 跳转到404页面
             YiiS::$app->response->setStatusCode(403);
-            var_dump($e->getMessage());
 
 //                $url = $e->url;
 //                if (is_array($url)) {
