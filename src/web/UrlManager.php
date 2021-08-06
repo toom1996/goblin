@@ -66,7 +66,6 @@ class UrlManager extends Component
 
         // PathInfo will be return action path (e.g `\app\controllers\api\v1\GoodsController\actionIndex`)
         $pathInfo = $this->matchRoute($pathInfo);
-        var_dump($pathInfo);
 //        if (!isset($this->route[$pathInfo])) {
 //            // TODO new Exception
 //            throw new NotFoundHttpException("Page not found~");
@@ -232,7 +231,6 @@ class UrlManager extends Component
         $key = [];
         foreach ($pattern as $k => $childPattern) {
             $key[] = $childPattern;
-            var_dump($key);
             if (!BaseArrayHelper::getValue($this->route, $key)) {
                 $c = $key;
                 array_pop($c);

@@ -2,11 +2,12 @@
 
 namespace toom1996\base;
 
-class ErrorHandler
+/**
+ * Class ErrorHandler
+ *
+ * @author: TOOM <1023150697@qq.com>
+ */
+abstract class ErrorHandler
 {
-
-    public function handleException($exception)
-    {
-        var_dump($exception);
-    }
+    public function handleException($exception){}
 }
