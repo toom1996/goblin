@@ -68,12 +68,10 @@ class YiiS extends BaseYiiS
         }catch (\Swoole\ExitException $e){
             $this->getResponse()->content = $e->getStatus();
         }catch (\Throwable $e) {
-            echo '##########';
 //            var_dump($e->getTrace());
 //            return $this->end(debug_backtrace());
             $this->getErrorHandler()->handleException($e);
         } finally {
-            echo '……………………………………………………';
             return $this->getResponse()->send();
         }
     }

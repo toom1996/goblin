@@ -10,4 +10,6 @@ namespace toom1996\base;
 abstract class ErrorHandler
 {
     public function handleException($exception){}
+
+    abstract protected function renderException($exception);
 }

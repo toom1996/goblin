@@ -261,6 +261,10 @@ class Response extends Component
     public function setContent($content)
     {
         $this->content = $content;
-   }
+    }
 
+    public function setStatusCodeByException()
+    {
+
+    }
 }
