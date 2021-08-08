@@ -31,7 +31,7 @@ class YiiS extends BaseYiiS
      * Application config
      * @var array
      */
-    protected static $config;
+    public static $config;
 
 
     /**
@@ -56,18 +56,21 @@ class YiiS extends BaseYiiS
     public function run($request, \Swoole\Http\Response $response)
     {
         try {
-            ob_start();
             $this->bootstrap();
-            $res = $this->getRequest($request);
+            // Detach swoole response
             $response->detach();
+            // See https://wiki.swoole.com/#/http_server?id=create-1
             $this->getResponse([
                 'fd' => $response->fd
             ]);
-            return $this->handleRequest($res)
+            return $this->handleRequest($this->getRequest($request))
                 ->send();
-        } catch (Throwable $e) {
-            return $this->end();
-//            $this->getErrorHandler()->handleException($e);
+        }catch (\Swoole\ExitException $e){
+            $this->getResponse()->content = $e->getStatus();
+        }catch (\Throwable $e) {
+            $this->getErrorHandler()->handleException($e);
+        } finally {
+            return $this->getResponse()->send();
         }
     }
 
@@ -141,13 +144,10 @@ class YiiS extends BaseYiiS
      */
     public function handleRequest($request)
     {
-
         try {
             list($route, $params) = $request->resolve();
         } catch (\toom1996\base\NotFoundHttpException $e) {
-            // TODO 跳转到404页面
-            YiiS::$app->response->setStatusCode(403);
-
+            YiiS::$app->getErrorHandler()->handleException($e);
 //                $url = $e->url;
 //                if (is_array($url)) {
 //                    if (isset($url[0])) {
@@ -159,11 +159,13 @@ class YiiS extends BaseYiiS
 //
 //                return $this->getResponse()->redirect(Url::to($url, $e->scheme), $e->statusCode);
         }
-        echo 'sdfsdfsdfsd';
 //        try {
 //            Yii::debug("Route requested: '$route'", __METHOD__);
             $this->requestedRoute = $route;
             $result = $this->runAction($route);
+//            echo '333333333';
+//            var_dump('pppppp');
+//            var_dump($result);
 //            var_dump($result);
 //            if ($result instanceof Response) {
 //                return $result;
@@ -171,7 +173,7 @@ class YiiS extends BaseYiiS
 //
             $response = $this->getResponse();
 //            if ($result !== null) {
-            $response->content = ob_get_clean();
+                $response->content = ob_get_clean();
 //            }
 //
 //            return $response;
@@ -183,6 +185,7 @@ class YiiS extends BaseYiiS
 
     public function init()
     {
+        ob_start();
         // merge core components with custom components
         foreach ($this->coreComponents() as $id => $component) {
             if (!isset(self::$config['components'][$id])) {
@@ -216,9 +219,16 @@ class YiiS extends BaseYiiS
    }
 
 
-   public function end()
+    /**
+     * Exit YiiS and send content.
+     * @param  int  $code
+     */
+   public function end($code = 0)
    {
        $response = $this->getResponse();
-       return $response->send();
+       $response->send();
+       exit(0);
    }
+
+
 }

@@ -56,9 +56,9 @@ class Application
      */
     public function initConfig()
     {
-        $this->config['scanner']['arguments'] = $this->scanRouter();
+//        $this->config['scanner']['arguments'] = $this->scanRouter();
 
-        $this->config['components']['urlManager']['route'] = UrlManager::buildRouteTree($this->config);
+        $this->config['components']['urlManager']['adapter'] = UrlManager::loadRoute($this->config);
     }
 
     /**

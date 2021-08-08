@@ -3,9 +3,11 @@
 namespace toom1996\web;
 
 use app\controllers\SiteController;
+use FastRoute\Dispatcher;
 use Swoole\Coroutine;
 use toom1996\base\Component;
 use toom1996\base\NotFoundHttpException;
+use toom1996\http\MethodNotAllowedHttpException;
 
 /**
  * Class Request
@@ -90,6 +92,12 @@ class Request extends Component
      */
     public $tmpfiles;
 
+    /**
+     * Request method.
+     * @var
+     */
+    private $_method;
+
     public function __construct($id = null, $params = null)
     {
         parent::__construct($id, $params);
@@ -105,12 +113,8 @@ class Request extends Component
      */
     public function resolve()
     {
-        $result = \YiiS::$app->getUrlManager()->parseRequest($this);
-        if ($result !== false) {
-            return [$result, $this->getQueryParams()];
-        }
-
-        throw new NotFoundHttpException('Page not found');
+        $result = \YiiS::$app->getUrlManager()->parseRequest();
+        return [$result[0], array_merge($this->getQueryParams(), $result[1])];
     }
 
 
@@ -132,7 +136,6 @@ class Request extends Component
     }
 
     /**
-     * 解析当前请求URL的请求URI部分。
      * Resolves the request URI portion for the currently requested URL.
      * @return string|bool the request URI portion for the currently requested URL.
      * Note that the URI returned may be URL-encoded depending on the client.
@@ -214,4 +217,21 @@ class Request extends Component
 
         return $this->_queryParams;
     }
+
+    /**
+     * Returns the request method given in the [[method]].
+     *
+     * Thid method will return the conentes of swoole `server['request_method']` if params where not explicitly set.
+     * @return mixed
+     */
+    public function getMethod()
+    {
+        if ($this->_method === null) {
+            return $this->server['request_method'];
+        }
+
+        return $this->_method;
+    }
+    
+    
 }

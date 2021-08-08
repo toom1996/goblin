@@ -248,4 +248,45 @@ class Module extends Component
 
         return false;
     }
+
+    /**
+     * Returns the directory that contains layout view files for this module.
+     * @return string the root directory of layout files. Defaults to "[[viewPath]]/layouts".
+     */
+    public function getLayoutPath()
+    {
+        if ($this->_layoutPath === null) {
+            $this->_layoutPath = $this->getViewPath() . DIRECTORY_SEPARATOR . 'layouts';
+        }
+
+        return $this->_layoutPath;
+    }
+
+    /**
+     * Returns the directory that contains the view files for this module.
+     * @return string the root directory of view files. Defaults to "[[basePath]]/views".
+     */
+    public function getViewPath()
+    {
+        if ($this->_viewPath === null) {
+            $this->_viewPath = $this->getBasePath() . DIRECTORY_SEPARATOR . 'views';
+        }
+
+        return $this->_viewPath;
+    }
+
+    /**
+     * Returns the root directory of the module.
+     * It defaults to the directory containing the module class file.
+     * @return string the root directory of the module.
+     */
+    public function getBasePath()
+    {
+        if ($this->_basePath === null) {
+            $class = new \ReflectionClass($this);
+            $this->_basePath = dirname($class->getFileName());
+        }
+
+        return $this->_basePath;
+    }
 }
