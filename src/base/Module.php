@@ -64,86 +64,40 @@ class Module extends Component
         }
     }
 
-    public function runAction($route)
+    /**
+     * Run action.
+     *
+     * @param $action
+     *
+     * @return mixed
+     */
+    public function runAction($action)
     {
-        //        var_dump($parts);
-//        if (is_array($parts)) {
-//            /* @var $controller Controller */
-//            list($controller, $actionID) = $parts;
-//            $oldController = Yii::$app->controller;
-//            Yii::$app->controller = $controller;
-//            $result = $controller->runAction($actionID, $params);
-//            if ($oldController !== null) {
-//                Yii::$app->controller = $oldController;
-//            }
-//
-//            return $result;
-//        }
-        return $this->createController($route);
-//
-//        $id = $this->getUniqueId();
-//        throw new InvalidRouteException('Unable to resolve the request "' . ($id === '' ? $route : $id . '/' . $route) . '".');
+        $action = \YiiS::getAlias($action);
+        var_dump($action);
+        return $this->createController($action);
     }
 
 
+    /**
+     * Create controller and run action.
+     *
+     * @param         $route
+     * @param  array  $params
+     *
+     * @return mixed
+     * @throws \ReflectionException
+     */
     public function createController($route, $params = [])
     {
-
-        $a = explode('\\', $route);
-
-        $action = array_pop($a);
-        $ref = new \ReflectionClass(implode('\\',$a));
-        $n = (new (implode('\\',$a)));
+        var_dump($route);
+        var_dump(get_declared_classes());
+        $ex = explode('/', $route);
+        var_dump($ex);
+        $action = array_pop($ex);
+        $ref = new \ReflectionClass(implode('/', $ex));
+        $n = (new (implode('/', $ex)));
         return call_user_func([$n, $action]);
-//
-//
-//        // 根目录
-//        if ($route === '/') {
-//            $route = $this->defaultRoute;
-//        }
-//        // double slashes or leading/ending slashes may cause substr problem
-//        $route = trim($route, '/');
-//        if (strpos($route, '//') !== false) {
-//            return false;
-//        }
-//
-//        // 不知道干啥的
-//        if (strpos($route, '/') !== false) {
-//            list($id, $route) = explode('/', $route, 2);
-//        } else {
-//            $id = $route;
-//            $route = '';
-//        }
-////        echo ('id -> ' . $id);
-////        echo ('route -> ' . $route);
-//        // module and controller map take precedence
-//        if (isset($this->controllerMap[$id])) {
-//            $controller = Toom::createObject($this->controllerMap[$id], [$id, $this]);
-//            return [$controller, $route];
-//        }
-//
-//        $module = $this->getModule($id);
-////        echo 'module' . PHP_EOL;
-////        var_dump($module);
-////        if ($module !== null) {
-////            return $module->createController($route);
-////        }
-////
-//        if (($pos = strrpos($route, '/')) !== false) {
-//            $id .= '/' . substr($route, 0, $pos);
-//            $route = substr($route, $pos + 1);
-//        }
-////
-//        $controller = $this->createControllerByID($id);
-////        var_dump($controller);
-////        var_dump($route);
-////        if ($controller === null && $route !== '') {
-////            echo 'llll';
-////            $controller = $this->createControllerByID($id . '/' . $route);
-////            $route = '';
-////        }
-////
-//        return $controller === null ? false : [$controller, $route];
     }
 
     /**

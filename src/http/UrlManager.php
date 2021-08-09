@@ -1,6 +1,6 @@
 <?php
 
-namespace toom1996\web;
+namespace toom1996\http;
 
 use FastRoute\Dispatcher;
 use FastRoute\RouteCollector;

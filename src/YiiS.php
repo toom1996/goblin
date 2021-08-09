@@ -163,6 +163,10 @@ class YiiS extends BaseYiiS
 //            Yii::debug("Route requested: '$route'", __METHOD__);
             $this->requestedRoute = $route;
             $result = $this->runAction($route);
+
+            if ($result === false) {
+                
+            }
 //            echo '333333333';
 //            var_dump('pppppp');
 //            var_dump($result);
@@ -215,6 +219,7 @@ class YiiS extends BaseYiiS
            'request' => ['class' => 'toom1996\web\Request'],
            'response' => ['class' => 'toom1996\web\Response'],
            'errorHandler' => ['class' => 'toom1996\web\ErrorHandler'],
+           'urlManager'   => ['class' => 'toom1996\http\UrlManager'],
        ]);
    }
 
