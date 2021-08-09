@@ -3,9 +3,11 @@
 namespace toom1996\web;
 
 use app\controllers\SiteController;
+use FastRoute\Dispatcher;
 use Swoole\Coroutine;
 use toom1996\base\Component;
 use toom1996\base\NotFoundHttpException;
+use toom1996\http\MethodNotAllowedHttpException;
 
 /**
  * Class Request
@@ -90,6 +92,12 @@ class Request extends Component
      */
     public $tmpfiles;
 
+    /**
+     * Request method.
+     * @var
+     */
+    private $_method;
+
     public function __construct($id = null, $params = null)
     {
         parent::__construct($id, $params);
@@ -102,15 +110,12 @@ class Request extends Component
      * @return array the first element is the route, and the second is the
      *     associated parameters.
      * @throws \toom1996\base\NotFoundHttpException
+     * @throws \toom1996\http\MethodNotAllowedHttpException
      */
     public function resolve()
     {
-        $result = \YiiS::$app->getUrlManager()->parseRequest($this);
-        if ($result !== false) {
-            return [$result, $this->getQueryParams()];
-        }
-
-        throw new NotFoundHttpException('Page not found');
+        $result = \YiiS::$app->getUrlManager()->parseRequest();
+        return [$result[0], array_merge($this->getQueryParams(), $result[1])];
     }
 
 
@@ -132,7 +137,6 @@ class Request extends Component
     }
 
     /**
-     * 解析当前请求URL的请求URI部分。
      * Resolves the request URI portion for the currently requested URL.
      * @return string|bool the request URI portion for the currently requested URL.
      * Note that the URI returned may be URL-encoded depending on the client.
@@ -145,57 +149,6 @@ class Request extends Component
             $requestUri = preg_replace('/^(http|https):\/\/[^\/]+/i', '', $requestUri);
         }
         return $requestUri;
-    }
-
-
-    /**
-     * 看不懂..
-     * Encodes an ISO-8859-1 string to UTF-8
-     * @param string $s
-     * @return string the UTF-8 translation of `s`.
-     * @see https://github.com/symfony/polyfill-php72/blob/master/Php72.php#L24
-     */
-    private function utf8Encode($s)
-    {
-        $s .= $s;
-        $len = \strlen($s);
-        for ($i = $len >> 1, $j = 0; $i < $len; ++$i, ++$j) {
-            switch (true) {
-                case $s[$i] < "\x80": $s[$j] = $s[$i]; break;
-                case $s[$i] < "\xC0": $s[$j] = "\xC2"; $s[++$j] = $s[$i]; break;
-                default: $s[$j] = "\xC3"; $s[++$j] = \chr(\ord($s[$i]) - 64); break;
-            }
-        }
-        return substr($s, 0, $j);
-    }
-
-    /**
-     * Returns the relative URL of the entry script.
-     * The implementation of this method referenced Zend_Controller_Request_Http in Zend Framework.
-     * @return string the relative URL of the entry script.
-     * @throws InvalidConfigException if unable to determine the entry script URL
-     */
-    public function getScriptUrl()
-    {
-        if ($this->_scriptUrl === null) {
-            $scriptFile = $this->getScriptFile();
-            $scriptName = basename($scriptFile);
-            if (isset($_SERVER['SCRIPT_NAME']) && basename($_SERVER['SCRIPT_NAME']) === $scriptName) {
-                $this->_scriptUrl = $_SERVER['SCRIPT_NAME'];
-            } elseif (isset($_SERVER['PHP_SELF']) && basename($_SERVER['PHP_SELF']) === $scriptName) {
-                $this->_scriptUrl = $_SERVER['PHP_SELF'];
-            } elseif (isset($_SERVER['ORIG_SCRIPT_NAME']) && basename($_SERVER['ORIG_SCRIPT_NAME']) === $scriptName) {
-                $this->_scriptUrl = $_SERVER['ORIG_SCRIPT_NAME'];
-            } elseif (isset($_SERVER['PHP_SELF']) && ($pos = strpos($_SERVER['PHP_SELF'], '/' . $scriptName)) !== false) {
-                $this->_scriptUrl = substr($_SERVER['SCRIPT_NAME'], 0, $pos) . '/' . $scriptName;
-            } elseif (!empty($_SERVER['DOCUMENT_ROOT']) && strpos($scriptFile, $_SERVER['DOCUMENT_ROOT']) === 0) {
-                $this->_scriptUrl = str_replace([$_SERVER['DOCUMENT_ROOT'], '\\'], ['', '/'], $scriptFile);
-            } else {
-                throw new InvalidConfigException('Unable to determine the entry script URL.');
-            }
-        }
-
-        return $this->_scriptUrl;
     }
 
     /**
@@ -214,4 +167,21 @@ class Request extends Component
 
         return $this->_queryParams;
     }
+
+    /**
+     * Returns the request method given in the [[method]].
+     *
+     * Thid method will return the conentes of swoole `server['request_method']` if params where not explicitly set.
+     * @return mixed
+     */
+    public function getMethod()
+    {
+        if ($this->_method === null) {
+            return $this->server['request_method'];
+        }
+
+        return $this->_method;
+    }
+    
+    
 }

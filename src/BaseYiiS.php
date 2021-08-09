@@ -56,6 +56,7 @@ class BaseYiiS extends Module
             return $alias;
         }
 
+        var_dump($alias);
         $pos = strpos($alias, '/');
         $root = $pos === false ? $alias : substr($alias, 0, $pos);
 

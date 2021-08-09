@@ -31,7 +31,7 @@ class ErrorHandler extends \toom1996\base\ErrorHandler
             'line' => $exception->getLine(),
             'stack-trace' => explode("\n", $exception->getTraceAsString()),
         ];
-
+        var_dump($this->_errorData);
         $this->renderException($this->_errorData);
     }
 

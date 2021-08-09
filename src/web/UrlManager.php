@@ -2,34 +2,25 @@
 
 namespace toom1996\web;
 
-use Psr\Container\ContainerInterface;
-use toom1996\base\Component;
+use FastRoute\Dispatcher;
+use FastRoute\RouteCollector;
 use toom1996\base\NotFoundHttpException;
-use toom1996\helpers\BaseArrayHelper;
-use toom1996\helpers\BaseFileHelper;
-use yii\base\InvalidConfigException;
-use yii\helpers\ArrayHelper;
-use yii\web\UrlRule;
-use yii\web\UrlRuleInterface;
+use toom1996\http\BaseUrlManager;
+use toom1996\http\MethodNotAllowedHttpException;
+use function FastRoute\simpleDispatcher;
 
 /**
  * Class UrlManager
  *
  * @author: TOOM <1023150697@qq.com>
  */
-class UrlManager extends Component
+class UrlManager extends BaseUrlManager
 {
-    private static $_verbs = 'GET|HEAD|POST|PUT|PATCH|DELETE|OPTIONS';
 
-
-    public $rules = [
-
-    ];
-
-    public $route = [];
-
-
-    public $suffix = '';
+    /**
+     * @var Dispatcher
+     */
+    protected $adapter;
 
     /**
      * Init UrlManager
@@ -40,122 +31,27 @@ class UrlManager extends Component
     }
 
     /**
-     * /hello/{id}/{sdfsdf}/
+     * Parse request.
+     * It will return an array of return values consisting of a method and a matching data.
      *
-     * @param  Request  $request
-     *
-     * @return bool|false|string
-     * @throws \toom1996\base\NotFoundHttpException
-     */
-    public function parseRequest($request)
-    {
-        // The url suffix. (e.g http://abc.com/1.html).
-        $suffix = (string) $this->suffix;
-        $pathInfo = $request->getPathInfo();
-
-//        if ($pathInfo !== '/' && $this->suffix !== '') {
-//            $n = strlen($this->suffix);
-//            if (substr_compare($pathInfo, $this->suffix, -$n, $n) === 0) {
-//                $pathInfo = substr($pathInfo, 0, -$n);
-//                if ($pathInfo === '/') {
-//                    // suffix alone is not allowed
-//                    return false;
-//                }
-//            }
-//        }
-
-        // PathInfo will be return action path (e.g `\app\controllers\api\v1\GoodsController\actionIndex`)
-        $pathInfo = $this->matchRoute($pathInfo);
-//        if (!isset($this->route[$pathInfo])) {
-//            // TODO new Exception
-//            throw new NotFoundHttpException("Page not found~");
-//        }
-//        $a = explode('\\',$pathInfo);
-//        var_dump($a);
-//        $action = array_pop($a);
-//        var_dump($action);
-//        var_dump($a);
-//        $ref = new \ReflectionClass(implode('\\',$a));
-//        var_dump($ref->getMethod($action));
-//        $n = (new (implode('\\',$a)));
-//        call_user_func([$n, $action]);
-        return $pathInfo;
-    }
-
-
-    /**
-     * Build a route tree
-     *
-     * @param  array  $config
      *
      * @return array
+     * @throws MethodNotAllowedHttpException
+     * @throws NotFoundHttpException
      */
-    public static function buildRouteTree(array $config)
+    public function parseRequest(): array
     {
-        $buildRoute = [];
-        foreach ($config['scanner']['arguments'] as $className => $method) {
-            foreach ($method as $methodName => $function) {
-                if (isset($function['Url'])) {
-                    $node = self::buildNode(self::parseRoute($function['Url']), $className . '\\' . $methodName);
-                    $buildRoute = BaseArrayHelper::merge($buildRoute, $node);
-                }
-            }
+        $match = $this->matchRoute();
+        
+        switch ($match[0]) {
+            case Dispatcher::NOT_FOUND:
+                throw new NotFoundHttpException("404 Page not found.");
+                break;
+            case Dispatcher::METHOD_NOT_ALLOWED:
+                throw new MethodNotAllowedHttpException("405 Method Not Allowed");
+                break;
         }
-        // overwrite annotation if set urlManager route
-        foreach ($config['components']['urlManager']['route'] as $routes) {
-            foreach ($routes as $route => $path) {
-                if (is_array($path)) {
-                    // Route group
-                    foreach ($path as $childRoute => $method) {
-                        list($verbs, $url) = self::parseRoute($childRoute);
-                        $node = self::buildNode([$verbs, $route . $url], $method);
-                        $buildRoute = BaseArrayHelper::merge($buildRoute, $node);
-                    }
-                }else{
-                    $node = self::buildNode(self::parseRoute($route), $path);
-                    $buildRoute = BaseArrayHelper::merge($buildRoute, $node);
-                }
-            }
-        }
-        return $buildRoute;
-    }
-
-
-    /**
-     * Build urlManager route.
-     * It can return route verbs and trim url.
-     *
-     * @param $route `(e.g GET /xxx)`
-     *
-     * @return array
-     */
-    private static function parseRoute($route) : array
-    {
-        // Compatible with routing in the configuration
-        if (is_array($route)) {
-            if (isset($route[0])) {
-                $route = $route[0];
-            }else{
-                // TODO throw exception 'undefined url'
-            }
-        }
-        if (!$route) {
-            //TODO throw Exception 'url error'
-        }
-
-        // If has request method (e.g `GET /xxx`)
-        if (strpos($route, ' ')) {
-            list($verbs, $url) = explode(' ', $route);
-        }else{
-            list($verbs, $url) = [self::$_verbs, $route];
-        }
-
-        // If first letter is not '/'
-        if (substr($url,0, 1) !== '/') {
-            $url = '/' . $url;
-        }
-
-        return [$verbs, self::trimSlashes($url)];
+        return [$match[1], $match[2]];
     }
 
 
@@ -174,85 +70,67 @@ class UrlManager extends Component
         return preg_replace('#/+#', '/', $url);
     }
 
+
     /**
-     * Build route tree node.
-     * When route is /xx/dd/ff. it's will be build to ` xx => [ dd => [ ff => [] ]]`
      *
-     * @param $url
      *
-     * @param $class
      *
      * @return array
      */
-    private static function buildNode($url, $class): array
+    protected function matchRoute()
     {
-        if (!is_array($url)) {
-            // TODO throw new Exception
+        $request = \YiiS::$app->getRequest();
+        $httpMethod = $request->getMethod();
+        $uri = self::trimSlashes($request->getUrl());
+        if (false !== $pos = strpos($uri, '?')) {
+            $uri = substr($uri, 0, $pos);
         }
-        list($verbs, $url) = $url;
-        $ex = array_filter(explode('/', $url));
-        $node = $tmp = [];
-        foreach ($ex as $pattern) {
-            if ($pattern) {
-                array_push($tmp, $pattern);
-                $path = implode('@', $tmp);
-                if (end($ex) === $pattern) {
-                    BaseArrayHelper::setValue($node, "{$path}", [
-                        'verbs' => $verbs,
-                        'method' => $class,
-                    ], '@');
-                }else{
-                    BaseArrayHelper::setValue($node, "{$path}", [], '@');
-                }
-            }
-        }
-        return $node;
+        $uri = rawurldecode($uri);
+
+        return $this->adapter->dispatch($httpMethod, $uri);
     }
 
 
     /**
-     * Match route.
+     * Load config route.
      *
-     * @param $route
+     * @param $config
      *
-     * @return bool|mixed
-     * @throws \Exception
+     * @return Dispatcher
      */
-    private function matchRoute($route)
+    public static function loadRoute($config)
     {
-        // Match url manager route
-        $pattern = explode('/', ltrim($route, '/'));
-        $r = BaseArrayHelper::getValue($this->route, $pattern);
-        if (isset($r['method'])) {
-            return $r['method'];
-        }
-
-        // Match url manager route with preg
-        $key = [];
-        foreach ($pattern as $k => $childPattern) {
-            $key[] = $childPattern;
-            if (!BaseArrayHelper::getValue($this->route, $key)) {
-                $c = $key;
-                array_pop($c);
-                var_dump(BaseArrayHelper::getValue($this->route, end($tmp)));
-                var_dump($this->route);
-                var_dump(BaseArrayHelper::getValue($this->route, $c));
-//                foreach (BaseArrayHelper::getValue($this->route, $c) as $preg => $value) {
-//                    preg_match('/<.*:.*>/', $preg, $res);
-//                    if (isset($res[0])) {
-//                        preg_match("/{$res[0]}/", $preg, $pattern);
-//                        var_dump("/{$res[0]}/");
-//                        var_dump($pattern);
-//                    }
-//                }
-
-                var_dump($c);
-                echo '没找到' . $childPattern;
+        $webRoute = self::getRoute($config);
+        return simpleDispatcher(function (RouteCollector $controller) use ($webRoute) {
+            foreach ($webRoute as $prefix => $rules) {
+                if (count($rules) == count($rules, 1)) {
+                    list($method, $route, $handler) = self::parseRule($rules);
+                    $controller->addRoute($method, $route, $handler);
+                }else{
+                    $controller->addGroup($prefix, function (RouteCollector $controller) use ($rules) {
+                        foreach ($rules as $rulesChild) {
+                            list($method, $route, $handler) = self::parseRule($rulesChild);
+                            $controller->addRoute($method, $route, $handler);
+                        }
+                    });
+                }
             }
+        });
+    }
+
+    /**
+     * Parse rules.
+     * @param $rule
+     *
+     * @return array
+     */
+    private static function parseRule($rule)
+    {
+        list($method, $route, $handler) = [$rule[0], $rule[1], $rule[2]];
+        if (strpos($handler, '@') === 0) {
+            $handler = \YiiS::getAlias($handler);
+            var_dump($handler);
         }
-
-        // Match url manager route with action
-
-       return false;
+        return [$method, $route, $rule[2]];
     }
 }

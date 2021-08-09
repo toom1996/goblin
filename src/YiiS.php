@@ -31,7 +31,7 @@ class YiiS extends BaseYiiS
      * Application config
      * @var array
      */
-    protected static $config;
+    public static $config;
 
 
     /**
@@ -68,8 +68,6 @@ class YiiS extends BaseYiiS
         }catch (\Swoole\ExitException $e){
             $this->getResponse()->content = $e->getStatus();
         }catch (\Throwable $e) {
-//            var_dump($e->getTrace());
-//            return $this->end(debug_backtrace());
             $this->getErrorHandler()->handleException($e);
         } finally {
             return $this->getResponse()->send();
@@ -165,9 +163,9 @@ class YiiS extends BaseYiiS
 //            Yii::debug("Route requested: '$route'", __METHOD__);
             $this->requestedRoute = $route;
             $result = $this->runAction($route);
-            echo '333333333';
-            var_dump('pppppp');
-            var_dump($result);
+//            echo '333333333';
+//            var_dump('pppppp');
+//            var_dump($result);
 //            var_dump($result);
 //            if ($result instanceof Response) {
 //                return $result;
