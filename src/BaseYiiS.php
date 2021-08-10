@@ -4,6 +4,7 @@
 namespace toom1996;
 
 
+use toom1996\base\Exception;
 use toom1996\base\Module;
 use yii\base\InvalidArgumentException;
 
@@ -18,6 +19,7 @@ class BaseYiiS extends Module
 
     /**
      * Aliases.
+     *
      * @var
      */
     public static $aliases;
@@ -25,17 +27,19 @@ class BaseYiiS extends Module
     /**
      * @var
      */
-    protected static $config;
+    public static $handlerMap = [];
+
+    /**
+     * @var
+     */
+    public static $config;
 
     public function coreComponents()
     {
         return [
-            'log'          => ['class' => 'yii\log\Dispatcher'],
             'view'         => ['class' => 'toom1996\web\View'],
             'formatter'    => ['class' => 'yii\i18n\Formatter'],
-            'i18n'         => ['class' => 'yii\i18n\I18N'],
             'mailer'       => ['class' => 'yii\swiftmailer\Mailer'],
-            'urlManager'   => ['class' => 'toom1996\web\UrlManager'],
             'assetManager' => ['class' => 'yii\web\AssetManager'],
             'security'     => ['class' => 'yii\base\Security'],
         ];
@@ -56,21 +60,22 @@ class BaseYiiS extends Module
             return $alias;
         }
 
-        var_dump($alias);
         $pos = strpos($alias, '/');
         $root = $pos === false ? $alias : substr($alias, 0, $pos);
 
         if (isset(static::$aliases[$root])) {
             if (is_string(static::$aliases[$root])) {
-                return $pos === false ? static::$aliases[$root] : static::$aliases[$root] . substr($alias, $pos);
+                return $pos === false ? static::$aliases[$root]
+                    : static::$aliases[$root].substr($alias, $pos);
             }
 
             foreach (static::$aliases[$root] as $name => $path) {
-                if (strpos($alias . '/', $name . '/') === 0) {
-                    return $path . substr($alias, strlen($name));
+                if (strpos($alias.'/', $name.'/') === 0) {
+                    return $path.substr($alias, strlen($name));
                 }
             }
         }
+
         return false;
     }
 
@@ -91,10 +96,10 @@ class BaseYiiS extends Module
      *
      * See the [guide article on aliases](guide:concept-aliases) for more information.
      *
-     * @param string $alias the alias name (e.g. "@yii"). It must start with a '@' character.
+     * @param  string  $alias  the alias name (e.g. "@yii"). It must start with a '@' character.
      * It may contain the forward slash '/' which serves as boundary character when performing
      * alias translation by [[getAlias()]].
-     * @param string $path the path corresponding to the alias. If this is null, the alias will
+     * @param  string  $path  the path corresponding to the alias. If this is null, the alias will
      * be removed. Trailing '/' and '\' characters will be trimmed. This can be
      *
      * - a directory or a file path (e.g. `/tmp`, `/tmp/main.txt`)
@@ -108,13 +113,14 @@ class BaseYiiS extends Module
     public static function setAlias($alias, $path)
     {
         if (strncmp($alias, '@', 1)) {
-            $alias = '@' . $alias;
+            $alias = '@'.$alias;
         }
         $pos = strpos($alias, '/');
         $root = $pos === false ? $alias : substr($alias, 0, $pos);
         if ($path !== null) {
-            $path = strncmp($path, '@', 1) ? rtrim($path, '\\/') : static::getAlias($path);
-            if (!isset(static::$aliases[$root])) {
+            $path = strncmp($path, '@', 1) ? rtrim($path, '\\/')
+                : static::getAlias($path);
+            if ( ! isset(static::$aliases[$root])) {
                 if ($pos === false) {
                     static::$aliases[$root] = $path;
                 } else {
@@ -125,8 +131,7 @@ class BaseYiiS extends Module
                     static::$aliases[$root] = $path;
                 } else {
                     static::$aliases[$root] = [
-                        $alias => $path,
-                        $root => static::$aliases[$root],
+                        $alias => $path, $root => static::$aliases[$root],
                     ];
                 }
             } else {
@@ -140,6 +145,30 @@ class BaseYiiS extends Module
                 unset(static::$aliases[$root]);
             }
         }
+    }
+
+
+    public static function setHandlerMap($key, $value)
+    {
+        self::$handlerMap[$key] = $value;
+    }
+
+
+    /**
+     * Get php class namespace.
+     *
+     * @param $file
+     *
+     * @return string
+     */
+    public static function getNamespace($file)
+    {
+        $file = file_get_contents($file);
+        if ( ! $r = preg_match('/namespace(.*);/', $file, $matches)) {
+            // TODO throw new exception.
+        }
+
+        return trim($matches[1]);
     }
     
 }

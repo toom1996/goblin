@@ -63,6 +63,7 @@ class YiiS extends BaseYiiS
             $this->getResponse([
                 'fd' => $response->fd
             ]);
+
             return $this->handleRequest($this->getRequest($request))
                 ->send();
         }catch (\Swoole\ExitException $e){
@@ -127,7 +128,7 @@ class YiiS extends BaseYiiS
 
     /**
      * Returens the urlManager component.
-     * @return UrlManager
+     * @return \toom1996\http\UrlManager
      */
     public function getUrlManager()
     {
@@ -145,7 +146,7 @@ class YiiS extends BaseYiiS
     public function handleRequest($request)
     {
         try {
-            list($route, $params) = $request->resolve();
+            list($handler, $params) = $request->resolve();
         } catch (\toom1996\base\NotFoundHttpException $e) {
             YiiS::$app->getErrorHandler()->handleException($e);
 //                $url = $e->url;
@@ -161,8 +162,11 @@ class YiiS extends BaseYiiS
         }
 //        try {
 //            Yii::debug("Route requested: '$route'", __METHOD__);
-            $this->requestedRoute = $route;
-            $result = $this->runAction($route);
+            $result = $this->runAction($handler, $params);
+
+            if ($result === false) {
+                
+            }
 //            echo '333333333';
 //            var_dump('pppppp');
 //            var_dump($result);
@@ -194,7 +198,6 @@ class YiiS extends BaseYiiS
                 self::$config['components'][$id]['class'] = $component['class'];
             }
         }
-
         self::$app = $this;
     }
 
@@ -215,6 +218,7 @@ class YiiS extends BaseYiiS
            'request' => ['class' => 'toom1996\web\Request'],
            'response' => ['class' => 'toom1996\web\Response'],
            'errorHandler' => ['class' => 'toom1996\web\ErrorHandler'],
+           'urlManager'   => ['class' => 'toom1996\http\UrlManager'],
        ]);
    }
 

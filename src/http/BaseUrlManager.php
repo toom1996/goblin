@@ -38,5 +38,13 @@ abstract class BaseUrlManager extends Component
     {
         return $config['components']['urlManager']['route'];
     }
+
+    /**
+     *
+     * @param $config
+     *
+     * @return mixed
+     */
+    abstract static function loadRoute($config);
     
 }

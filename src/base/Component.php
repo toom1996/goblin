@@ -57,9 +57,10 @@ class Component
 
         if (isset(YiiS::$config['components'][$id])) {
             $className = YiiS::$config['components'][$id]['class'];
+            new \ReflectionClass($className);
             return $this->component[$id] = new $className($id, $value);
         }else{
-            // TODO 
+            // TODO
         }
 
     }

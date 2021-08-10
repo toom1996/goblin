@@ -1,5 +1,5 @@
 <?php
-namespace toom1996;
+namespace toom1996\http;
 
 use Swoole\Coroutine;
 use toom1996\base\AnnotationScanner;
@@ -18,7 +18,7 @@ defined('APP_PATH') or define('APP_PATH', __DIR__);
 /**
  * Register autoload function.
  */
-spl_autoload_register(['toom1996\Application', 'autoload'], true, true);
+spl_autoload_register(['toom1996\http\Application', 'autoload'], true, true);
 /**
  * Base Application.
  * Defined all public variables.
@@ -39,6 +39,8 @@ class Application
      *
      * @param  array  $config
      *
+     * @throws \ReflectionException
+     * @throws \toom1996\base\Exception
      */
     public function __construct($config = [])
     {
@@ -50,11 +52,12 @@ class Application
 
     /**
      * Init config for Application
+     * @throws \ReflectionException
+     * @throws \toom1996\base\Exception
      */
     public function initConfig()
     {
 //        $this->config['scanner']['arguments'] = $this->scanRouter();
-
         $this->config['components']['urlManager']['adapter'] = UrlManager::loadRoute($this->config);
     }
 

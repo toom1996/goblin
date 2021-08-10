@@ -1,12 +1,10 @@
 <?php
 
-namespace toom1996\web;
+namespace toom1996\http;
 
 use FastRoute\Dispatcher;
 use FastRoute\RouteCollector;
 use toom1996\base\NotFoundHttpException;
-use toom1996\http\BaseUrlManager;
-use toom1996\http\MethodNotAllowedHttpException;
 use function FastRoute\simpleDispatcher;
 
 /**
@@ -42,7 +40,6 @@ class UrlManager extends BaseUrlManager
     public function parseRequest(): array
     {
         $match = $this->matchRoute();
-        
         switch ($match[0]) {
             case Dispatcher::NOT_FOUND:
                 throw new NotFoundHttpException("404 Page not found.");
@@ -51,6 +48,7 @@ class UrlManager extends BaseUrlManager
                 throw new MethodNotAllowedHttpException("405 Method Not Allowed");
                 break;
         }
+        // handler, param
         return [$match[1], $match[2]];
     }
 
@@ -58,6 +56,7 @@ class UrlManager extends BaseUrlManager
     /**
      * Trim url slashes.
      * `/xxx/xxx////1///xxx` will be trim to `/xxx/xxx/1/xxx`
+     *
      * @param $url
      *
      * @return string
@@ -67,13 +66,13 @@ class UrlManager extends BaseUrlManager
         if ($url !== '/') {
             $url = rtrim($url, '/');
         }
+
         return preg_replace('#/+#', '/', $url);
     }
 
 
     /**
-     *
-     *
+     * Match route.
      *
      * @return array
      */
@@ -101,25 +100,32 @@ class UrlManager extends BaseUrlManager
     public static function loadRoute($config)
     {
         $webRoute = self::getRoute($config);
-        return simpleDispatcher(function (RouteCollector $controller) use ($webRoute) {
+
+        return simpleDispatcher(function (RouteCollector $controller) use (
+            $webRoute
+        ) {
             foreach ($webRoute as $prefix => $rules) {
                 if (count($rules) == count($rules, 1)) {
                     list($method, $route, $handler) = self::parseRule($rules);
                     $controller->addRoute($method, $route, $handler);
-                }else{
-                    $controller->addGroup($prefix, function (RouteCollector $controller) use ($rules) {
-                        foreach ($rules as $rulesChild) {
-                            list($method, $route, $handler) = self::parseRule($rulesChild);
-                            $controller->addRoute($method, $route, $handler);
-                        }
-                    });
+                } else {
+                    $controller->addGroup($prefix,
+                        function (RouteCollector $controller) use ($rules) {
+                            foreach ($rules as $rulesChild) {
+                                list($method, $route, $handler) =
+                                    self::parseRule($rulesChild);
+                                $controller->addRoute($method, $route,
+                                    $handler);
+                            }
+                        });
                 }
             }
         });
     }
 
     /**
-     * Parse rules.
+     * Parse rules and add to handlerMap.
+     *
      * @param $rule
      *
      * @return array
@@ -128,9 +134,33 @@ class UrlManager extends BaseUrlManager
     {
         list($method, $route, $handler) = [$rule[0], $rule[1], $rule[2]];
         if (strpos($handler, '@') === 0) {
-            $handler = \YiiS::getAlias($handler);
-            var_dump($handler);
+            // If route is `@controllers/site/index`, will be convert @controller to BathPath
+            $handlerAlias = \YiiS::getAlias($handler);
+            $ex = explode('/', $handlerAlias);
+
+            // Find controller and action.
+            list($controller, $action) = array_slice($ex, -2, 2);
+
+            // will be convert to `$bathPath/SiteController/index`
+            if (strpos($controller, 'Controller') === false) {
+                $controller = ucfirst($controller).'Controller';
+            }
+
+            // will be convert to `$bathPath/SiteController/actionIndex`
+            if (strpos($action, 'action') === false) {
+                $action = 'action'.ucfirst($action);
+            }
+            $handlerFile = implode('/',
+                array_merge(array_slice($ex, 0, count($ex) - 2),
+                    [$controller . '.php']));
+            $className = '\\' . \YiiS::getNamespace($handlerFile) . '\\' . basename(str_replace('.php', '', $handlerFile));
+
+            \YiiS::setHandlerMap($handler, [
+                'class' => $className,
+                'action' => $action
+            ]);
         }
-        return [$method, $route, $rule[2]];
+        return [$method, $route, $handler];
     }
+
 }

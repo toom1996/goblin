@@ -114,8 +114,8 @@ class Request extends Component
      */
     public function resolve()
     {
-        $result = \YiiS::$app->getUrlManager()->parseRequest();
-        return [$result[0], array_merge($this->getQueryParams(), $result[1])];
+        list($handler, $param) = \YiiS::$app->getUrlManager()->parseRequest();
+        return [$handler, array_merge($this->getQueryParams(), $param)];
     }
 
 
@@ -162,7 +162,7 @@ class Request extends Component
     public function getQueryParams()
     {
         if ($this->_queryParams === null) {
-            return $this->get;
+            return $this->get ?? [];
         }
 
         return $this->_queryParams;

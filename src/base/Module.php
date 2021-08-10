@@ -2,16 +2,14 @@
 
 namespace toom1996\base;
 
-use app\controllers\SiteController;
 use yii\base\Controller;
-use yii\base\InvalidRouteException;
-
+use YiiS;
 /**
  * Class Module
  *
  * @author: TOOM <1023150697@qq.com>
  */
-class Module extends Component
+class Module extends ServiceLocator
 {
     /**
      * 默认的应用路由。(e.g. www.xx.com => SiteController)
@@ -64,189 +62,27 @@ class Module extends Component
         }
     }
 
-    public function runAction($route)
-    {
-        //        var_dump($parts);
-//        if (is_array($parts)) {
-//            /* @var $controller Controller */
-//            list($controller, $actionID) = $parts;
-//            $oldController = Yii::$app->controller;
-//            Yii::$app->controller = $controller;
-//            $result = $controller->runAction($actionID, $params);
-//            if ($oldController !== null) {
-//                Yii::$app->controller = $oldController;
-//            }
-//
-//            return $result;
-//        }
-        return $this->createController($route);
-//
-//        $id = $this->getUniqueId();
-//        throw new InvalidRouteException('Unable to resolve the request "' . ($id === '' ? $route : $id . '/' . $route) . '".');
-    }
-
-
-    public function createController($route, $params = [])
-    {
-
-        $a = explode('\\', $route);
-
-        $action = array_pop($a);
-        $ref = new \ReflectionClass(implode('\\',$a));
-        $n = (new (implode('\\',$a)));
-        return call_user_func([$n, $action]);
-//
-//
-//        // 根目录
-//        if ($route === '/') {
-//            $route = $this->defaultRoute;
-//        }
-//        // double slashes or leading/ending slashes may cause substr problem
-//        $route = trim($route, '/');
-//        if (strpos($route, '//') !== false) {
-//            return false;
-//        }
-//
-//        // 不知道干啥的
-//        if (strpos($route, '/') !== false) {
-//            list($id, $route) = explode('/', $route, 2);
-//        } else {
-//            $id = $route;
-//            $route = '';
-//        }
-////        echo ('id -> ' . $id);
-////        echo ('route -> ' . $route);
-//        // module and controller map take precedence
-//        if (isset($this->controllerMap[$id])) {
-//            $controller = Toom::createObject($this->controllerMap[$id], [$id, $this]);
-//            return [$controller, $route];
-//        }
-//
-//        $module = $this->getModule($id);
-////        echo 'module' . PHP_EOL;
-////        var_dump($module);
-////        if ($module !== null) {
-////            return $module->createController($route);
-////        }
-////
-//        if (($pos = strrpos($route, '/')) !== false) {
-//            $id .= '/' . substr($route, 0, $pos);
-//            $route = substr($route, $pos + 1);
-//        }
-////
-//        $controller = $this->createControllerByID($id);
-////        var_dump($controller);
-////        var_dump($route);
-////        if ($controller === null && $route !== '') {
-////            echo 'llll';
-////            $controller = $this->createControllerByID($id . '/' . $route);
-////            $route = '';
-////        }
-////
-//        return $controller === null ? false : [$controller, $route];
-    }
-
     /**
-     * Retrieves the child module of the specified ID.
-     * This method supports retrieving both child modules and grand child modules.
-     * @param string $id module ID (case-sensitive). To retrieve grand child modules,
-     * use ID path relative to this module (e.g. `admin/content`).
-     * @param bool $load whether to load the module if it is not yet loaded.
-     * @return \yii\base\Module|null the module instance, `null` if the module does not exist.
-     * @see hasModule()
+     * Run action.
+     *
+     * @param $handler
+     *
+     * @return mixed
+     * @throws \ReflectionException
+     * @throws \toom1996\base\UnknownClassException|\toom1996\base\InvalidConfigException
      */
-    public function getModule($id, $load = true)
+    public function runAction($handler, $params)
     {
-        if (($pos = strpos($id, '/')) !== false) {
-            // sub-module
-            $module = $this->getModule(substr($id, 0, $pos));
-
-            return $module === null ? null : $module->getModule(substr($id, $pos + 1), $load);
+        $handlerMap = YiiS::$handlerMap[$handler];
+        if (!class_exists($handlerMap['class'])) {
+            throw new UnknownClassException("{Unknown class {$handlerMap['class']}");
+        }
+        $ref = new \ReflectionClass($handlerMap['class']);
+        if (!$ref->hasMethod($handlerMap['action'])) {
+            throw new InvalidConfigException("class {$handlerMap['class']} does not have a method {$handlerMap['action']}, please check your config.");
         }
 
-        if (isset($this->_modules[$id])) {
-            if ($this->_modules[$id] instanceof self) {
-                return $this->_modules[$id];
-            } elseif ($load) {
-                Yii::debug("Loading module: $id", __METHOD__);
-                /* @var $module Module */
-                $module = Yii::createObject($this->_modules[$id], [$id, $this]);
-                $module::setInstance($module);
-                return $this->_modules[$id] = $module;
-            }
-        }
-
-        return null;
-    }
-
-
-    /**
-     * Creates a controller based on the given controller ID.
-     *
-     * The controller ID is relative to this module. The controller class
-     * should be namespaced under [[controllerNamespace]].
-     *
-     * Note that this method does not check [[modules]] or [[controllerMap]].
-     *
-     * @param string $id the controller ID.
-     * @return Controller|null the newly created controller instance, or `null` if the controller ID is invalid.
-     * @throws InvalidConfigException if the controller class and its file name do not match.
-     * This exception is only thrown when in debug mode.
-     */
-    public function createControllerByID($id)
-    {
-        $pos = strrpos($id, '/');
-        if ($pos === false) {
-            $prefix = '';
-            $className = $id;
-        } else {
-            $prefix = substr($id, 0, $pos + 1);
-            $className = substr($id, $pos + 1);
-        }
-
-        if ($this->isIncorrectClassNameOrPrefix($className, $prefix)) {
-//            echo 'isIncorrectClassNameOrPrefix';
-            return null;
-        }
-
-        $className = preg_replace_callback('%-([a-z0-9_])%i', function ($matches) {
-                return ucfirst($matches[1]);
-            }, ucfirst($className)) . 'Controller';
-        $className = ltrim($this->controllerNamespace . '\\' . str_replace('/', '\\', $prefix) . $className, '\\');
-//        echo 'className' . PHP_EOL;
-//        var_dump($className);
-
-        if (strpos($className, '-') !== false || !class_exists($className)) {
-            return null;
-        }
-
-//        if (is_subclass_of($className, 'yii\base\Controller')) {
-//            $controller = Yii::createObject($className, [$id, $this]);
-//            return get_class($controller) === $className ? $controller : null;
-//        } elseif (YII_DEBUG) {
-//            throw new InvalidConfigException('Controller class must extend from \\yii\\base\\Controller.');
-//        }
-
-        return null;
-    }
-
-    /**
-     * Checks if class name or prefix is incorrect
-     *
-     * @param string $className
-     * @param string $prefix
-     * @return bool
-     */
-    private function isIncorrectClassNameOrPrefix($className, $prefix)
-    {
-        if (!preg_match('%^[a-z][a-z0-9\\-_]*$%', $className)) {
-            return true;
-        }
-        if ($prefix !== '' && !preg_match('%^[a-z0-9_/]+$%i', $prefix)) {
-            return true;
-        }
-
-        return false;
+        return call_user_func([$ref->newInstance(), $handlerMap['action']]);
     }
 
     /**
@@ -289,4 +125,5 @@ class Module extends Component
 
         return $this->_basePath;
     }
+
 }
