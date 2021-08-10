@@ -92,6 +92,9 @@ class YiiS extends BaseYiiS
      */
     public function getRequest($request = null)
     {
+        if (!$this->has('request')) {
+
+        }
         return $this->component('request', $request);
     }
 
