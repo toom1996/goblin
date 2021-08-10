@@ -37,32 +37,5 @@ class Component
     {
 
     }
-
-    /**
-     *
-     * @param $name
-     *
-     * @return mixed
-     */
-    public function __get($name)
-    {
-        return $this->component($name);
-    }
-
-    public function component($id, $value = null)
-    {
-        if (isset($this->component[$id])) {
-            return $this->component[$id];
-        }
-
-        if (isset(YiiS::$config['components'][$id])) {
-            $className = YiiS::$config['components'][$id]['class'];
-            new \ReflectionClass($className);
-            return $this->component[$id] = new $className($id, $value);
-        }else{
-            // TODO
-        }
-
-    }
-
+    
 }

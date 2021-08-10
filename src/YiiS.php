@@ -63,7 +63,6 @@ class YiiS extends BaseYiiS
             $this->getResponse([
                 'fd' => $response->fd
             ]);
-
             return $this->handleRequest($this->getRequest($request))
                 ->send();
         }catch (\Swoole\ExitException $e){
@@ -93,9 +92,10 @@ class YiiS extends BaseYiiS
     public function getRequest($request = null)
     {
         if (!$this->has('request')) {
-
+            $this->set('request', $request);
         }
-        return $this->component('request', $request);
+
+        return $this->get('request');
     }
 
     /**
@@ -104,7 +104,7 @@ class YiiS extends BaseYiiS
      */
     public function getView()
     {
-        return $this->component('view');
+        return $this->get('view');
     }
 
     /**
@@ -114,7 +114,7 @@ class YiiS extends BaseYiiS
      */
     public function getErrorHandler()
     {
-        return $this->component('errorHandler');
+        return $this->get('errorHandler');
     }
 
     /**
@@ -126,7 +126,10 @@ class YiiS extends BaseYiiS
      */
     public function getResponse($response = null)
     {
-        return $this->component('response', $response);
+        if (!$this->has('response')) {
+            $this->set('response', $response);
+        }
+        return $this->get('response');
     }
 
     /**
@@ -135,7 +138,7 @@ class YiiS extends BaseYiiS
      */
     public function getUrlManager()
     {
-        return $this->component('urlManager');
+        return $this->get('urlManager');
     }
 
 
@@ -170,13 +173,6 @@ class YiiS extends BaseYiiS
             if ($result === false) {
                 
             }
-//            echo '333333333';
-//            var_dump('pppppp');
-//            var_dump($result);
-//            var_dump($result);
-//            if ($result instanceof Response) {
-//                return $result;
-//            }
 //
             $response = $this->getResponse();
 //            if ($result !== null) {
@@ -203,13 +199,7 @@ class YiiS extends BaseYiiS
         }
         self::$app = $this;
     }
-
-    public function createObject($type)
-    {
-        if (is_string($type)) {
-            return self::$app->component($type);
-        }
-    }
+    
 
     /**
      * Returns default YIIS core component.
