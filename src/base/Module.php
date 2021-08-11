@@ -73,7 +73,11 @@ class Module extends ServiceLocator
      */
     public function runAction($handler, $params)
     {
-        $handlerMap = YiiS::$handlerMap[$handler];
+        if (isset(YiiS::$handlerMap[$handler])) {
+            $handlerMap = YiiS::$handlerMap[$handler];
+        }else{
+            throw new InvalidConfigException("{$handler} is invalid function, please check your config.");
+        }
         if (!class_exists($handlerMap['class'])) {
             throw new UnknownClassException("{Unknown class {$handlerMap['class']}");
         }

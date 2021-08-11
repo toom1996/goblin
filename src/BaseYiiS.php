@@ -37,7 +37,6 @@ class BaseYiiS extends Module
     public function coreComponents()
     {
         return [
-            'view'         => ['class' => 'toom1996\web\View'],
             'formatter'    => ['class' => 'yii\i18n\Formatter'],
             'mailer'       => ['class' => 'yii\swiftmailer\Mailer'],
             'assetManager' => ['class' => 'yii\web\AssetManager'],

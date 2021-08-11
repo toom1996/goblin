@@ -105,12 +105,10 @@ class Request extends Component
 
 
     /**
-     * Resolves the current request into a route and the associated parameters.
      *
-     * @return array the first element is the route, and the second is the
-     *     associated parameters.
-     * @throws \toom1996\base\NotFoundHttpException
-     * @throws \toom1996\http\MethodNotAllowedHttpException
+     * @return array
+     * @throws \ReflectionException
+     * @throws \toom1996\base\InvalidConfigException
      */
     public function resolve()
     {
@@ -181,6 +179,37 @@ class Request extends Component
         }
 
         return $this->_method;
+    }
+
+    /**
+     * Returns GET parameter with a given name. If name isn't specified, returns an array of all GET parameters.
+     *
+     * @param string $name the parameter name
+     * @param mixed $defaultValue the default parameter value if the parameter does not exist.
+     * @return array|mixed
+     */
+    public function get($name = null, $defaultValue = null)
+    {
+        if ($name === null) {
+            return $this->getQueryParams();
+        }
+
+        return $this->getQueryParam($name, $defaultValue);
+    }
+
+    /**
+     * Returns the named GET parameter value.
+     * If the GET parameter does not exist, the second parameter passed to this method will be returned.
+     * @param string $name the GET parameter name.
+     * @param mixed $defaultValue the default parameter value if the GET parameter does not exist.
+     * @return mixed the GET parameter value
+     * @see getBodyParam()
+     */
+    public function getQueryParam($name, $defaultValue = null)
+    {
+        $params = $this->getQueryParams();
+
+        return isset($params[$name]) ? $params[$name] : $defaultValue;
     }
     
     

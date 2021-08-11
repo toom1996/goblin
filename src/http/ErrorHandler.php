@@ -1,6 +1,6 @@
 <?php
 
-namespace toom1996\web;
+namespace toom1996\http;
 
 class ErrorHandler extends \toom1996\base\ErrorHandler
 {

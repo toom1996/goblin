@@ -90,7 +90,7 @@ class Application
      * When Application initial, register this function for `spl_autoload_register` callback function.
      * @param  string  $className
      */
-    public static function autoload(string $className): void
+    public static function autoload(string $className)
     {
         if (strpos($className, '\\') !== false) {
             $classFile = \YiiS::getAlias('@' . str_replace('\\', '/', $className) . '.php', false);
@@ -101,6 +101,7 @@ class Application
             return;
         }
 
+        var_dump($classFile);
         include $classFile;
 
 //        if (YIIS_DEBUG && !class_exists($className, false) && !interface_exists($className, false) && !trait_exists($className, false)) {

@@ -10,7 +10,7 @@ use toom1996\BaseYiiS;
  *
  * @author: TOOM <1023150697@qq.com>
  * @property-read \toom1996\web\Request $request
- * @property-read \toom1996\web\ErrorHandler $errorHandler
+ * @property-read \toom1996\http\ErrorHandler $errorHandler
  * @property-read \toom1996\web\Response $response
  */
 class YiiS extends BaseYiiS
@@ -44,14 +44,15 @@ class YiiS extends BaseYiiS
         self::$config = $config;
     }
 
-    
+
     /**
-     * Run application
      *
-     * @param  \Swoole\Http\Request   $request
+     * @param $request
      * @param  \Swoole\Http\Response  $response
      *
-     * @return mixed
+     * @return bool
+     * @throws \ReflectionException
+     * @throws \yii\base\InvalidConfigException
      */
     public function run($request, \Swoole\Http\Response $response)
     {
@@ -63,7 +64,6 @@ class YiiS extends BaseYiiS
             $this->getResponse([
                 'fd' => $response->fd
             ]);
-
             return $this->handleRequest($this->getRequest($request))
                 ->send();
         }catch (\Swoole\ExitException $e){
@@ -84,67 +84,80 @@ class YiiS extends BaseYiiS
     }
 
     /**
-     * Returns the request component.
      *
-     * @param $request
+     * @param  null  $request
      *
      * @return Request
+     * @throws \ReflectionException
+     * @throws \toom1996\base\InvalidConfigException
      */
     public function getRequest($request = null)
     {
         if (!$this->has('request')) {
-
+            $this->set('request', $request);
         }
-        return $this->component('request', $request);
+
+        return $this->get('request');
     }
 
     /**
      *
-     * @return \toom1996\web\View
+     * @return \toom1996\http\View
+     * @throws \ReflectionException
+     * @throws \toom1996\base\InvalidConfigException
      */
     public function getView()
     {
-        return $this->component('view');
+        return $this->get('view');
     }
 
     /**
-     * Returns the errorHandler component.
      *
-     * @return \toom1996\web\ErrorHandler
+     * @return \toom1996\http\ErrorHandler
+     * @throws \ReflectionException
+     * @throws \toom1996\base\InvalidConfigException
      */
     public function getErrorHandler()
     {
-        return $this->component('errorHandler');
+        return $this->get('errorHandler');
     }
 
     /**
-     * Returns the request component.
      *
      * @param  null  $response
      *
      * @return \toom1996\web\Response
+     * @throws \ReflectionException
+     * @throws \toom1996\base\InvalidConfigException
      */
     public function getResponse($response = null)
     {
-        return $this->component('response', $response);
+        if (!$this->has('response')) {
+            $this->set('response', $response);
+        }
+        return $this->get('response');
     }
 
     /**
-     * Returens the urlManager component.
-     * @return \toom1996\http\UrlManager
+     *
+     * @return mixed
+     * @throws \ReflectionException
+     * @throws \toom1996\base\InvalidConfigException
      */
     public function getUrlManager()
     {
-        return $this->component('urlManager');
+        return $this->get('urlManager');
     }
 
-
     /**
-     * Handles request.
      *
-     * @param \toom1996\web\Request $request
+     * @param $request Request
      *
-     * @return \toom1996\web\Response
+     * @return mixed
+     * @throws \ReflectionException
+     * @throws \toom1996\base\InvalidConfigException
+     * @throws \toom1996\base\UnknownClassException
+     * @throws \toom1996\base\InvalidConfigException
      */
     public function handleRequest($request)
     {
@@ -166,17 +179,9 @@ class YiiS extends BaseYiiS
 //        try {
 //            Yii::debug("Route requested: '$route'", __METHOD__);
             $result = $this->runAction($handler, $params);
-
             if ($result === false) {
                 
             }
-//            echo '333333333';
-//            var_dump('pppppp');
-//            var_dump($result);
-//            var_dump($result);
-//            if ($result instanceof Response) {
-//                return $result;
-//            }
 //
             $response = $this->getResponse();
 //            if ($result !== null) {
@@ -203,13 +208,7 @@ class YiiS extends BaseYiiS
         }
         self::$app = $this;
     }
-
-    public function createObject($type)
-    {
-        if (is_string($type)) {
-            return self::$app->component($type);
-        }
-    }
+    
 
     /**
      * Returns default YIIS core component.
@@ -220,15 +219,19 @@ class YiiS extends BaseYiiS
        return array_merge(parent::coreComponents(), [
            'request' => ['class' => 'toom1996\web\Request'],
            'response' => ['class' => 'toom1996\web\Response'],
-           'errorHandler' => ['class' => 'toom1996\web\ErrorHandler'],
+           'errorHandler' => ['class' => 'toom1996\http\ErrorHandler'],
            'urlManager'   => ['class' => 'toom1996\http\UrlManager'],
+           'view'         => ['class' => 'toom1996\http\View'],
        ]);
    }
 
 
     /**
-     * Exit YiiS and send content.
+     *
      * @param  int  $code
+     *
+     * @throws \ReflectionException
+     * @throws \toom1996\base\InvalidConfigException
      */
    public function end($code = 0)
    {

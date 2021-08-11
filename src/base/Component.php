@@ -2,6 +2,7 @@
 
 namespace toom1996\base;
 
+use yii\base\UnknownPropertyException;
 use YiiS;
 
 class Component
@@ -43,26 +44,22 @@ class Component
      * @param $name
      *
      * @return mixed
+     * @throws \toom1996\base\UnknownClassException
      */
-    public function __get($name)
+    public function __get(string $name)
     {
-        return $this->component($name);
-    }
-
-    public function component($id, $value = null)
-    {
-        if (isset($this->component[$id])) {
-            return $this->component[$id];
+        // TODO: Implement __get() method.
+        $getter = 'get' . $name;
+        if (method_exists($this, $getter)) {
+            // read property, e.g. getName()
+            return $this->$getter();
         }
 
-        if (isset(YiiS::$config['components'][$id])) {
-            $className = YiiS::$config['components'][$id]['class'];
-            new \ReflectionClass($className);
-            return $this->component[$id] = new $className($id, $value);
-        }else{
-            // TODO
+        if (method_exists($this, 'set' . $name)) {
+            throw new InvalidCallException('Getting write-only property: ' . get_class($this) . '::' . $name);
         }
 
+        throw new UnknownClassException('Getting unknown property: ' . get_class($this) . '::' . $name);
     }
 
 }

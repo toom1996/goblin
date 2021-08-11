@@ -7,7 +7,7 @@ namespace toom1996\base;
  *
  * @author: TOOM <1023150697@qq.com>
  */
-abstract class ErrorHandler
+abstract class ErrorHandler extends Component
 {
     public function handleException($exception){}
 

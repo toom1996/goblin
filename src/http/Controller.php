@@ -1,7 +1,7 @@
 <?php
 
 
-namespace toom1996\web;
+namespace toom1996\http;
 
 
 use toom1996\base\Module;
@@ -20,31 +20,32 @@ class Controller extends Module
 
     }
 
+    /**
+     *
+     * @param $view
+     * @param  array  $params
+     *
+     * @return mixed
+     * @throws \ReflectionException
+     * @throws \toom1996\base\InvalidConfigException
+     */
     public function render($view, $params = [])
     {
-        $content = $this->getView()->render($view, $params);
+        $content = YiiS::$app->getView()->render($view, $params);
         return $this->renderContent($content);
     }
 
 
     public function renderContent($content)
     {
-        $layoutFile = $this->findLayoutFile($this->getView());
-        if ($layoutFile !== false) {
-            return $this->getView()->renderFile($layoutFile, ['content' => $content], $this);
-        }
+//        $layoutFile = $this->findLayoutFile(YiiS::$app->getView());
+//        if ($layoutFile !== false) {
+//            return $this->getView()->renderFile($layoutFile, ['content' => $content], $this);
+//        }
 
         return $content;
     }
 
-    public function getView()
-    {
-        if ($this->_view === null) {
-            $this->_view = YiiS::$app->getView();
-        }
-
-        return $this->_view;
-    }
 
     /**
      * Finds the applicable layout file.
