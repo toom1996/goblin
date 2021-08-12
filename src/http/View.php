@@ -17,7 +17,10 @@ use YiiS;
 class View extends Component
 {
 
-    private $defaultExtension = 'php';
+    public $defaultExtension = 'php';
+
+
+    private $_viewCache;
 
     /**
      *
@@ -58,10 +61,16 @@ class View extends Component
         return $path;
     }
 
-    protected function renderFile($viewFile, $params)
+    /**
+     *
+     * @param $viewFile
+     * @param $params
+     * @param  null  $context
+     */
+    public function renderFile($viewFile, $params, $context = null)
     {
         $viewFile = $requestedFile = YiiS::getAlias($viewFile);
-
+        var_dump($viewFile);
         if (!is_file($viewFile)) {
             throw new ViewNotFoundException("The view file does not exist: $viewFile");
         }
@@ -85,28 +94,44 @@ class View extends Component
 
     public function renderPhpFile($_file_, $_params_ = [])
     {
-        $_obInitialLevel_ = ob_get_level();
-//        ob_start();
-//        ob_implicit_flush(false);
+//
+//        $_obInitialLevel_ = ob_get_level();
+////        ob_start();
+////        ob_implicit_flush(false);
         extract($_params_, EXTR_OVERWRITE);
-        try {
-            $c = include $_file_;
-            return true;
-//            return '123123';
-        } catch (\Exception $e) {
-            while (ob_get_level() > $_obInitialLevel_) {
-                if (!@ob_end_clean()) {
-                    ob_clean();
-                }
-            }
-            throw $e;
-        } catch (\Throwable $e) {
-            while (ob_get_level() > $_obInitialLevel_) {
-                if (!@ob_end_clean()) {
-                    ob_clean();
-                }
-            }
-            throw $e;
-        }
+
+//        if (!isset(YiiS::$viewCache[$_file_])) {
+//            YiiS::$viewCache[$_file_] = file_get_contents( $_file_);
+//        }
+        require  $_file_;
+//        var_dump(YiiS::$viewCache[$_file_]);
+//
+//        $a = YiiS::$viewCache[$_file_];
+//
+////        eval(YiiS::$viewCache[$_file_]);//执行了这条命令
+//        $str="hell sowrd"; //比如这个是元算结果
+//        $code= "<<<<<><><><><><><print('n$str');";//这个是保存在数据库内的php代码
+////        echo($code);//打印组合后的命令,str字符串被替代了,形成一个完整的php命令,但并是不会执行
+//        eval($code);//执行了这条命令
+
+//        try {
+//            $c = include $_file_;
+//            return true;
+////            return '123123';
+//        } catch (\Exception $e) {
+//            while (ob_get_level() > $_obInitialLevel_) {
+//                if (!@ob_end_clean()) {
+//                    ob_clean();
+//                }
+//            }
+//            throw $e;
+//        } catch (\Throwable $e) {
+//            while (ob_get_level() > $_obInitialLevel_) {
+//                if (!@ob_end_clean()) {
+//                    ob_clean();
+//                }
+//            }
+//            throw $e;
+//        }
     }
 }

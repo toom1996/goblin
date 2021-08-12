@@ -9,6 +9,7 @@ use YiiS;
 
 class Controller extends Module
 {
+    public $layout = '@app/views/layouts/main';
 
     /**
      * @var \toom1996\web\View the view object that can be used to render views or view files.
@@ -36,36 +37,35 @@ class Controller extends Module
     }
 
 
+    /**
+     *
+     * @param $content
+     *
+     * @return mixed
+     * @throws \ReflectionException
+     * @throws \toom1996\base\InvalidConfigException
+     */
     public function renderContent($content)
     {
-//        $layoutFile = $this->findLayoutFile(YiiS::$app->getView());
-//        if ($layoutFile !== false) {
-//            return $this->getView()->renderFile($layoutFile, ['content' => $content], $this);
-//        }
+        $layoutFile = $this->findLayoutFile(YiiS::$app->getView());
+        if ($layoutFile !== false) {
+            return YiiS::$app->getView()->renderFile($layoutFile, ['content' => $content], $this);
+        }
 
         return $content;
     }
 
 
     /**
-     * Finds the applicable layout file.
-     * @param View $view the view object to render the layout file.
-     * @return string|bool the layout file path, or false if layout is not needed.
-     * Please refer to [[render()]] on how to specify this parameter.
-     * @throws InvalidArgumentException if an invalid path alias is used to specify the layout.
+     *
+     * @param $view \toom1996\http\View
+     *
+     * @return bool|string
      */
     public function findLayoutFile($view)
     {
-        $module = $this->module;
         if (is_string($this->layout)) {
             $layout = $this->layout;
-        } elseif ($this->layout === null) {
-            while ($module !== null && $module->layout === null) {
-                $module = $module->module;
-            }
-            if ($module !== null && is_string($module->layout)) {
-                $layout = $module->layout;
-            }
         }
 
         if (!isset($layout)) {
@@ -73,12 +73,13 @@ class Controller extends Module
         }
 
         if (strncmp($layout, '@', 1) === 0) {
-            $file = Yii::getAlias($layout);
-        } elseif (strncmp($layout, '/', 1) === 0) {
-            $file = Yii::$app->getLayoutPath() . DIRECTORY_SEPARATOR . substr($layout, 1);
-        } else {
-            $file = $module->getLayoutPath() . DIRECTORY_SEPARATOR . $layout;
+            $file = YiiS::getAlias($layout);
         }
+//        elseif (strncmp($layout, '/', 1) === 0) {
+//            $file = YiiS::$app->getLayoutPath() . DIRECTORY_SEPARATOR . substr($layout, 1);
+//        } else {
+//            $file = $module->getLayoutPath() . DIRECTORY_SEPARATOR . $layout;
+//        }
 
         if (pathinfo($file, PATHINFO_EXTENSION) !== '') {
             return $file;
@@ -88,6 +89,7 @@ class Controller extends Module
             $path = $file . '.php';
         }
 
+        var_dump('layout is ', $layout);
         return $path;
     }
 }

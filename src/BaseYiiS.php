@@ -30,6 +30,12 @@ class BaseYiiS extends Module
     public static $handlerMap = [];
 
     /**
+     * View Cahce.
+     * @var
+     */
+    public static $viewCache;
+
+    /**
      * @var
      */
     public static $config;
