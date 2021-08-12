@@ -70,7 +70,6 @@ class View extends Component
     public function renderFile($viewFile, $params, $context = null)
     {
         $viewFile = $requestedFile = YiiS::getAlias($viewFile);
-        var_dump($viewFile);
         if (!is_file($viewFile)) {
             throw new ViewNotFoundException("The view file does not exist: $viewFile");
         }
@@ -97,13 +96,14 @@ class View extends Component
 //
 //        $_obInitialLevel_ = ob_get_level();
 ////        ob_start();
-////        ob_implicit_flush(false);
+//        ob_implicit_flush(false);
         extract($_params_, EXTR_OVERWRITE);
 
 //        if (!isset(YiiS::$viewCache[$_file_])) {
 //            YiiS::$viewCache[$_file_] = file_get_contents( $_file_);
 //        }
-        require  $_file_;
+        require $_file_;
+        return ob_get_contents();
 //        var_dump(YiiS::$viewCache[$_file_]);
 //
 //        $a = YiiS::$viewCache[$_file_];
@@ -128,7 +128,7 @@ class View extends Component
 //        } catch (\Throwable $e) {
 //            while (ob_get_level() > $_obInitialLevel_) {
 //                if (!@ob_end_clean()) {
-//                    ob_clean();
+                    ob_clean();
 //                }
 //            }
 //            throw $e;
