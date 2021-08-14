@@ -184,9 +184,9 @@ class YiiS extends BaseYiiS
             }
 //
             $response = $this->getResponse();
-//            if ($result !== null) {
-                $response->content = ob_get_clean();
-//            }
+            if ($result !== null) {
+                $response->content = $result;
+            }
 //
 //            return $response;
 //        } catch (InvalidRouteException $e) {
@@ -197,7 +197,7 @@ class YiiS extends BaseYiiS
 
     public function init()
     {
-        ob_start();
+//        ob_start();
         // merge core components with custom components
         foreach ($this->coreComponents() as $id => $component) {
             if (!isset(self::$config['components'][$id])) {

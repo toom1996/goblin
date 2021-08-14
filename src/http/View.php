@@ -95,15 +95,16 @@ class View extends Component
     {
 //
 //        $_obInitialLevel_ = ob_get_level();
-////        ob_start();
-//        ob_implicit_flush(false);
+        ob_start();
+        ob_implicit_flush(false);
         extract($_params_, EXTR_OVERWRITE);
 
 //        if (!isset(YiiS::$viewCache[$_file_])) {
 //            YiiS::$viewCache[$_file_] = file_get_contents( $_file_);
 //        }
         require $_file_;
-        return ob_get_contents();
+
+        return ob_get_clean();;
 //        var_dump(YiiS::$viewCache[$_file_]);
 //
 //        $a = YiiS::$viewCache[$_file_];
