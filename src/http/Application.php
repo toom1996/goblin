@@ -101,7 +101,6 @@ class Application
             return;
         }
 
-        var_dump($classFile);
         require $classFile;
 
 //        if (YIIS_DEBUG && !class_exists($className, false) && !interface_exists($className, false) && !trait_exists($className, false)) {

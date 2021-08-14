@@ -89,7 +89,6 @@ class Controller extends Module
             $path = $file . '.php';
         }
 
-        var_dump('layout is ', $layout);
         return $path;
     }
 }

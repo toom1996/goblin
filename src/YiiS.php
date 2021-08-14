@@ -2,7 +2,6 @@
 
 use toom1996\base\UnknownClassException;
 use toom1996\web\Request;
-use toom1996\web\UrlManager;
 use toom1996\BaseYiiS;
 
 /**
@@ -15,11 +14,13 @@ use toom1996\BaseYiiS;
  */
 class YiiS extends BaseYiiS
 {
+
+
     /**
      * The requested route
      * @var string
      */
-    public $requestedRoute;
+    public $charset = 'UTF-8';
 
     /**
      * Application app
@@ -184,9 +185,9 @@ class YiiS extends BaseYiiS
             }
 //
             $response = $this->getResponse();
-//            if ($result !== null) {
-                $response->content = ob_get_clean();
-//            }
+            if ($result !== null) {
+                $response->content = $result;
+            }
 //
 //            return $response;
 //        } catch (InvalidRouteException $e) {
@@ -197,7 +198,7 @@ class YiiS extends BaseYiiS
 
     public function init()
     {
-        ob_start();
+//        ob_start();
         // merge core components with custom components
         foreach ($this->coreComponents() as $id => $component) {
             if (!isset(self::$config['components'][$id])) {
