@@ -2,7 +2,6 @@
 
 use toom1996\base\UnknownClassException;
 use toom1996\web\Request;
-use toom1996\web\UrlManager;
 use toom1996\BaseYiiS;
 
 /**
@@ -15,11 +14,13 @@ use toom1996\BaseYiiS;
  */
 class YiiS extends BaseYiiS
 {
+
+
     /**
      * The requested route
      * @var string
      */
-    public $requestedRoute;
+    public $charset = 'UTF-8';
 
     /**
      * Application app

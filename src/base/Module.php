@@ -129,10 +129,5 @@ class Module extends ServiceLocator
 
         return $this->_basePath;
     }
-    
-    
-    public static function varDump()
-    {
-    }
 
 }

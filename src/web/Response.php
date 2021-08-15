@@ -267,11 +267,4 @@ class Response extends Component
     {
 
     }
-
-    /**
-     *
-     */
-    public function appendConent()
-    {
-    }
 }
