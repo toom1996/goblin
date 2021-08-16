@@ -5,7 +5,6 @@ namespace toom1996\http;
 
 
 use toom1996\base\Module;
-use YiiS;
 
 class Controller extends Module
 {
@@ -32,7 +31,7 @@ class Controller extends Module
      */
     public function render($view, $params = [])
     {
-        $content = YiiS::$app->getView()->render($view, $params);
+        $content = Goblin::$app->getView()->render($view, $params);
         return $this->renderContent($content);
     }
 
@@ -47,9 +46,9 @@ class Controller extends Module
      */
     public function renderContent($content)
     {
-        $layoutFile = $this->findLayoutFile(YiiS::$app->getView());
+        $layoutFile = $this->findLayoutFile(Goblin::$app->getView());
         if ($layoutFile !== false) {
-            return YiiS::$app->getView()->renderFile($layoutFile, ['content' => $content], $this);
+            return Goblin::$app->getView()->renderFile($layoutFile, ['content' => $content], $this);
         }
 
         return $content;
@@ -73,7 +72,7 @@ class Controller extends Module
         }
 
         if (strncmp($layout, '@', 1) === 0) {
-            $file = YiiS::getAlias($layout);
+            $file = Goblin::getAlias($layout);
         }
 //        elseif (strncmp($layout, '/', 1) === 0) {
 //            $file = YiiS::$app->getLayoutPath() . DIRECTORY_SEPARATOR . substr($layout, 1);

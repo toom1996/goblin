@@ -38,7 +38,7 @@ class View extends Component
     {
         if (strncmp($view, '@', 1) === 0) {
             // e.g. "@app/views/main"
-            $file = YiiS::getAlias($view);
+            $file = Goblin::getAlias($view);
         } elseif (strncmp($view, '/', 1) === 0) {
             // e.g. "/site/index"
 //            if (YiiS::$app->controller !== null) {
@@ -69,7 +69,7 @@ class View extends Component
      */
     public function renderFile($viewFile, $params, $context = null)
     {
-        $viewFile = $requestedFile = YiiS::getAlias($viewFile);
+        $viewFile = $requestedFile = Goblin::getAlias($viewFile);
         if (!is_file($viewFile)) {
             throw new ViewNotFoundException("The view file does not exist: $viewFile");
         }

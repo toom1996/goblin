@@ -114,7 +114,7 @@ class Request extends Component
      */
     public function resolve()
     {
-        list($handler, $param) = \YiiS::$app->getUrlManager()->parseRequest();
+        list($handler, $param) = Goblin::$app->getUrlManager()->parseRequest();
         return [$handler, array_merge($this->getQueryParams(), $param)];
     }
 

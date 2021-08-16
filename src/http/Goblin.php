@@ -11,7 +11,7 @@ use Swoole\Http\Response;
  *
  * @property-read \toom1996\web\Request $request
  * @property-read \toom1996\http\ErrorHandler $errorHandler
- * @property-read \toom1996\web\Response $response
+ * @property-read \toom1996\http\Response $response
  * @author: TOOM1996
  */
 class Goblin extends BaseGoblin
@@ -72,7 +72,7 @@ class Goblin extends BaseGoblin
             return $this->handleRequest($this->getRequest($request))
                 ->send();
         }catch (\Swoole\ExitException $e){
-            $this->getResponse()->content = 'exit';
+            $this->getResponse()->content = $e->getMessage();
         }catch (\Throwable $e) {
             $this->getErrorHandler()->handleException($e);
         } finally {
@@ -94,6 +94,7 @@ class Goblin extends BaseGoblin
                 self::$config['components'][$id]['class'] = $component['class'];
             }
         }
+        
         self::$app = $this;
     }
 
@@ -140,7 +141,7 @@ class Goblin extends BaseGoblin
      *
      * @param  null  $response
      *
-     * @return \toom1996\web\Response
+     * @return \toom1996\http\Response
      * @throws \ReflectionException
      * @throws \toom1996\base\InvalidConfigException
      */
@@ -149,6 +150,7 @@ class Goblin extends BaseGoblin
         if (!$this->has('response')) {
             $this->set('response', $response);
         }
+        
         return $this->get('response');
     }
 
@@ -175,16 +177,8 @@ class Goblin extends BaseGoblin
      */
     public function handleRequest($request)
     {
-        try {
-            list($handler, $params) = $request->resolve();
-        } catch (\toom1996\base\NotFoundHttpException $e) {
-            $handler = YiiS::$app->getErrorHandler()->errorAction;
-        }
+        list($handler, $params) = $request->resolve();
         $result = $this->runAction($handler);
-        if ($result === false) {
-
-        }
-
         $response = $this->getResponse();
         if ($result !== null) {
             $response->content = $result;

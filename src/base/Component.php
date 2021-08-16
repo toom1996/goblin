@@ -2,8 +2,8 @@
 
 namespace toom1996\base;
 
+use toom1996\http\Goblin;
 use yii\base\UnknownPropertyException;
-use YiiS;
 
 class Component
 {
@@ -24,7 +24,7 @@ class Component
     public function __construct($id = null, $params = null)
     {
         if ($id) {
-            $config = array_merge(YiiS::$config['components'][$id], (array)$params);
+            $config = array_merge(Goblin::$config['components'][$id], (array)$params);
             foreach ($config as $name => $value) {
                 if (property_exists($this, $name)) {
                     $this->{$name} = $value;

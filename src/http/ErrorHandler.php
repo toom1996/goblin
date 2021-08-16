@@ -2,7 +2,7 @@
 
 namespace toom1996\http;
 
-use toom1996\web\Response;
+use toom1996\http\Response;
 
 class ErrorHandler extends \toom1996\base\ErrorHandler
 {
@@ -25,6 +25,7 @@ class ErrorHandler extends \toom1996\base\ErrorHandler
      */
     public function handleException($exception)
     {
+        Goblin::$app->end();
         $this->exception = $exception;
         $this->_errorData = [
             'type' => get_class($exception),
@@ -49,25 +50,20 @@ class ErrorHandler extends \toom1996\base\ErrorHandler
     {
         // TODO: Implement renderException() method.
 
-        if (\YiiS::$app->has('response')) {
-            $response = \YiiS::$app->getResponse();
-            $response->isSend = false;
-            $response->stream = null;
+        if (Goblin::$app->has('response')) {
+            $response = Goblin::$app->getResponse();
+//            $response->isSend = false;
             $response->content = null;
         } else {
-            $response = \YiiS::$app->get('response');
+            $response = Goblin::$app->get('response');
         }
         $response->setStatusCodeByException($exception);
 
         $useErrorView = $response->format === Response::FORMAT_HTML;
 
         if ($useErrorView && $this->errorAction !== null) {
-            $result = \YiiS::$app->runAction($this->errorAction);
-            if ($result instanceof Response) {
-                $response = $result;
-            } else {
-                $response->data = $result;
-            }
+            $result = Goblin::$app->runAction($this->errorAction);
+            $response->content = $result;
         } elseif ($response->format === Response::FORMAT_HTML) {
             if ($this->shouldRenderSimpleHtml()) {
                 // AJAX request

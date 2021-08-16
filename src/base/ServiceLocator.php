@@ -4,7 +4,7 @@
 namespace toom1996\base;
 
 
-use YiiS;
+use toom1996\http\Goblin;
 
 class ServiceLocator extends Component
 {
@@ -28,7 +28,7 @@ class ServiceLocator extends Component
             return $this->_components[$id];
         }
 
-        if (isset(YiiS::$config['components'][$id])) {
+        if (isset(Goblin::$config['components'][$id])) {
             return $this->set($id);
         }else{
             throw new InvalidConfigException("Unknown component ID: $id");
@@ -65,7 +65,7 @@ class ServiceLocator extends Component
                 $definition = (array)$definition;
             }
 
-            // e.g YiiS::$app->set('foo', ['class' => foo\bar, 'a' => 'b'])
+            // e.g Goblin::$app->set('foo', ['class' => foo\bar, 'a' => 'b'])
             // If has class, it will be overwrite all component attribuets.
             if (isset($definition['class'])) {
                 $class = new \ReflectionClass($definition['class']);
@@ -74,10 +74,10 @@ class ServiceLocator extends Component
         }
 
         // e.g YiiS::$app->set('foo', ['a' => 'b'])
-        if (!isset(YiiS::$config['components'][$id]['class'])) {
+        if (!isset(Goblin::$config['components'][$id]['class'])) {
             throw new InvalidConfigException("Unexpected configuration type for the \"$id\" component: " . gettype($definition));
         }
-        $class = new \ReflectionClass(YiiS::$config['components'][$id]['class']);
+        $class = new \ReflectionClass(Goblin::$config['components'][$id]['class']);
         $this->_components[$id] = $class->newInstanceArgs([$id, $definition]);
 
         return $this->_components[$id];

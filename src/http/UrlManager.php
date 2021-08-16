@@ -78,7 +78,7 @@ class UrlManager extends BaseUrlManager
      */
     protected function matchRoute()
     {
-        $request = \YiiS::$app->getRequest();
+        $request = Goblin::$app->getRequest();
         $httpMethod = $request->getMethod();
         $uri = self::trimSlashes($request->getUrl());
         if (false !== $pos = strpos($uri, '?')) {
@@ -132,7 +132,7 @@ class UrlManager extends BaseUrlManager
         list($method, $route, $handler) = [$rule[0], $rule[1], $rule[2]];
         if (strpos($handler, '@') === 0) {
             // If route is `@controllers/site/index`, will be convert @controller to BathPath
-            $handlerAlias = \YiiS::getAlias($handler);
+            $handlerAlias = Goblin::getAlias($handler);
             $ex = explode('/', $handlerAlias);
 
             // Find controller and action.
@@ -150,9 +150,9 @@ class UrlManager extends BaseUrlManager
             $handlerFile = implode('/',
                 array_merge(array_slice($ex, 0, count($ex) - 2),
                     [$controller . '.php']));
-            $className = '\\' . \YiiS::getNamespace($handlerFile) . '\\' . basename(str_replace('.php', '', $handlerFile));
+            $className = '\\' . Goblin::getNamespace($handlerFile) . '\\' . basename(str_replace('.php', '', $handlerFile));
 
-            \YiiS::setHandlerMap($handler, [
+            Goblin::setHandlerMap($handler, [
                 'class' => $className,
                 'action' => $action
             ]);

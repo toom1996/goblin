@@ -5,8 +5,8 @@ namespace toom1996\http;
 use toom1996\base\Component;
 use toom1996\base\HttpException;
 use toom1996\base\NotFoundHttpException;
-use yii\web\HeadersAlreadySentException;
-use YiiS;
+use toom1996\web\HeaderCollection;
+use yii\http\HeadersAlreadySentException;
 
 /**
  * Class Response
@@ -273,7 +273,6 @@ class Response extends Component
      */
     public function setStatusCodeByException($exception)
     {
-        var_dump($exception->getCode());
         if ($exception instanceof HttpException) {
             $this->setStatusCode($exception->getCode());
         } else {

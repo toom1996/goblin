@@ -44,8 +44,8 @@ class Application
      */
     public function __construct($config = [])
     {
-        \YiiS::setAlias('@app', $config['basePath']);
-        \YiiS::setAlias('@controllers', $config['basePath'] . '/controllers');
+        Goblin::setAlias('@app', $config['basePath']);
+        Goblin::setAlias('@controllers', $config['basePath'] . '/controllers');
         $this->config = $config;
         $this->initConfig();
     }
@@ -71,29 +71,16 @@ class Application
     {
         return (new AnnotationScanner($this->config))->scan();
     }
-    
-    
-    /**
-     * Load a new YIIS object from application.
-     *
-     * @param $app
-     *
-     * @return \YiiS
-     */
+
     public function load($app)
     {
         return new $app($this->config);
     }
 
-    /**
-     * YiiS autoload function.
-     * When Application initial, register this function for `spl_autoload_register` callback function.
-     * @param  string  $className
-     */
     public static function autoload(string $className)
     {
         if (strpos($className, '\\') !== false) {
-            $classFile = \YiiS::getAlias('@' . str_replace('\\', '/', $className) . '.php', false);
+            $classFile = Goblin::getAlias('@' . str_replace('\\', '/', $className) . '.php', false);
             if ($classFile === false || !is_file($classFile)) {
                 return;
             }
