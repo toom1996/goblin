@@ -2,6 +2,8 @@
 
 namespace toom1996\http;
 
+use toom1996\web\Response;
+
 class ErrorHandler extends \toom1996\base\ErrorHandler
 {
     /**
@@ -32,31 +34,35 @@ class ErrorHandler extends \toom1996\base\ErrorHandler
             'stack-trace' => explode("\n", $exception->getTraceAsString()),
         ];
         var_dump($this->_errorData);
-        $this->renderException($this->_errorData);
+        $this->renderException($exception);
     }
 
+    /**
+     *
+     * @param $exception \Exception
+     *
+     * @throws \ReflectionException
+     * @throws \toom1996\base\InvalidConfigException
+     * @throws \toom1996\base\UnknownClassException
+     */
     protected function renderException($exception)
     {
         // TODO: Implement renderException() method.
 
         if (\YiiS::$app->has('response')) {
-            $response = Yii::$app->getResponse();
-            // reset parameters of response to avoid interference with partially created response data
-            // in case the error occurred while sending the response.
-            $response->isSent = false;
+            $response = \YiiS::$app->getResponse();
+            $response->isSend = false;
             $response->stream = null;
-            $response->data = null;
             $response->content = null;
         } else {
-            $response = new Response();
+            $response = \YiiS::$app->get('response');
         }
-
         $response->setStatusCodeByException($exception);
 
-        $useErrorView = $response->format === Response::FORMAT_HTML && (!YII_DEBUG || $exception instanceof UserException);
+        $useErrorView = $response->format === Response::FORMAT_HTML;
 
         if ($useErrorView && $this->errorAction !== null) {
-            $result = Yii::$app->runAction($this->errorAction);
+            $result = \YiiS::$app->runAction($this->errorAction);
             if ($result instanceof Response) {
                 $response = $result;
             } else {
@@ -82,8 +88,6 @@ class ErrorHandler extends \toom1996\base\ErrorHandler
         } else {
             $response->data = $this->convertExceptionToArray($exception);
         }
-
-        $response->send();
     }
 
     /**

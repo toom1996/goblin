@@ -16,7 +16,7 @@ class Controller extends Module
      */
     private $_view;
 
-    public function runAction($route, $params)
+    public function runAction($handler)
     {
 
     }

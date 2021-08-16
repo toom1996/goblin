@@ -69,9 +69,10 @@ class Module extends ServiceLocator
      *
      * @return mixed
      * @throws \ReflectionException
-     * @throws \toom1996\base\UnknownClassException|\toom1996\base\InvalidConfigException
+     * @throws \toom1996\base\UnknownClassException
+     * @throws \toom1996\base\InvalidConfigException
      */
-    public function runAction($handler, $params)
+    public function runAction($handler)
     {
         if (isset(YiiS::$handlerMap[$handler])) {
             $handlerMap = YiiS::$handlerMap[$handler];
@@ -85,7 +86,7 @@ class Module extends ServiceLocator
         if (!$ref->hasMethod($handlerMap['action'])) {
             throw new InvalidConfigException("class {$handlerMap['class']} does not have a method {$handlerMap['action']}, please check your config.");
         }
-
+        echo '789';
         return call_user_func([$ref->newInstance(), $handlerMap['action']]);
     }
 

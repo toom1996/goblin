@@ -10,7 +10,7 @@ use Throwable;
  *
  * @author: TOOM <1023150697@qq.com>
  */
-class NotFoundHttpException extends Exception
+class NotFoundHttpException extends HttpException
 {
 
     /**

@@ -68,7 +68,7 @@ class YiiS extends BaseYiiS
             return $this->handleRequest($this->getRequest($request))
                 ->send();
         }catch (\Swoole\ExitException $e){
-            $this->getResponse()->content = $e->getStatus();
+            $this->getResponse()->content = 'exit';
         }catch (\Throwable $e) {
             $this->getErrorHandler()->handleException($e);
         } finally {
@@ -141,7 +141,7 @@ class YiiS extends BaseYiiS
 
     /**
      *
-     * @return mixed
+     * @return \toom1996\http\UrlManager
      * @throws \ReflectionException
      * @throws \toom1996\base\InvalidConfigException
      */
@@ -165,34 +165,18 @@ class YiiS extends BaseYiiS
         try {
             list($handler, $params) = $request->resolve();
         } catch (\toom1996\base\NotFoundHttpException $e) {
-            YiiS::$app->getErrorHandler()->handleException($e);
-//                $url = $e->url;
-//                if (is_array($url)) {
-//                    if (isset($url[0])) {
-//                        // ensure the route is absolute
-//                        $url[0] = '/' . ltrim($url[0], '/');
-//                    }
-//                    $url += $request->getQueryParams();
-//                }
-//
-//                return $this->getResponse()->redirect(Url::to($url, $e->scheme), $e->statusCode);
+            $handler = YiiS::$app->getErrorHandler()->errorAction;
         }
-//        try {
-//            Yii::debug("Route requested: '$route'", __METHOD__);
-            $result = $this->runAction($handler, $params);
-            if ($result === false) {
-                
-            }
-//
-            $response = $this->getResponse();
-            if ($result !== null) {
-                $response->content = $result;
-            }
-//
-//            return $response;
-//        } catch (InvalidRouteException $e) {
-//            throw new NotFoundHttpException(Yii::t('yii', 'Page not found.'), $e->getCode(), $e);
-//        }
+        $result = $this->runAction($handler);
+        if ($result === false) {
+
+        }
+
+        $response = $this->getResponse();
+        if ($result !== null) {
+            $response->content = $result;
+        }
+
         return $response;
     }
 
@@ -234,11 +218,11 @@ class YiiS extends BaseYiiS
      * @throws \ReflectionException
      * @throws \toom1996\base\InvalidConfigException
      */
-   public function end($code = 0)
+   public function end($code = 200)
    {
        $response = $this->getResponse();
+       $response->setStatusCode($code);
        $response->send();
-       exit(0);
    }
 
 

@@ -109,15 +109,12 @@ class UrlManager extends BaseUrlManager
                     list($method, $route, $handler) = self::parseRule($rules);
                     $controller->addRoute($method, $route, $handler);
                 } else {
-                    $controller->addGroup($prefix,
-                        function (RouteCollector $controller) use ($rules) {
-                            foreach ($rules as $rulesChild) {
-                                list($method, $route, $handler) =
-                                    self::parseRule($rulesChild);
-                                $controller->addRoute($method, $route,
-                                    $handler);
-                            }
-                        });
+                    $controller->addGroup($prefix, function (RouteCollector $controller) use ($rules) {
+                        foreach ($rules as $rulesChild) {
+                            list($method, $route, $handler) = self::parseRule($rulesChild);
+                            $controller->addRoute($method, $route, $handler);
+                        }
+                    });
                 }
             }
         });
@@ -162,5 +159,6 @@ class UrlManager extends BaseUrlManager
         }
         return [$method, $route, $handler];
     }
+
 
 }
