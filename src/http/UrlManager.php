@@ -4,7 +4,7 @@ namespace toom1996\http;
 
 use FastRoute\Dispatcher;
 use FastRoute\RouteCollector;
-use toom1996\base\NotFoundHttpException;
+use toom1996\http\NotFoundHttpException;
 use function FastRoute\simpleDispatcher;
 
 /**
@@ -42,10 +42,10 @@ class UrlManager extends BaseUrlManager
         $match = $this->matchRoute();
         switch ($match[0]) {
             case Dispatcher::NOT_FOUND:
-                throw new NotFoundHttpException("404 Page not found.");
+                throw new NotFoundHttpException("Page Not Found.");
                 break;
             case Dispatcher::METHOD_NOT_ALLOWED:
-                throw new MethodNotAllowedHttpException("405 Method Not Allowed");
+                throw new MethodNotAllowedHttpException("Method Not Allowed.");
                 break;
         }
         // handler, param
@@ -99,7 +99,7 @@ class UrlManager extends BaseUrlManager
      */
     public static function loadRoute($config)
     {
-        $webRoute = self::getRoute($config);
+        $webRoute = $config['route'];
 
         return simpleDispatcher(function (RouteCollector $controller) use (
             $webRoute

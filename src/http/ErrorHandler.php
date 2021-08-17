@@ -2,6 +2,8 @@
 
 namespace toom1996\http;
 
+use toom1996\base\Exception;
+use toom1996\base\InvalidCallException;
 use toom1996\http\Response;
 
 class ErrorHandler extends \toom1996\base\ErrorHandler
@@ -25,7 +27,6 @@ class ErrorHandler extends \toom1996\base\ErrorHandler
      */
     public function handleException($exception)
     {
-        var_dump($exception);
         $this->exception = $exception;
         $this->_errorData = [
             'type' => get_class($exception),
@@ -50,38 +51,43 @@ class ErrorHandler extends \toom1996\base\ErrorHandler
     {
         // TODO: Implement renderException() method.
 
-        if (Goblin::$app->has('response')) {
-            $response = Goblin::$app->getResponse();
+        try {
+            if (Goblin::$app->has('response')) {
+                $response = Goblin::$app->getResponse();
 //            $response->isSend = false;
-            $response->content = null;
-        } else {
-            $response = Goblin::$app->get('response');
-        }
-        $response->setStatusCodeByException($exception);
-
-        $useErrorView = $response->format === Response::FORMAT_HTML;
-        if ($useErrorView && $this->errorAction !== null) {
-            $result = Goblin::$app->runAction($this->errorAction);
-            $response->content = $result;
-        } elseif ($response->format === Response::FORMAT_HTML) {
-            if ($this->shouldRenderSimpleHtml()) {
-                // AJAX request
-                $response->data = '<pre>' . $this->htmlEncode(static::convertExceptionToString($exception)) . '</pre>';
+                $response->content = null;
             } else {
-                // if there is an error during error rendering it's useful to
-                // display PHP error in debug mode instead of a blank screen
-                if (YII_DEBUG) {
-                    ini_set('display_errors', 1);
-                }
-                $file = $useErrorView ? $this->errorView : $this->exceptionView;
-                $response->data = $this->renderFile($file, [
-                    'exception' => $exception,
-                ]);
+                $response = Goblin::$app->get('response');
             }
-        } elseif ($response->format === Response::FORMAT_RAW) {
-            $response->data = static::convertExceptionToString($exception);
-        } else {
-            $response->data = $this->convertExceptionToArray($exception);
+            $response->setStatusCodeByException($exception);
+
+            $useErrorView = $response->format === Response::FORMAT_HTML;
+            if ($useErrorView && $this->errorAction !== null) {
+                $result = Goblin::$app->runAction($this->errorAction);
+                $response->content = $result;
+            } elseif ($response->format === Response::FORMAT_HTML) {
+                if ($this->shouldRenderSimpleHtml()) {
+                    // AJAX request
+                    $response->data = '<pre>' . $this->htmlEncode(static::convertExceptionToString($exception)) . '</pre>';
+                } else {
+                    // if there is an error during error rendering it's useful to
+                    // display PHP error in debug mode instead of a blank screen
+                    if (YII_DEBUG) {
+                        ini_set('display_errors', 1);
+                    }
+                    $file = $useErrorView ? $this->errorView : $this->exceptionView;
+                    $response->data = $this->renderFile($file, [
+                        'exception' => $exception,
+                    ]);
+                }
+            } elseif ($response->format === Response::FORMAT_RAW) {
+                $response->data = static::convertExceptionToString($exception);
+            } else {
+                $response->data = $this->convertExceptionToArray($exception);
+            }
+        }catch (\Throwable $e) {
+            var_dump($e);
+            $response->content = $e->getMessage();
         }
     }
 
@@ -101,6 +107,20 @@ class ErrorHandler extends \toom1996\base\ErrorHandler
     public function getErrorData()
     {
         return $this->_errorData;
+    }
+
+    public function htmlEncode($text)
+    {
+        return htmlspecialchars($text, ENT_QUOTES, 'UTF-8');
+    }
+    
+    public function getExceptionName($exception)
+    {
+        if ($exception instanceof Exception || $exception instanceof InvalidCallException) {
+            return $exception->getName();
+        }
+
+        return null;
     }
 
 }

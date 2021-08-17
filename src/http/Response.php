@@ -3,7 +3,7 @@
 namespace toom1996\http;
 
 use toom1996\base\Component;
-use toom1996\base\HttpException;
+use toom1996\http\HttpException;
 use toom1996\base\NotFoundHttpException;
 use toom1996\web\HeaderCollection;
 use yii\http\HeadersAlreadySentException;
@@ -167,7 +167,6 @@ class Response extends Component
      */
     public function sendHeaders()
     {
-        var_dump(Goblin::$app->request->server['server_protocol']);
         if ($this->_headers) {
             foreach ($this->getHeaders() as $name => $values) {
                 $name = str_replace(' ', '-', ucwords(str_replace('-', ' ', $name)));

@@ -1,7 +1,7 @@
 <?php
 
 
-namespace toom1996\base;
+namespace toom1996\http;
 
 
 use Throwable;

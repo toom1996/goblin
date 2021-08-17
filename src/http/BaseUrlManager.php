@@ -29,17 +29,6 @@ abstract class BaseUrlManager extends Component
     abstract protected function parseRequest(): array ;
 
     /**
-     * Returns
-     * @param $config
-     *
-     * @return array
-     */
-    protected static function getRoute($config): array
-    {
-        return $config['components']['urlManager']['route'];
-    }
-
-    /**
      *
      * @param $config
      *

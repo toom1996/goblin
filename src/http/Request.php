@@ -6,7 +6,7 @@ use app\controllers\SiteController;
 use FastRoute\Dispatcher;
 use Swoole\Coroutine;
 use toom1996\base\Component;
-use toom1996\base\NotFoundHttpException;
+use toom1996\http\NotFoundHttpException;
 use toom1996\http\MethodNotAllowedHttpException;
 
 /**
@@ -109,7 +109,7 @@ class Request extends Component
      * @return array
      * @throws \ReflectionException
      * @throws \toom1996\base\InvalidConfigException
-     * @throws \toom1996\base\NotFoundHttpException
+     * @throws \toom1996\http\NotFoundHttpException
      * @throws \toom1996\http\MethodNotAllowedHttpException
      */
     public function resolve()
