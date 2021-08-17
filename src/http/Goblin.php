@@ -9,7 +9,7 @@ use Swoole\Http\Response;
 /**
  * Class Goblin
  *
- * @property-read \toom1996\web\Request $request
+ * @property-read \toom1996\http\Request $request
  * @property-read \toom1996\http\ErrorHandler $errorHandler
  * @property-read \toom1996\http\Response $response
  * @author: TOOM1996
@@ -23,14 +23,12 @@ class Goblin extends BaseGoblin
     public $charset = 'UTF-8';
 
     /**
-     * 框架实例。
      * Goblin framework instance.
      * @var Goblin
      */
     public static $app;
 
     /**
-     * 框架实例配置。
      * Goblin instance config.
      * @var array
      */
@@ -41,16 +39,13 @@ class Goblin extends BaseGoblin
      *
      * @param  array  $config
      */
-    public function __construct($config = [])
+    public function __construct(&$config = [])
     {
         self::$config = $config;
     }
 
     /**
-     * 运行Goblin应用。
      * Runs goblin application.
-     * 这是应用的主入口。
-     * This is main entrance of an application.
      *
      * @param \Swoole\Http\Request $request Swoole request object.
      * @param  \Swoole\Http\Response  $response Swoole response object.
@@ -81,7 +76,6 @@ class Goblin extends BaseGoblin
     }
 
     /**
-     * 初始化引导组件。
      * Initializes and executes bootstrap components.
      */
     public function bootstrap()
@@ -102,7 +96,7 @@ class Goblin extends BaseGoblin
      *
      * @param  null  $request
      *
-     * @return Request
+     * @return \toom1996\http\Request
      * @throws \ReflectionException
      * @throws \toom1996\base\InvalidConfigException
      */
@@ -166,14 +160,15 @@ class Goblin extends BaseGoblin
     }
 
     /**
-     *
-     * @param $request Request
+     * Request handler.
+     * @param $request \toom1996\http\Request
      *
      * @return mixed
      * @throws \ReflectionException
      * @throws \toom1996\base\InvalidConfigException
+     * @throws \toom1996\base\NotFoundHttpException
      * @throws \toom1996\base\UnknownClassException
-     * @throws \toom1996\base\InvalidConfigException
+     * @throws \toom1996\http\MethodNotAllowedHttpException
      */
     public function handleRequest($request)
     {
@@ -186,7 +181,6 @@ class Goblin extends BaseGoblin
 
         return $response;
     }
-
 
     /**
      * Returns default goblin components.
@@ -202,7 +196,6 @@ class Goblin extends BaseGoblin
             'view' => ['class' => 'toom1996\http\View'],
         ]);
     }
-
 
     /**
      *

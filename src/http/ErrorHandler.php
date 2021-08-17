@@ -25,7 +25,7 @@ class ErrorHandler extends \toom1996\base\ErrorHandler
      */
     public function handleException($exception)
     {
-        Goblin::$app->end();
+        var_dump($exception);
         $this->exception = $exception;
         $this->_errorData = [
             'type' => get_class($exception),
@@ -60,7 +60,6 @@ class ErrorHandler extends \toom1996\base\ErrorHandler
         $response->setStatusCodeByException($exception);
 
         $useErrorView = $response->format === Response::FORMAT_HTML;
-
         if ($useErrorView && $this->errorAction !== null) {
             $result = Goblin::$app->runAction($this->errorAction);
             $response->content = $result;

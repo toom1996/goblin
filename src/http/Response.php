@@ -42,9 +42,10 @@ class Response extends Component
     private $_response;
 
     /**
+     * Response headers.
      * @var
      */
-    private $_headers;
+    private $_headers = [];
 
     /**
      * Whether is send.
@@ -147,6 +148,10 @@ class Response extends Component
      */
     public $statusText = 'OK';
 
+    /**
+     * Send response content.
+     * @return bool
+     */
     public function send()
     {
         if ($this->isSend) {
@@ -158,10 +163,11 @@ class Response extends Component
     }
 
     /**
-     * Set send Headers.
+     * Set send header.
      */
     public function sendHeaders()
     {
+        var_dump(Goblin::$app->request->server['server_protocol']);
         if ($this->_headers) {
             foreach ($this->getHeaders() as $name => $values) {
                 $name = str_replace(' ', '-', ucwords(str_replace('-', ' ', $name)));
@@ -192,15 +198,18 @@ class Response extends Component
 
     public function getHeaders()
     {
-        if ($this->_headers === null) {
-            $this->_headers = new HeaderCollection();
-        }
-
         return $this->_headers;
+    }
+
+    public function setHeader($header, $body)
+    {
+
     }
 
     public function sendContent()
     {
+        // Set isSend is true.
+        // Prevent duplicate output.
         $this->isSend = true;
         if (!$this->content) {
             $this->content = ob_get_clean();

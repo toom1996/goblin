@@ -20,7 +20,7 @@ defined('APP_PATH') or define('APP_PATH', __DIR__);
  */
 spl_autoload_register(['toom1996\http\Application', 'autoload'], true, true);
 /**
- * Base Application.
+ * Base http application.
  * Defined all public variables.
  *
  * @author: TOOM <1023150697@qq.com>
@@ -29,7 +29,6 @@ class Application
 {
     /**
      * Application config.
-     * If the config/web.php content has changed, this variables cannot be changed accordingly.
      * @var array 
      */
     public $config;
@@ -42,11 +41,12 @@ class Application
      * @throws \ReflectionException
      * @throws \toom1996\base\Exception
      */
-    public function __construct($config = [])
+    public function __construct(&$config = [])
     {
-        Goblin::setAlias('@app', $config['basePath']);
-        Goblin::setAlias('@controllers', $config['basePath'] . '/controllers');
+        // Set alias and init config.
         $this->config = $config;
+        Goblin::setAlias('@app', $this->config['basePath']);
+        Goblin::setAlias('@controllers', $this->config['controllersPath']);
         $this->initConfig();
     }
 
@@ -57,21 +57,20 @@ class Application
      */
     public function initConfig()
     {
-//        $this->config['scanner']['arguments'] = $this->scanRouter();
+        if (isset($this->config['aliases']) && is_array($this->config['aliases'])) {
+            foreach ($this->config['aliases'] as $alias => $path) {
+                Goblin::setAlias($alias, $path);
+            }
+        }
         $this->config['components']['urlManager']['adapter'] = UrlManager::loadRoute($this->config);
     }
 
     /**
-     * Scan all route
-     * @return array
-     * @throws \ReflectionException
-     * @throws \toom1996\base\Exception
+     *
+     * @param $app
+     *
+     * @return mixed
      */
-    private function scanRouter(): array
-    {
-        return (new AnnotationScanner($this->config))->scan();
-    }
-
     public function load($app)
     {
         return new $app($this->config);

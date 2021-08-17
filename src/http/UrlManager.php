@@ -10,7 +10,7 @@ use function FastRoute\simpleDispatcher;
 /**
  * Class UrlManager
  *
- * @author: TOOM <1023150697@qq.com>
+ * @author: TOOM1996
  */
 class UrlManager extends BaseUrlManager
 {

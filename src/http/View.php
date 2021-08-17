@@ -7,25 +7,32 @@ namespace toom1996\http;
 use toom1996\base\Component;
 use toom1996\base\InvalidCallException;
 use toom1996\helpers\FileHelper;
-use YiiS;
 
 /**
  * Class View
  *
- * @author: TOOM <1023150697@qq.com>
+ * @author: TOOM1996
  */
 class View extends Component
 {
-
+    /**
+     * Default render file extension.
+     * @var string
+     */
     public $defaultExtension = 'php';
 
-
-    private $_viewCache;
+    /**
+     * Render html title.
+     * @var
+     */
+    public $title;
 
     /**
      *
-     * @param  string  $view The view name.
-     * @param  array  $params The parameters (name-value pairs) that will be extracted and made available in the view file.
+     * @param  string  $view
+     * @param  array  $params
+     *
+     * @return false|string
      */
     public function render(string $view, array $params = [])
     {
@@ -33,7 +40,12 @@ class View extends Component
         return $this->renderFile($viewFile, $params);
     }
 
-
+    /**
+     *
+     * @param $view
+     *
+     * @return bool|string
+     */
     public function findViewFile($view)
     {
         if (strncmp($view, '@', 1) === 0) {
@@ -66,6 +78,9 @@ class View extends Component
      * @param $viewFile
      * @param $params
      * @param  null  $context
+     *
+     * @return false|string
+     * @throws \Throwable
      */
     public function renderFile($viewFile, $params, $context = null)
     {
