@@ -4,7 +4,6 @@ namespace toom1996\http;
 
 use FastRoute\Dispatcher;
 use FastRoute\RouteCollector;
-use toom1996\http\NotFoundHttpException;
 use function FastRoute\simpleDispatcher;
 
 /**

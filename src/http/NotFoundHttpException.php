@@ -1,9 +1,10 @@
 <?php
 
 
-namespace toom1996\base;
+namespace toom1996\http;
 
 use Throwable;
+use toom1996\http\HttpException;
 
 /**
  * NotFoundHttpException represents an exception caused by using an not not found http route.

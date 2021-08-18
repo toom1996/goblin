@@ -33,6 +33,52 @@ $this->title = 'Goblin framework!';
         text-align: center;
         word-wrap:break-word;
     }
+
+    .call-stack ul li .code .lines-item {
+        position: absolute;
+        z-index: 200;
+        display: block;
+        width: 25px;
+        text-align: right;
+        color: #aaa;
+        line-height: 20px;
+        font-size: 12px;
+        margin-top: 1px;
+        font-family: Consolas, monospace;
+    }
+
+    .call-stack ul li .error-line, .call-stack ul li .hover-line {
+        background-color: #ffebeb;
+        position: absolute;
+        width: 100%;
+        z-index: 100;
+        margin-top: 0;
+    }
+
+    .call-stack ul li .code-wrap {
+        display: none;
+        position: relative;
+    }
+    .call-stack ul li.application .code-wrap {
+        display: block;
+    }
+
+    .call-stack ul li .code {
+        min-width: 860px;
+        margin: 15px auto;
+        padding: 0 50px;
+        position: relative;
+    }
+
+    .call-stack ul li .code pre {
+        position: relative;
+        z-index: 200;
+        left: 50px;
+        line-height: 20px;
+        font-size: 12px;
+        font-family: Consolas, monospace;
+        display: inline;
+    }
 </style>
 <div class="container">
     <div class="c-header-box">
@@ -47,5 +93,57 @@ $this->title = 'Goblin framework!';
             <?php endif; ?>
         </h1>
         <h2><?= nl2br($handler->htmlEncode($exception->getMessage())) ?></h2>
+        <?= $handler->renderPreviousExceptions($exception) ?>
+    </div>
+    <div class="call-stack">
+        <?= $handler->renderCallStack($exception) ?>
     </div>
 </div>
+<script>
+    var callStackItems = document.getElementsByClassName('call-stack-item');
+    var refreshCallStackItemCode = function(callStackItem) {
+        if (!callStackItem.getElementsByTagName('pre')[0]) {
+            console.log('return');
+            return;
+        }
+        var top = callStackItem.getElementsByClassName('code-wrap')[0].offsetTop - window.pageYOffset + 3,
+            lines = callStackItem.getElementsByTagName('pre')[0].getClientRects(),
+            lineNumbers = callStackItem.getElementsByClassName('lines-item'),
+            errorLine = callStackItem.getElementsByClassName('error-line')[0],
+            hoverLines = callStackItem.getElementsByClassName('hover-line');
+
+        for (var i = 0, imax = lines.length; i < imax; ++i) {
+            if (!lineNumbers[i]) {
+                console.log('continue')
+                continue;
+            }
+            console.log(lines[i].top)
+            lineNumbers[i].style.top = parseInt(lines[i].top - top) + 'px';
+            console.log(parseInt(lines[i].top - top) + 'px')
+            hoverLines[i].style.top = parseInt(lines[i].top - top) + 'px';
+            hoverLines[i].style.height = parseInt(lines[i].bottom - lines[i].top + 6) + 'px';
+            if (parseInt(callStackItem.getAttribute('data-line')) === i) {
+                errorLine.style.top = parseInt(lines[i].top - top) + 'px';
+                errorLine.style.height = parseInt(lines[i].bottom - lines[i].top + 6) + 'px';
+            }
+        }
+    };
+    for (var i = 0, imax = callStackItems.length; i < imax; ++i) {
+        refreshCallStackItemCode(callStackItems[i]);
+    //
+    //     // // toggle code block visibility
+    //     // callStackItems[i].getElementsByClassName('element-wrap')[0].addEventListener('click', function(event) {
+    //     //     if (event.target.nodeName.toLowerCase() === 'a') {
+    //     //         return;
+    //     //     }
+    //     //
+    //     //     var callStackItem = this.parentNode,
+    //     //         code = callStackItem.getElementsByClassName('code-wrap')[0];
+    //     //
+    //     //     if (typeof code !== 'undefined') {
+    //     //         code.style.display = window.getComputedStyle(code).display === 'block' ? 'none' : 'block';
+    //     //         refreshCallStackItemCode(callStackItem);
+    //     //     }
+    //     // });
+    }
+</script>
