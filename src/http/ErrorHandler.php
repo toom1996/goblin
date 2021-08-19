@@ -25,9 +25,9 @@ class ErrorHandler extends \toom1996\base\ErrorHandler
 
     public $maxTraceSourceLines = 13;
 
-    public $previousExceptionView = '@app/views/site/previousException.php';
+    public $previousExceptionView = '@goblin/views/errorHandler/previousException.php';
 
-    public $callStackItemView = '@app/views/site/callStackItem.php';
+    public $callStackItemView = '@goblin/views/errorHandler/callStackItem.php';
 
     public $traceLine = '{html}';
 
@@ -45,7 +45,7 @@ class ErrorHandler extends \toom1996\base\ErrorHandler
             'line' => $exception->getLine(),
             'stack-trace' => explode("\n", $exception->getTraceAsString()),
         ];
-        var_dump($this->_errorData);
+//        var_dump($this->_errorData);
         $this->renderException($exception);
     }
 

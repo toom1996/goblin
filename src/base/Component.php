@@ -5,7 +5,7 @@ namespace toom1996\base;
 use toom1996\http\Goblin;
 use yii\base\UnknownPropertyException;
 
-class Component
+class Component extends BaseObject
 {
 
     /**
@@ -31,12 +31,12 @@ class Component
                 }
             }
         }
-        $this->init();
+        parent::__construct();
     }
-
+    
     public function init()
     {
-
+        parent::init();
     }
 
     /**

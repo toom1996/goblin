@@ -6,6 +6,7 @@ namespace toom1996\http;
 
 use toom1996\base\Component;
 use toom1996\base\InvalidCallException;
+use toom1996\base\InvalidConfigException;
 use toom1996\helpers\FileHelper;
 
 /**
@@ -26,6 +27,9 @@ class View extends Component
      * @var
      */
     public $title;
+
+    
+    public $assetBundles = [];
 
     /**
      *
@@ -131,5 +135,39 @@ class View extends Component
             }
             throw $e;
         }
+    }
+
+    public function registerAssetBundle($name, $position = null)
+    {
+        if (!isset($this->assetBundles[$name])) {
+            $am = Goblin::$app->getAssetManager();
+            $bundle = $am->getBundle($name);
+            $this->assetBundles[$name] = false;
+            // register dependencies
+            $pos = isset($bundle->jsOptions['position']) ? $bundle->jsOptions['position'] : null;
+            foreach ($bundle->depends as $dep) {
+                $this->registerAssetBundle($dep, $pos);
+            }
+            $this->assetBundles[$name] = $bundle;
+        } elseif ($this->assetBundles[$name] === false) {
+            throw new InvalidConfigException("A circular dependency is detected for bundle '$name'.");
+        } else {
+            $bundle = $this->assetBundles[$name];
+        }
+
+        if ($position !== null) {
+            $pos = isset($bundle->jsOptions['position']) ? $bundle->jsOptions['position'] : null;
+            if ($pos === null) {
+                $bundle->jsOptions['position'] = $pos = $position;
+            } elseif ($pos > $position) {
+                throw new InvalidConfigException("An asset bundle that depends on '$name' has a higher javascript file position configured than '$name'.");
+            }
+            // update position for all dependencies
+            foreach ($bundle->depends as $dep) {
+                $this->registerAssetBundle($dep, $pos);
+            }
+        }
+
+        return $bundle;
     }
 }

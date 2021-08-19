@@ -67,7 +67,7 @@ class Goblin extends BaseGoblin
             return $this->handleRequest($this->getRequest($request))
                 ->send();
         }catch (\Swoole\ExitException $e){
-            $this->getResponse()->content = $e->getMessage();
+            $this->getResponse()->content = $e->getStatus();
         }catch (\Throwable $e) {
             $this->getErrorHandler()->handleException($e);
         } finally {
@@ -158,6 +158,11 @@ class Goblin extends BaseGoblin
     {
         return $this->get('urlManager');
     }
+    
+    public function getAssetManager()
+    {
+        return $this->get('assetManager');
+    }
 
     /**
      * Request handler.
@@ -194,6 +199,7 @@ class Goblin extends BaseGoblin
             'errorHandler' => ['class' => 'toom1996\http\ErrorHandler'],
             'urlManager' => ['class' => 'toom1996\http\UrlManager'],
             'view' => ['class' => 'toom1996\http\View'],
+            'assetManager' => ['class' => 'toom1996\http\AssetManager'],
         ]);
     }
 

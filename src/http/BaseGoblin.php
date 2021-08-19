@@ -19,7 +19,7 @@ class BaseGoblin extends Module
      *
      * @var
      */
-    public static $aliases;
+    public static $aliases = [];
 
     /**
      * @var
@@ -42,7 +42,6 @@ class BaseGoblin extends Module
         return [
             'formatter'    => ['class' => 'yii\i18n\Formatter'],
             'mailer'       => ['class' => 'yii\swiftmailer\Mailer'],
-            'assetManager' => ['class' => 'yii\web\AssetManager'],
             'security'     => ['class' => 'yii\base\Security'],
         ];
     }

@@ -46,6 +46,7 @@ class Application
         // Set alias and init config.
         $this->config = $config;
         Goblin::setAlias('@app', $this->config['basePath']);
+        Goblin::setAlias('@goblin', dirname(__DIR__));
         Goblin::setAlias('@controllers', $this->config['controllersPath']);
         $this->initConfig();
     }
