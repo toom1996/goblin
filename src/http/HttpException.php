@@ -5,6 +5,7 @@ namespace toom1996\http;
 
 
 use Throwable;
+use toom1996\base\Exception;
 
 class HttpException extends Exception
 {

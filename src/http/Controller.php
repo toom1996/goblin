@@ -10,11 +10,6 @@ class Controller extends Module
 {
     public $layout = '@app/views/layouts/main';
 
-    /**
-     * @var \toom1996\web\View the view object that can be used to render views or view files.
-     */
-    private $_view;
-
     public function runAction($handler)
     {
 
