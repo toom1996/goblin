@@ -70,7 +70,7 @@ class Application
      *
      * @param $app
      *
-     * @return mixed
+     * @return \toom1996\http\Goblin
      */
     public function load($app)
     {

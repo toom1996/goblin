@@ -37,7 +37,7 @@ class Controller extends Module
      *
      * @return mixed
      * @throws \ReflectionException
-     * @throws \toom1996\base\InvalidConfigException
+     * @throws \toom1996\base\InvalidConfigException|\Throwable
      */
     public function renderContent($content)
     {

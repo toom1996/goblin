@@ -14,7 +14,6 @@ class BaseObject
     
     public function init()
     {
-        echo 123;
     }
     
 }

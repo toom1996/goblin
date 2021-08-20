@@ -89,7 +89,7 @@ class Goblin extends BaseGoblin
             }
         }
         
-        self::$app = $this;
+        self::$app = &$this;
     }
 
     /**
