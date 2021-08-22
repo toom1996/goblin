@@ -12,7 +12,7 @@ class ErrorHandler extends \toom1996\base\ErrorHandler
      * ErrorHandler render error page action.
      * @var
      */
-    public $errorAction;
+    public $errorAction = '@goblin/controllers/errorHandler/error';
 
     /**
      * @var
@@ -45,7 +45,7 @@ class ErrorHandler extends \toom1996\base\ErrorHandler
             'line' => $exception->getLine(),
             'stack-trace' => explode("\n", $exception->getTraceAsString()),
         ];
-//        var_dump($this->_errorData);
+        var_dump($this->_errorData);
         $this->renderException($exception);
     }
 
