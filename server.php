@@ -99,7 +99,7 @@ function getParams()
         $rawParams = $_SERVER['argv'];
         array_shift($rawParams);
     }
-
+//a
     $params = [];
     foreach ($rawParams as $param) {
         if (preg_match('/^--([\w-]*\w)(=(.*))?$/', $param, $matches)) {
