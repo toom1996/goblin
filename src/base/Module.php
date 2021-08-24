@@ -2,8 +2,8 @@
 
 namespace toom1996\base;
 
+use toom1996\http\Controller;
 use toom1996\http\Goblin;
-use yii\base\Controller;
 /**
  * Class Module
  *
@@ -74,11 +74,20 @@ class Module extends ServiceLocator
      */
     public function runAction($handler)
     {
+
+        // If is register
         if (isset(Goblin::$handlerMap[$handler])) {
             $handlerMap = Goblin::$handlerMap[$handler];
         }else{
             throw new InvalidConfigException("{$handler} is invalid function, please check your config.");
         }
+        var_dump($handlerMap);
+        var_dump($handlerMap->actionId);
+
+        if (is_object($handlerMap) && $handlerMap instanceof Controller) {
+            return call_user_func([$handlerMap, $handlerMap->actionId]);
+        }
+
         if (!class_exists($handlerMap['class'])) {
             throw new UnknownClassException("{Unknown class {$handlerMap['class']}");
         }
@@ -86,6 +95,11 @@ class Module extends ServiceLocator
         if (!$ref->hasMethod($handlerMap['action'])) {
             throw new InvalidConfigException("class {$handlerMap['class']} does not have a method {$handlerMap['action']}, please check your config.");
         }
+
+        if (is_object($handlerMap) && $handlerMap instanceof Controller) {
+            return call_user_func($handlerMap, $handlerMap->actionId);
+        }
+
         return call_user_func([$ref->newInstance(), $handlerMap['action']]);
     }
 

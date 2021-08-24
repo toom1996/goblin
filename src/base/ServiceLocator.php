@@ -69,7 +69,7 @@ class ServiceLocator extends Component
             // If has class, it will be overwrite all component attribuets.
             if (isset($definition['class'])) {
                 $class = new \ReflectionClass($definition['class']);
-                $this->_components[$id] = $class->newInstanceArgs([$id, $definition]);
+                $this->_components[$id] = Goblin::createObject($class, [$id, $definition]);
             }
         }
 
@@ -78,7 +78,7 @@ class ServiceLocator extends Component
             throw new InvalidConfigException("Unexpected configuration type for the \"$id\" component: " . gettype($definition));
         }
         $class = new \ReflectionClass(Goblin::$config['components'][$id]['class']);
-        $this->_components[$id] = $class->newInstanceArgs([$id, $definition]);
+        $this->_components[$id] = Goblin::createObject($class, [$id, $definition]);;
 
         return $this->_components[$id];
     }

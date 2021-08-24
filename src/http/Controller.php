@@ -4,15 +4,25 @@
 namespace toom1996\http;
 
 
+use toom1996\base\Component;
 use toom1996\base\Module;
 
-class Controller extends Module
+class Controller extends Component
 {
     public $layout = '@app/views/layouts/main';
+
+    public $actionId;
 
     public function runAction($handler)
     {
 
+    }
+
+    public function __construct($actionId)
+    {
+        echo '-----';
+        $this->actionId = $actionId;
+        var_dump($actionId);
     }
 
     /**

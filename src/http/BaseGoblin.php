@@ -170,4 +170,65 @@ class BaseGoblin extends Module
 
         return trim($matches[1]);
     }
+
+
+    /**
+     *
+     *
+     * @param        $handler
+     *
+     * @param  bool  $setToHandlerMap
+     *
+     * @throws \ReflectionException
+     */
+    public static function createController($handler, $setToHandlerMap = true)
+    {
+        // If route is `@controllers/site/index`, will be convert @controller to BathPath
+        $handlerAlias = Goblin::getAlias($handler);
+        $ex = explode('/', $handlerAlias);
+
+        // Find controller and action.
+        list($controller, $action) = array_slice($ex, -2, 2);
+
+        // will be convert to `$bathPath/SiteController/index`
+        if (strpos($controller, 'Controller') === false) {
+            $controller = ucfirst($controller).'Controller';
+        }
+
+        // will be convert to `$bathPath/SiteController/actionIndex`
+        if (strpos($action, 'action') === false) {
+            $action = 'action'.ucfirst($action);
+        }
+        $handlerFile = implode('/',
+            array_merge(array_slice($ex, 0, count($ex) - 2),
+                [$controller . '.php']));
+        $className = '\\' . Goblin::getNamespace($handlerFile) . '\\' . basename(str_replace('.php', '', $handlerFile));
+
+        if ($setToHandlerMap) {
+            Goblin::setHandlerMap($handler, Goblin::createObject($className, [
+                $action
+            ]));
+        }
+    }
+
+    /**
+     * Create object.
+     *
+     * @param         $type string|\ReflectionClass
+     * @param  array  $params
+     *
+     * @return object
+     * @throws \ReflectionException
+     */
+    public static function createObject($type, array $params = [])
+    {
+        if (is_string($type)) {
+            $ref = new \ReflectionClass($type);
+            return $ref->newInstanceArgs($params);
+        }
+
+        if (is_object($type)) {
+            return $type->newInstanceArgs($params);
+        }
+    }
 }

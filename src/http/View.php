@@ -4,6 +4,7 @@
 namespace toom1996\http;
 
 
+use Throwable;
 use toom1996\base\Component;
 use toom1996\base\InvalidCallException;
 use toom1996\base\InvalidConfigException;
@@ -34,9 +35,10 @@ class View extends Component
     /**
      *
      * @param  string  $view
-     * @param  array  $params
+     * @param  array   $params
      *
      * @return false|string
+     * @throws Throwable
      */
     public function render(string $view, array $params = [])
     {
@@ -84,7 +86,7 @@ class View extends Component
      * @param  null  $context
      *
      * @return false|string
-     * @throws \Throwable
+     * @throws Throwable
      */
     public function renderFile($viewFile, $params, $context = null)
     {
@@ -116,7 +118,7 @@ class View extends Component
      * @param  array  $_params_
      *
      * @return false|string
-     * @throws \Throwable
+     * @throws Throwable
      */
     public function renderPhpFile($_file_, $_params_ = [])
     {
@@ -127,7 +129,7 @@ class View extends Component
         try {
             require $_file_;
             return ob_get_clean();
-        }catch (\Throwable $e) {
+        }catch (Throwable $e) {
             while (ob_get_level() > $_obInitialLevel_) {
                 if (!@ob_end_clean()) {
                     ob_clean();

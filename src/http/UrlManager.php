@@ -69,11 +69,12 @@ class UrlManager extends BaseUrlManager
         return preg_replace('#/+#', '/', $url);
     }
 
-
     /**
-     * Match route.
+     *
      *
      * @return array
+     * @throws \ReflectionException
+     * @throws \toom1996\base\InvalidConfigException
      */
     protected function matchRoute()
     {
@@ -120,41 +121,18 @@ class UrlManager extends BaseUrlManager
     }
 
     /**
-     * Parse rules and add to handlerMap.
+     * Parse route and add to handlerMap.
      *
      * @param $rule
      *
      * @return array
+     * @throws \ReflectionException
      */
     private static function parseRule($rule)
     {
         list($method, $route, $handler) = [$rule[0], $rule[1], $rule[2]];
         if (strpos($handler, '@') === 0) {
-            // If route is `@controllers/site/index`, will be convert @controller to BathPath
-            $handlerAlias = Goblin::getAlias($handler);
-            $ex = explode('/', $handlerAlias);
-
-            // Find controller and action.
-            list($controller, $action) = array_slice($ex, -2, 2);
-
-            // will be convert to `$bathPath/SiteController/index`
-            if (strpos($controller, 'Controller') === false) {
-                $controller = ucfirst($controller).'Controller';
-            }
-
-            // will be convert to `$bathPath/SiteController/actionIndex`
-            if (strpos($action, 'action') === false) {
-                $action = 'action'.ucfirst($action);
-            }
-            $handlerFile = implode('/',
-                array_merge(array_slice($ex, 0, count($ex) - 2),
-                    [$controller . '.php']));
-            $className = '\\' . Goblin::getNamespace($handlerFile) . '\\' . basename(str_replace('.php', '', $handlerFile));
-
-            Goblin::setHandlerMap($handler, [
-                'class' => $className,
-                'action' => $action
-            ]);
+            Goblin::createController($handler);
         }
         return [$method, $route, $handler];
     }

@@ -5,13 +5,15 @@ namespace toom1996\http;
 
 use Swoole\Http\Request;
 use Swoole\Http\Response;
+use toom1996\base\InvalidConfigException;
+use toom1996\base\UnknownClassException;
 
 /**
  * Class Goblin
  *
- * @property-read \toom1996\http\Request $request
- * @property-read \toom1996\http\ErrorHandler $errorHandler
- * @property-read \toom1996\http\Response $response
+ * @property-read Request  $request
+ * @property-read ErrorHandler            $errorHandler
+ * @property-read Response $response
  * @author: TOOM1996
  */
 class Goblin extends BaseGoblin
@@ -52,7 +54,7 @@ class Goblin extends BaseGoblin
      *
      * @return bool
      * @throws \ReflectionException
-     * @throws \toom1996\base\InvalidConfigException
+     * @throws InvalidConfigException
      */
     public function run(Request $request, Response $response)
     {
@@ -98,7 +100,7 @@ class Goblin extends BaseGoblin
      *
      * @return \toom1996\http\Request
      * @throws \ReflectionException
-     * @throws \toom1996\base\InvalidConfigException
+     * @throws InvalidConfigException
      */
     public function getRequest($request = null)
     {
@@ -111,9 +113,9 @@ class Goblin extends BaseGoblin
 
     /**
      *
-     * @return \toom1996\http\View
+     * @return View
      * @throws \ReflectionException
-     * @throws \toom1996\base\InvalidConfigException
+     * @throws InvalidConfigException
      */
     public function getView()
     {
@@ -122,9 +124,9 @@ class Goblin extends BaseGoblin
 
     /**
      *
-     * @return \toom1996\http\ErrorHandler
+     * @return ErrorHandler
      * @throws \ReflectionException
-     * @throws \toom1996\base\InvalidConfigException
+     * @throws InvalidConfigException
      */
     public function getErrorHandler()
     {
@@ -137,7 +139,7 @@ class Goblin extends BaseGoblin
      *
      * @return \toom1996\http\Response
      * @throws \ReflectionException
-     * @throws \toom1996\base\InvalidConfigException
+     * @throws InvalidConfigException
      */
     public function getResponse($response = null)
     {
@@ -152,28 +154,36 @@ class Goblin extends BaseGoblin
      *
      * @return \toom1996\http\UrlManager
      * @throws \ReflectionException
-     * @throws \toom1996\base\InvalidConfigException
+     * @throws InvalidConfigException
      */
     public function getUrlManager()
     {
         return $this->get('urlManager');
     }
-    
+
+    /**
+     *
+     *
+     * @return mixed
+     * @throws InvalidConfigException
+     * @throws \ReflectionException
+     */
     public function getAssetManager()
     {
         return $this->get('assetManager');
     }
 
     /**
-     * Request handler.
+     *
+     *
      * @param $request \toom1996\http\Request
      *
-     * @return mixed
+     * @return \toom1996\http\Response
+     * @throws InvalidConfigException
+     * @throws MethodNotAllowedHttpException
+     * @throws NotFoundHttpException
+     * @throws UnknownClassException
      * @throws \ReflectionException
-     * @throws \toom1996\base\InvalidConfigException
-     * @throws \toom1996\base\NotFoundHttpException
-     * @throws \toom1996\base\UnknownClassException
-     * @throws \toom1996\http\MethodNotAllowedHttpException
      */
     public function handleRequest($request)
     {
@@ -208,7 +218,7 @@ class Goblin extends BaseGoblin
      * @param  int  $code
      *
      * @throws \ReflectionException
-     * @throws \toom1996\base\InvalidConfigException
+     * @throws InvalidConfigException
      */
     public function end($code = 200)
     {
