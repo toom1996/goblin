@@ -4,6 +4,7 @@ namespace toom1996\http;
 
 use FastRoute\Dispatcher;
 use FastRoute\RouteCollector;
+use toom1996\base\InvalidConfigException;
 use function FastRoute\simpleDispatcher;
 
 /**
@@ -28,13 +29,13 @@ class UrlManager extends BaseUrlManager
     }
 
     /**
-     * Parse request.
-     * It will return an array of return values consisting of a method and a matching data.
      *
      *
      * @return array
      * @throws MethodNotAllowedHttpException
      * @throws NotFoundHttpException
+     * @throws \ReflectionException
+     * @throws InvalidConfigException
      */
     public function parseRequest(): array
     {
@@ -66,7 +67,12 @@ class UrlManager extends BaseUrlManager
             $url = rtrim($url, '/');
         }
 
-        return preg_replace('#/+#', '/', $url);
+        $url = preg_replace('#/+#', '/', $url);
+        if ($url === '') {
+            return '/';
+        }
+
+        return $url;
     }
 
     /**
@@ -74,7 +80,7 @@ class UrlManager extends BaseUrlManager
      *
      * @return array
      * @throws \ReflectionException
-     * @throws \toom1996\base\InvalidConfigException
+     * @throws InvalidConfigException
      */
     protected function matchRoute()
     {
@@ -105,16 +111,21 @@ class UrlManager extends BaseUrlManager
             $webRoute
         ) {
             foreach ($webRoute as $prefix => $rules) {
-                if (count($rules) == count($rules, 1)) {
+                if (count($rules) == count($rules, COUNT_RECURSIVE)) {
                     list($method, $route, $handler) = self::parseRule($rules);
                     $controller->addRoute($method, $route, $handler);
                 } else {
-                    $controller->addGroup($prefix, function (RouteCollector $controller) use ($rules) {
-                        foreach ($rules as $rulesChild) {
-                            list($method, $route, $handler) = self::parseRule($rulesChild);
-                            $controller->addRoute($method, $route, $handler);
-                        }
-                    });
+                    if (is_int($prefix)) {
+                        list($method, $route, $handler) = self::parseRule($rules);
+                        $controller->addRoute($method, $route, $handler);
+                    }else{
+                        $controller->addGroup($prefix, function (RouteCollector $controller) use ($rules) {
+                            foreach ($rules as $rulesChild) {
+                                list($method, $route, $handler) = self::parseRule($rulesChild);
+                                $controller->addRoute($method, $route, $handler);
+                            }
+                        });
+                    }
                 }
             }
         });

@@ -140,7 +140,7 @@ $this->title = 'Goblin framework!';
                 <?= $handler->createHttpStatusLink($exception->getCode(), $handler->htmlEncode($exception->getName())) . ' &ndash; ' . get_class($exception);?>
             <?php else: ?>
                 <?= $handler->getExceptionName($exception) !== null
-                    ? '<span>' . $handler->htmlEncode($name) . '</span>' . ' &ndash; ' . $handler->addTypeLinks(get_class($exception))
+                    ? '<span>' . $handler->htmlEncode($exception->getName()) . '</span>' . ' &ndash; ' . $handler->addTypeLinks(get_class($exception))
                     : '<span>' . $handler->htmlEncode(get_class($exception)) . '</span>';
                 ; ?>
             <?php endif; ?>

@@ -16,11 +16,12 @@ class ServiceLocator extends Component
 
     /**
      *
+     *
      * @param  string  $id
      *
      * @return mixed
+     * @throws InvalidConfigException
      * @throws \ReflectionException
-     * @throws \toom1996\base\InvalidConfigException
      */
     public function get(string $id)
     {
@@ -54,7 +55,7 @@ class ServiceLocator extends Component
      *
      * @return mixed
      * @throws \ReflectionException
-     * @throws \toom1996\base\InvalidConfigException
+     * @throws InvalidConfigException
      */
     public function set($id, $definition = null)
     {
@@ -68,8 +69,7 @@ class ServiceLocator extends Component
             // e.g Goblin::$app->set('foo', ['class' => foo\bar, 'a' => 'b'])
             // If has class, it will be overwrite all component attribuets.
             if (isset($definition['class'])) {
-                $class = new \ReflectionClass($definition['class']);
-                $this->_components[$id] = Goblin::createObject($class, [$id, $definition]);
+                $this->_components[$id] = Goblin::createObject($definition['class'], [$id, $definition]);
             }
         }
 
@@ -77,8 +77,7 @@ class ServiceLocator extends Component
         if (!isset(Goblin::$config['components'][$id]['class'])) {
             throw new InvalidConfigException("Unexpected configuration type for the \"$id\" component: " . gettype($definition));
         }
-        $class = new \ReflectionClass(Goblin::$config['components'][$id]['class']);
-        $this->_components[$id] = Goblin::createObject($class, [$id, $definition]);;
+        $this->_components[$id] = Goblin::createObject(Goblin::$config['components'][$id]['class'], [$id, $definition]);;
 
         return $this->_components[$id];
     }
@@ -89,7 +88,7 @@ class ServiceLocator extends Component
      *
      * @return mixed
      * @throws \ReflectionException
-     * @throws \toom1996\base\InvalidConfigException
+     * @throws InvalidConfigException
      * @throws \toom1996\base\UnknownClassException
      */
     public function __get(string $name)

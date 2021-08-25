@@ -5,6 +5,7 @@ namespace toom1996\http;
 
 
 use toom1996\base\Component;
+use toom1996\base\InvalidConfigException;
 use toom1996\base\Module;
 
 class Controller extends Component
@@ -22,12 +23,14 @@ class Controller extends Component
 
     /**
      *
-     * @param $view
+     *
+     * @param         $view
      * @param  array  $params
      *
      * @return mixed
      * @throws \ReflectionException
-     * @throws \toom1996\base\InvalidConfigException
+     * @throws \Throwable
+     * @throws InvalidConfigException
      */
     public function render($view, $params = [])
     {
@@ -38,11 +41,12 @@ class Controller extends Component
 
     /**
      *
+     *
      * @param $content
      *
-     * @return mixed
-     * @throws \ReflectionException
-     * @throws \toom1996\base\InvalidConfigException|\Throwable
+     * @return false|string
+     * @throws InvalidConfigException
+     * @throws \Throwable
      */
     public function renderContent($content)
     {
@@ -57,7 +61,8 @@ class Controller extends Component
 
     /**
      *
-     * @param $view \toom1996\http\View
+     *
+     * @param $view View
      *
      * @return bool|string
      */

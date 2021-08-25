@@ -162,7 +162,7 @@ class Module extends ServiceLocator
                 [$controller . '.php']));
 
         if (!file_exists($handlerFile)) {
-            throw new UnknownClassException("{Unknown class {$handlerMap['class']}");
+            throw new UnknownClassException("{Unknown class {$actionPath}");
         }
         
         $classNamespace = Goblin::getNamespace($handlerFile);
