@@ -43,6 +43,7 @@ class Goblin extends BaseGoblin
      */
     public function __construct(&$config = [])
     {
+        var_dump(self::$handlerMap);
         self::$config = $config;
     }
 

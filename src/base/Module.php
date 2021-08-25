@@ -72,35 +72,20 @@ class Module extends ServiceLocator
      * @throws \toom1996\base\UnknownClassException
      * @throws \toom1996\base\InvalidConfigException
      */
-    public function runAction($handler)
+    public function runAction($path)
     {
-
         // If is register
-        if (isset(Goblin::$handlerMap[$handler])) {
-            $handlerMap = Goblin::$handlerMap[$handler];
+        if (isset(Goblin::$handlerMap[$path])) {
+            $controller = Goblin::$handlerMap[$path];
         }else{
-            throw new InvalidConfigException("{$handler} is invalid function, please check your config.");
-        }
-        var_dump($handlerMap);
-        var_dump($handlerMap->actionId);
-
-        if (is_object($handlerMap) && $handlerMap instanceof Controller) {
-            return call_user_func([$handlerMap, $handlerMap->actionId]);
+            $controller = Goblin::createController($path, true);
         }
 
-        if (!class_exists($handlerMap['class'])) {
-            throw new UnknownClassException("{Unknown class {$handlerMap['class']}");
-        }
-        $ref = new \ReflectionClass($handlerMap['class']);
-        if (!$ref->hasMethod($handlerMap['action'])) {
-            throw new InvalidConfigException("class {$handlerMap['class']} does not have a method {$handlerMap['action']}, please check your config.");
+        if (is_object($controller) && $controller instanceof Controller) {
+            return call_user_func([$controller, $controller->actionId]);
         }
 
-        if (is_object($handlerMap) && $handlerMap instanceof Controller) {
-            return call_user_func($handlerMap, $handlerMap->actionId);
-        }
-
-        return call_user_func([$ref->newInstance(), $handlerMap['action']]);
+        throw new InvalidConfigException("Unknown action.");
     }
 
     /**
@@ -144,4 +129,60 @@ class Module extends ServiceLocator
         return $this->_basePath;
     }
 
+    /**
+     *
+     *
+     * @param        $actionPath
+     *
+     * @param  bool  $setToHandlerMap
+     *
+     * @throws \ReflectionException
+     */
+    public static function createController($actionPath, $setToHandlerMap = true)
+    {
+        // If route is `@controllers/site/index`, will be convert @controller to BathPath
+        $handlerAlias = Goblin::getAlias($actionPath);
+        $ex = explode('/', $handlerAlias);
+
+        // Find controller and action.
+        [$controller, $action] = array_slice($ex, -2, 2);
+
+        // will be convert to `$bathPath/SiteController/index`
+        if (strpos($controller, 'Controller') === false) {
+            $controller = ucfirst($controller).'Controller';
+        }
+
+        // will be convert to `$bathPath/SiteController/actionIndex`
+        if (strpos($action, 'action') === false) {
+            $action = 'action'.ucfirst($action);
+        }
+
+        $handlerFile = implode('/',
+            array_merge(array_slice($ex, 0, count($ex) - 2),
+                [$controller . '.php']));
+
+        if (!file_exists($handlerFile)) {
+            throw new UnknownClassException("{Unknown class {$handlerMap['class']}");
+        }
+        
+        $classNamespace = Goblin::getNamespace($handlerFile);
+        $className = '\\' . $classNamespace . '\\' . basename(str_replace('.php', '', $handlerFile));
+
+        $ref = new \ReflectionClass($className);
+        if (!$ref->hasMethod($action)) {
+            throw new InvalidConfigException("class {$className} does not have a method {$action}, please check your config.");
+        }
+
+        // Create controller object.
+        $controllerInstance = Goblin::createObject($className, [$action]);
+
+        /**
+         * Set to handlerMap.
+         * @see Goblin::$handlerMap
+         */
+        if ($setToHandlerMap) {
+            Goblin::setHandlerMap($actionPath, $controllerInstance);
+        }
+        return $controllerInstance;
+    }
 }

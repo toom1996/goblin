@@ -10,7 +10,6 @@ use toom1996\http\UrlManager;
  */
 defined('GOBLIN_PATH') or define('GOBLIN_PATH', __DIR__);
 
-var_dump(GOBLIN_PATH);
 /**
  * Register autoload function.
  */
@@ -59,7 +58,7 @@ class GoblinLoader
     }
 
     /**
-     *
+     * returns goblin application.
      * @param $app
      *
      * @return \toom1996\http\Goblin
@@ -70,8 +69,7 @@ class GoblinLoader
     }
 
     /**
-     *
-     *
+     * Autoload function.
      * @param  string  $className
      */
     public static function autoload(string $className)
@@ -86,10 +84,5 @@ class GoblinLoader
         }
 
         require $classFile;
-    }
-
-    public function createServer()
-    {
-
     }
 }

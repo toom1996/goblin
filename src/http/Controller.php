@@ -13,11 +13,6 @@ class Controller extends Component
 
     public $actionId;
 
-    public function runAction($handler)
-    {
-
-    }
-
     public function __construct($actionId)
     {
         echo '-----';
