@@ -43,7 +43,6 @@ class Goblin extends BaseGoblin
      */
     public function __construct(&$config = [])
     {
-        var_dump(self::$handlerMap);
         self::$config = $config;
     }
 
@@ -188,7 +187,7 @@ class Goblin extends BaseGoblin
      */
     public function handleRequest($request)
     {
-        list($handler, $params) = $request->resolve();
+        [$handler, $params] = $request->resolve();
         $result = $this->runAction($handler);
         $response = $this->getResponse();
         if ($result !== null) {
@@ -226,5 +225,17 @@ class Goblin extends BaseGoblin
         $response = $this->getResponse();
         $response->setStatusCode($code);
         $response->send();
+    }
+
+    /**
+     * Print something to browser.
+     * @param $output
+     *
+     * @throws \ReflectionException
+     * @throws \toom1996\base\InvalidConfigException
+     */
+    public static function dump($output)
+    {
+        self::$app->getResponse()->setContent(print_r($output, true));
     }
 }
