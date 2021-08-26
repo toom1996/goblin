@@ -24,6 +24,8 @@ class Component extends BaseObject
     public function __construct($id = null, $params = null)
     {
         if ($id) {
+            echo 'configure ' . $id . PHP_EOL;
+            // TODO configure attributes.
             $config = array_merge(Goblin::$config['components'][$id], (array)$params);
             foreach ($config as $name => $value) {
                 if (property_exists($this, $name)) {
@@ -44,7 +46,7 @@ class Component extends BaseObject
      * @param $name
      *
      * @return mixed
-     * @throws \toom1996\base\UnknownClassException
+     * @throws UnknownClassException
      */
     public function __get(string $name)
     {
@@ -61,5 +63,4 @@ class Component extends BaseObject
 
         throw new UnknownClassException('Getting unknown property: ' . get_class($this) . '::' . $name);
     }
-
 }

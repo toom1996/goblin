@@ -16,9 +16,7 @@ class Controller extends Component
 
     public function __construct($actionId)
     {
-        echo '-----';
         $this->actionId = $actionId;
-        var_dump($actionId);
     }
 
     /**

@@ -4,6 +4,8 @@ namespace toom1996\http;
 
 use toom1996\base\Exception;
 use toom1996\base\InvalidCallException;
+use toom1996\base\InvalidConfigException;
+use toom1996\base\UnknownClassException;
 use toom1996\http\Response;
 
 class ErrorHandler extends \toom1996\base\ErrorHandler
@@ -34,6 +36,10 @@ class ErrorHandler extends \toom1996\base\ErrorHandler
     /**
      *
      * @param $exception \Exception
+     *
+     * @throws \ReflectionException
+     * @throws InvalidConfigException
+     * @throws UnknownClassException
      */
     public function handleException($exception)
     {
@@ -54,27 +60,21 @@ class ErrorHandler extends \toom1996\base\ErrorHandler
      * @param $exception \Exception
      *
      * @throws \ReflectionException
-     * @throws \toom1996\base\InvalidConfigException
-     * @throws \toom1996\base\UnknownClassException
+     * @throws InvalidConfigException
+     * @throws UnknownClassException
      */
     protected function renderException($exception)
     {
         // TODO: Implement renderException() method.
 
         try {
-            if (Goblin::$app->has('response')) {
-                $response = Goblin::$app->getResponse();
-//            $response->isSend = false;
-                $response->content = null;
-            } else {
-                $response = Goblin::$app->get('response');
-            }
+            $response = Goblin::$app->getResponse();
             $response->setStatusCodeByException($exception);
 
             $useErrorView = $response->format === Response::FORMAT_HTML;
             if ($useErrorView && $this->errorAction !== null) {
                 $result = Goblin::$app->runAction($this->errorAction);
-                $response->content = $result;
+                $response->setContent($result);
             } elseif ($response->format === Response::FORMAT_HTML) {
                 if ($this->shouldRenderSimpleHtml()) {
                     // AJAX request

@@ -61,15 +61,21 @@ class ServiceLocator extends Component
     {
         unset($this->_components[$id]);
 
-        if (is_array($definition) || is_object($definition)) {
-            if (is_object($definition)) {
-                $definition = (array)$definition;
-            }
+        if (is_array($definition)) {
+//            if (is_object($definition)) {
+//                $definition = (array)$definition;
+//            }
 
             // e.g Goblin::$app->set('foo', ['class' => foo\bar, 'a' => 'b'])
             // If has class, it will be overwrite all component attribuets.
             if (isset($definition['class'])) {
                 $this->_components[$id] = Goblin::createObject($definition['class'], [$id, $definition]);
+            }
+        }
+
+        if (is_object($definition)) {
+            if (isset($definition->class)) {
+                $this->_components[$id] = Goblin::createObject($definition->class, [$id, $definition]);
             }
         }
 

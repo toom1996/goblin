@@ -7,13 +7,15 @@ use Swoole\Http\Request;
 use Swoole\Http\Response;
 use toom1996\base\InvalidConfigException;
 use toom1996\base\UnknownClassException;
+use toom1996\log\Target;
 
 /**
  * Class Goblin
  *
  * @property-read Request  $request
- * @property-read ErrorHandler            $errorHandler
+ * @property-read ErrorHandler $errorHandler
  * @property-read Response $response
+ * @property-read Target $log
  * @author: TOOM1996
  */
 class Goblin extends BaseGoblin
@@ -40,41 +42,50 @@ class Goblin extends BaseGoblin
      * Goblin constructor.
      *
      * @param  array  $config
+     * @param         $request
+     * @param         $response
+     *
+     * @throws InvalidConfigException
+     * @throws \ReflectionException
      */
-    public function __construct(&$config = [])
+    public function __construct(&$config = [], $request = null, $response = null)
     {
         self::$config = $config;
+        $this->bootstrap();
+        $this->getResponse($response);
+    }
+
+    public function __destruct()
+    {
+        // TODO: Implement __destruct() method.
+        echo 'goblin destruct';
     }
 
     /**
      * Runs goblin application.
      *
-     * @param \Swoole\Http\Request $request Swoole request object.
-     * @param  \Swoole\Http\Response  $response Swoole response object.
+     * @param  \Swoole\Http\Request   $request   Swoole request object.
+     * @param  \Swoole\Http\Response  $response  Swoole response object.
      *
      * @return bool
      * @throws \ReflectionException
      * @throws InvalidConfigException
+     * @throws UnknownClassException
      */
     public function run(Request $request, Response $response)
     {
         try {
-            $this->bootstrap();
-            // Detach swoole response
-            $response->detach();
-            // See https://wiki.swoole.com/#/http_server?id=create-1
-            $this->getResponse([
-                'fd' => $response->fd
-            ]);
-            return $this->handleRequest($this->getRequest($request))
+            self::$app->getLog()->messages = '21123123';
+            $this->handleRequest($this->getRequest($request))
                 ->send();
         }catch (\Swoole\ExitException $e){
             $this->getResponse()->content = $e->getStatus();
         }catch (\Throwable $e) {
             $this->getErrorHandler()->handleException($e);
         } finally {
-            return $this->getResponse()->send();
+            $this->getResponse()->send();
         }
+        self::$app = null;
     }
 
     /**
@@ -146,7 +157,7 @@ class Goblin extends BaseGoblin
         if (!$this->has('response')) {
             $this->set('response', $response);
         }
-        
+
         return $this->get('response');
     }
 
@@ -171,6 +182,18 @@ class Goblin extends BaseGoblin
     public function getAssetManager()
     {
         return $this->get('assetManager');
+    }
+
+    /**
+     *
+     *
+     * @return Target
+     * @throws InvalidConfigException
+     * @throws \ReflectionException
+     */
+    public function getLog()
+    {
+        return $this->get('log');
     }
 
     /**
@@ -228,11 +251,11 @@ class Goblin extends BaseGoblin
     }
 
     /**
-     * Print something to browser.
+     * Print to browser.
      * @param $output
      *
      * @throws \ReflectionException
-     * @throws \toom1996\base\InvalidConfigException
+     * @throws InvalidConfigException
      */
     public static function dump($output)
     {

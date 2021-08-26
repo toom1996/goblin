@@ -4,6 +4,7 @@ namespace toom1996;
 
 use toom1996\http\Goblin;
 use toom1996\http\UrlManager;
+use toom1996\log\FileTarget;
 
 /**
  * This constant defines the framework installation directory.
@@ -38,9 +39,7 @@ class GoblinLoader
     {
         // Set alias and init config.
         $this->config = $config;
-        Goblin::setAlias('@app', $this->config['basePath']);
         Goblin::setAlias('@goblin', __DIR__);
-        Goblin::setAlias('@controllers', $this->config['controllersPath']);
         $this->initInitialize();
     }
 
@@ -63,9 +62,9 @@ class GoblinLoader
      *
      * @return \toom1996\http\Goblin
      */
-    public function load($app)
+    public function load($app, $request = null, $response = null)
     {
-        return new $app($this->config);
+        return new $app($this->config, $request, $response);
     }
 
     /**

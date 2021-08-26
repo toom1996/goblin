@@ -26,6 +26,11 @@ class BaseGoblin extends Module
      */
     public static $handlerMap = [];
 
+    /**
+     * @var
+     */
+    public static $logger;
+
     public function coreComponents()
     {
         return [
