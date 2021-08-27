@@ -34,9 +34,10 @@ class BaseGoblin extends Module
     public function coreComponents()
     {
         return [
-            'formatter'    => ['class' => 'yii\i18n\Formatter'],
-            'mailer'       => ['class' => 'yii\swiftmailer\Mailer'],
-            'security'     => ['class' => 'yii\base\Security'],
+//            'formatter'    => ['class' => 'yii\i18n\Formatter'],
+//            'mailer'       => ['class' => 'yii\swiftmailer\Mailer'],
+//            'security'     => ['class' => 'yii\base\Security'],
+            'log'     => ['class' => 'toom1996\log\LogDispatcher'],
         ];
     }
 
@@ -176,13 +177,24 @@ class BaseGoblin extends Module
      */
     public static function createObject($type, array $params = [])
     {
+        // instance of ReflectionClass
+        if (is_object($type)) {
+            return $type->newInstanceArgs($params);
+        }
+
         if (is_string($type)) {
             $ref = new \ReflectionClass($type);
             return $ref->newInstanceArgs($params);
         }
 
-        if (is_object($type)) {
-            return $type->newInstanceArgs($params);
+        if (is_array($type) && isset($type['class'])) {
+            $ref = new \ReflectionClass($type['class']);
+            return $ref->newInstanceArgs($params);
         }
+    }
+
+    public static function getLogger()
+    {
+
     }
 }

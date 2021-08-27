@@ -4,6 +4,8 @@
 namespace toom1996\log;
 
 
+use toom1996\base\InvalidConfigException;
+use toom1996\helpers\FileHelper;
 use toom1996\http\Goblin;
 
 class FileTarget extends Target
@@ -53,11 +55,14 @@ class FileTarget extends Target
      */
     public $rotateByCopy = true;
 
+    public function __construct($logFile, $class = null)
+    {
+
+    }
+
     public function init()
     {
         parent::init();
-        $this->logFile = Goblin::getAlias($this->logFile);
-
         if ($this->maxLogFiles < 1) {
             $this->maxLogFiles = 1;
         }
@@ -65,9 +70,79 @@ class FileTarget extends Target
             $this->maxFileSize = 1;
         }
     }
+    public function log($message, $level, $category = 'application')
+    {
+        $time = microtime(true);
+        $traces = [];
+//        if ($this->traceLevel > 0) {
+//            $count = 0;
+//            $ts = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
+//            array_pop($ts); // remove the last trace since it would be the entry script, not very useful
+//            foreach ($ts as $trace) {
+//                if (isset($trace['file'], $trace['line']) && strpos($trace['file'], YII2_PATH) !== 0) {
+//                    unset($trace['object'], $trace['args']);
+//                    $traces[] = $trace;
+//                    if (++$count >= $this->traceLevel) {
+//                        break;
+//                    }
+//                }
+//            }
+//        }
+        $this->messages[] = [$message, $level, $category, $time, $traces, memory_get_usage()];
+//        if ($this->flushInterval > 0 && count($this->messages) >= $this->flushInterval) {
+            $this->flush();
+//        }
+    }
 
     public function export()
     {
-        // TODO: Implement export() method.
+        $this->logFile = Goblin::getAlias('@runtime/log/app.log');
+        if (strpos($this->logFile, '://') === false || strncmp($this->logFile, 'file://', 7) === 0) {
+            $logPath = dirname($this->logFile);
+            FileHelper::createDirectory($logPath, $this->dirMode, true);
+        }
+
+//        $text = implode("\n", array_map([$this, 'formatMessage'], $this->messages)) . "\n";
+
+        $text = $this->messages;
+        $text = 'ppppp';
+        if (($fp = @fopen($this->logFile, 'a')) === false) {
+            throw new InvalidConfigException("Unable to append to log file: {$this->logFile}");
+        }
+        @flock($fp, LOCK_EX);
+        if ($this->enableRotation) {
+            // clear stat cache to ensure getting the real current file size and not a cached one
+            // this may result in rotating twice when cached file size is used on subsequent calls
+            clearstatcache();
+        }
+        if ($this->enableRotation && @filesize($this->logFile) > $this->maxFileSize * 1024) {
+            @flock($fp, LOCK_UN);
+            @fclose($fp);
+//            $this->rotateFiles();
+            $writeResult = @file_put_contents($this->logFile, $text, FILE_APPEND | LOCK_EX);
+            if ($writeResult === false) {
+                $error = error_get_last();
+                throw new LogRuntimeException("Unable to export log through file ({$this->logFile})!: {$error['message']}");
+            }
+            $textSize = strlen($text);
+            if ($writeResult < $textSize) {
+                throw new LogRuntimeException("Unable to export whole log through file ({$this->logFile})! Wrote $writeResult out of $textSize bytes.");
+            }
+        } else {
+            $writeResult = @fwrite($fp, $text);
+            if ($writeResult === false) {
+                $error = error_get_last();
+                throw new LogRuntimeException("Unable to export log through file ({$this->logFile})!: {$error['message']}");
+            }
+            $textSize = strlen($text);
+            if ($writeResult < $textSize) {
+                throw new LogRuntimeException("Unable to export whole log through file ({$this->logFile})! Wrote $writeResult out of $textSize bytes.");
+            }
+            @flock($fp, LOCK_UN);
+            @fclose($fp);
+        }
+        if ($this->fileMode !== null) {
+            @chmod($this->logFile, $this->fileMode);
+        }
     }
 }

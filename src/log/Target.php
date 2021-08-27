@@ -7,7 +7,7 @@ use toom1996\base\Component;
 abstract class Target extends Component
 {
 
-
+    public $enabled = true;
 
     public $logVars = [
 
@@ -33,6 +33,11 @@ abstract class Target extends Component
 
             $this->messages = [];
         }
+    }
+
+    public function flush()
+    {
+        $this->export();
     }
 
 }

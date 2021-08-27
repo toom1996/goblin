@@ -24,7 +24,6 @@ class Component extends BaseObject
     public function __construct($id = null, $params = null)
     {
         if ($id) {
-            echo 'configure ' . $id . PHP_EOL;
             // TODO configure attributes.
             $config = array_merge(Goblin::$config['components'][$id], (array)$params);
             foreach ($config as $name => $value) {

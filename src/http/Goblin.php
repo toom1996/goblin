@@ -7,7 +7,9 @@ use Swoole\Http\Request;
 use Swoole\Http\Response;
 use toom1996\base\InvalidConfigException;
 use toom1996\base\UnknownClassException;
+use toom1996\log\LogDispatcher;
 use toom1996\log\Target;
+
 
 /**
  * Class Goblin
@@ -20,6 +22,7 @@ use toom1996\log\Target;
  */
 class Goblin extends BaseGoblin
 {
+
     /**
      * [[网页编码格式。也许应该把他放到response里。]]
      * @var string
@@ -53,12 +56,13 @@ class Goblin extends BaseGoblin
         self::$config = $config;
         $this->bootstrap();
         $this->getResponse($response);
+        $this->getRequest($request);
     }
 
     public function __destruct()
     {
         // TODO: Implement __destruct() method.
-        echo 'goblin destruct';
+//        echo 'goblin destruct';
     }
 
     /**
@@ -76,7 +80,7 @@ class Goblin extends BaseGoblin
     {
         try {
             self::$app->getLog()->messages = '21123123';
-            $this->handleRequest($this->getRequest($request))
+            $this->handleRequest($this->getRequest())
                 ->send();
         }catch (\Swoole\ExitException $e){
             $this->getResponse()->content = $e->getStatus();
@@ -187,7 +191,7 @@ class Goblin extends BaseGoblin
     /**
      *
      *
-     * @return Target
+     * @return \toom1996\log\LogDispatcher
      * @throws InvalidConfigException
      * @throws \ReflectionException
      */
@@ -260,5 +264,25 @@ class Goblin extends BaseGoblin
     public static function dump($output)
     {
         self::$app->getResponse()->setContent(print_r($output, true));
+    }
+
+    public static function warring()
+    {
+
+    }
+
+    public static function error()
+    {
+
+    }
+
+    public static function notice()
+    {
+
+    }
+
+    public static function info($message, $cat = 'application')
+    {
+        self::$app->getLog()->getTarget($cat)->log($message, LogDispatcher::LEVEL_INFO, $cat);
     }
 }
