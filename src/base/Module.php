@@ -11,10 +11,6 @@ use toom1996\http\Goblin;
  */
 class Module extends ServiceLocator
 {
-    public function __construct($id = null, $params = null)
-    {
-        parent::__construct($id, $params);
-    }
 
     /**
      * Run action.

@@ -55,11 +55,6 @@ class FileTarget extends Target
      */
     public $rotateByCopy = true;
 
-    public function __construct($logFile, $class = null)
-    {
-
-    }
-
     public function init()
     {
         parent::init();
@@ -96,7 +91,7 @@ class FileTarget extends Target
 
     public function export()
     {
-        $this->logFile = Goblin::getAlias('@runtime/log/app.log');
+        $this->logFile = Goblin::getAlias($this->logFile);
         if (strpos($this->logFile, '://') === false || strncmp($this->logFile, 'file://', 7) === 0) {
             $logPath = dirname($this->logFile);
             FileHelper::createDirectory($logPath, $this->dirMode, true);

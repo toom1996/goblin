@@ -18,7 +18,7 @@ class UrlManager extends BaseUrlManager
     /**
      * @var Dispatcher
      */
-    protected $adapter;
+    public $adapter;
 
     /**
      * Init UrlManager

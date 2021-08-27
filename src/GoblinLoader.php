@@ -2,6 +2,7 @@
 
 namespace toom1996;
 
+use toom1996\base\InvalidConfigException;
 use toom1996\http\Goblin;
 use toom1996\http\UrlManager;
 use toom1996\log\FileTarget;
@@ -45,15 +46,36 @@ class GoblinLoader
 
     /**
      * Init config for Application
+     *
+     * @throws InvalidConfigException
      */
     public function initInitialize()
     {
+        // Set aliases.
         if (isset($this->config['aliases']) && is_array($this->config['aliases'])) {
             foreach ($this->config['aliases'] as $alias => $path) {
                 Goblin::setAlias($alias, $path);
             }
         }
+
+//        $config = array_merge(Goblin::$config['components'][$id], (array)$params);
+//        foreach ($config as $name => $value) {
+//            if (property_exists($this, $name)) {
+//                $this->{$name} = $value;
+//            }
+//        }
+        // merge core components with custom components.
+        foreach ($this->httpBaseComponents() as $id => $component) {
+            if (!isset($this->config['components'][$id])) {
+                $this->config['components'][$id] = $component;
+            }
+
+            if (!isset($this->config['components'][$id]['class'])) {
+                $this->config['components'][$id]['class'] = $component['class'];
+            }
+        }
         $this->config['components']['urlManager']['adapter'] = UrlManager::loadRoute($this->config);
+        var_dump($this->config);
     }
 
     /**
@@ -83,5 +105,18 @@ class GoblinLoader
         }
 
         require $classFile;
+    }
+
+    public function httpBaseComponents()
+    {
+        return [
+            'request' => ['class' => 'toom1996\http\Request'],
+            'response' => ['class' => 'toom1996\http\Response'],
+            'errorHandler' => ['class' => 'toom1996\http\ErrorHandler'],
+            'urlManager' => ['class' => 'toom1996\http\UrlManager'],
+            'view' => ['class' => 'toom1996\http\View'],
+            'assetManager' => ['class' => 'toom1996\http\AssetManager'],
+            'log' => ['class' => 'toom1996\log\LogDispatcher'],
+        ];
     }
 }

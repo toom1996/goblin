@@ -71,9 +71,10 @@ class LogDispatcher extends Component
             if (!$target instanceof Target) {
                 // Set default target class if target dont have class.
                 if (!isset($target['class'])) {
-                    $target['class'] = $this->defaultTargerClass;
+                    $this->targets[$name] = Goblin::createObject($this->defaultTargerClass, [$target]);
+                }else{
+                    $this->targets[$name] = Goblin::createObject($target['class'], [$target]);
                 }
-                $this->targets[$name] = Goblin::createObject($target['class'], $target);
             }
         }
     }

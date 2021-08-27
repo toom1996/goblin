@@ -14,26 +14,6 @@ class Component extends BaseObject
      */
     protected $component;
 
-
-    /**
-     * Component constructor.
-     *
-     * @param $id
-     * @param  null  $params
-     */
-    public function __construct($id = null, $params = null)
-    {
-        if ($id) {
-            // TODO configure attributes.
-            $config = array_merge(Goblin::$config['components'][$id], (array)$params);
-            foreach ($config as $name => $value) {
-                if (property_exists($this, $name)) {
-                    $this->{$name} = $value;
-                }
-            }
-        }
-        parent::__construct();
-    }
     
     public function init()
     {

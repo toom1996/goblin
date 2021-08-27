@@ -71,10 +71,10 @@ class Goblin extends BaseGoblin
      * @param  \Swoole\Http\Request   $request   Swoole request object.
      * @param  \Swoole\Http\Response  $response  Swoole response object.
      *
-     * @return bool
-     * @throws \ReflectionException
+     * @return void
      * @throws InvalidConfigException
      * @throws UnknownClassException
+     * @throws \ReflectionException
      */
     public function run(Request $request, Response $response)
     {
@@ -97,15 +97,6 @@ class Goblin extends BaseGoblin
      */
     public function bootstrap()
     {
-        // merge core components with custom components
-        foreach ($this->coreComponents() as $id => $component) {
-            if (!isset(self::$config['components'][$id])) {
-                self::$config['components'][$id] = $component;
-            } elseif (is_array(self::$config['components'][$id]) && !isset(self::$config['components'][$id]['class'])) {
-                self::$config['components'][$id]['class'] = $component['class'];
-            }
-        }
-        
         self::$app = &$this;
     }
 
@@ -167,7 +158,7 @@ class Goblin extends BaseGoblin
 
     /**
      *
-     * @return \toom1996\http\UrlManager
+     * @return UrlManager
      * @throws \ReflectionException
      * @throws InvalidConfigException
      */
@@ -191,7 +182,7 @@ class Goblin extends BaseGoblin
     /**
      *
      *
-     * @return \toom1996\log\LogDispatcher
+     * @return LogDispatcher
      * @throws InvalidConfigException
      * @throws \ReflectionException
      */
@@ -209,7 +200,6 @@ class Goblin extends BaseGoblin
      * @throws InvalidConfigException
      * @throws MethodNotAllowedHttpException
      * @throws NotFoundHttpException
-     * @throws UnknownClassException
      * @throws \ReflectionException
      */
     public function handleRequest($request)
@@ -222,22 +212,6 @@ class Goblin extends BaseGoblin
         }
 
         return $response;
-    }
-
-    /**
-     * Returns default goblin components.
-     * @return array
-     */
-    public function coreComponents()
-    {
-        return array_merge(parent::coreComponents(), [
-            'request' => ['class' => 'toom1996\http\Request'],
-            'response' => ['class' => 'toom1996\http\Response'],
-            'errorHandler' => ['class' => 'toom1996\http\ErrorHandler'],
-            'urlManager' => ['class' => 'toom1996\http\UrlManager'],
-            'view' => ['class' => 'toom1996\http\View'],
-            'assetManager' => ['class' => 'toom1996\http\AssetManager'],
-        ]);
     }
 
     /**

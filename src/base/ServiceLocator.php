@@ -14,6 +14,11 @@ class ServiceLocator extends Component
      */
     private $_components;
 
+
+    public function init()
+    {
+    }
+
     /**
      *
      *
@@ -30,7 +35,7 @@ class ServiceLocator extends Component
         }
 
         if (isset(Goblin::$config['components'][$id])) {
-            return $this->set($id);
+            return $this->set($id, Goblin::$config['components'][$id]);
         }else{
             throw new InvalidConfigException("Unknown component ID: $id");
         }
@@ -59,23 +64,23 @@ class ServiceLocator extends Component
      */
     public function set($id, $definition = null)
     {
+        var_dump($id);
+        var_dump($definition);
+        // Remove old component.
         unset($this->_components[$id]);
 
         if (is_array($definition)) {
-//            if (is_object($definition)) {
-//                $definition = (array)$definition;
-//            }
-
             // e.g Goblin::$app->set('foo', ['class' => foo\bar, 'a' => 'b'])
-            // If has class, it will be overwrite all component attribuets.
+            // If has class, it will be overwrite all component attributes.
+            unset($definition['class']);
             if (isset($definition['class'])) {
-                $this->_components[$id] = Goblin::createObject($definition['class'], [$id, $definition]);
+                $this->_components[$id] = Goblin::createObject($definition['class'], [$definition]);
             }
         }
 
         if (is_object($definition)) {
             if (isset($definition->class)) {
-                $this->_components[$id] = Goblin::createObject($definition->class, [$id, $definition]);
+                $this->_components[$id] = Goblin::createObject($definition->class, [$definition]);
             }
         }
 
@@ -83,7 +88,8 @@ class ServiceLocator extends Component
         if (!isset(Goblin::$config['components'][$id]['class'])) {
             throw new InvalidConfigException("Unexpected configuration type for the \"$id\" component: " . gettype($definition));
         }
-        $this->_components[$id] = Goblin::createObject(Goblin::$config['components'][$id]['class'], [$id, $definition]);;
+
+        $this->_components[$id] = Goblin::createObject(Goblin::$config['components'][$id]['class'], [$definition]);;
 
         return $this->_components[$id];
     }

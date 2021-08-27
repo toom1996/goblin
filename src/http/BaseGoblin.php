@@ -31,16 +31,6 @@ class BaseGoblin extends Module
      */
     public static $logger;
 
-    public function coreComponents()
-    {
-        return [
-//            'formatter'    => ['class' => 'yii\i18n\Formatter'],
-//            'mailer'       => ['class' => 'yii\swiftmailer\Mailer'],
-//            'security'     => ['class' => 'yii\base\Security'],
-            'log'     => ['class' => 'toom1996\log\LogDispatcher'],
-        ];
-    }
-
     /**
      * Get alias.
      *
@@ -196,5 +186,22 @@ class BaseGoblin extends Module
     public static function getLogger()
     {
 
+    }
+
+    /**
+     * Configures an object with the initial property values.
+     *
+     * @param $object
+     * @param $properties
+     *
+     * @return object the object itself
+     */
+    public static function configure($object, $properties)
+    {
+        foreach ($properties as $name => $value) {
+            $object->$name = $value;
+        }
+
+        return $object;
     }
 }

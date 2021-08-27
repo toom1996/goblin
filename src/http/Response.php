@@ -134,9 +134,9 @@ class Response extends Component
      */
     private $_statusCode = 200;
 
-    public function __construct($response, $params)
+    public function __construct($config)
     {
-        $this->response = $params;
+        $this->response = $config;
     }
 
     /**
