@@ -89,6 +89,7 @@ class Goblin extends BaseGoblin
         } finally {
             $this->getResponse()->send();
         }
+        $this->getLog()->flush();
         self::$app = null;
     }
 
@@ -240,23 +241,45 @@ class Goblin extends BaseGoblin
         self::$app->getResponse()->setContent(print_r($output, true));
     }
 
-    public static function warring()
+    /**
+     *
+     *
+     * @param          $message
+     * @param  string  $category
+     *
+     * @throws InvalidConfigException
+     * @throws \ReflectionException
+     */
+    public static function warring($message, $category = 'application')
     {
-
+        self::$app->getLog()->getTarget($category)->log($message, LogDispatcher::LEVEL_WARNING, $category);
     }
 
-    public static function error()
+    /**
+     *
+     *
+     * @param          $message
+     * @param  string  $category
+     *
+     * @throws InvalidConfigException
+     * @throws \ReflectionException
+     */
+    public static function error($message, $category = 'application')
     {
-
+        self::$app->getLog()->getTarget($category)->log($message, LogDispatcher::LEVEL_ERROR, $category);
     }
 
-    public static function notice()
+    /**
+     *
+     *
+     * @param          $message
+     * @param  string  $category
+     *
+     * @throws InvalidConfigException
+     * @throws \ReflectionException
+     */
+    public static function info($message, $category = 'application')
     {
-
-    }
-
-    public static function info($message, $cat = 'application')
-    {
-        self::$app->getLog()->getTarget($cat)->log($message, LogDispatcher::LEVEL_INFO, $cat);
+        self::$app->getLog()->getTarget($category)->log($message, LogDispatcher::LEVEL_INFO, $category);
     }
 }

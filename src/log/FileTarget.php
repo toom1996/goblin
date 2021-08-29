@@ -4,15 +4,14 @@
 namespace toom1996\log;
 
 
+use Swoole\Coroutine\System;
 use toom1996\base\InvalidConfigException;
 use toom1996\helpers\FileHelper;
 use toom1996\http\Goblin;
+use function Swoole\Coroutine\run;
 
 class FileTarget extends Target
 {
-
-    public $logFile;
-
     /**
      * @var bool whether log files should be rotated when they reach a certain [[maxFileSize|maximum size]].
      * Log rotation is enabled by default. This property allows you to disable it, when you have configured
@@ -83,7 +82,7 @@ class FileTarget extends Target
 //                }
 //            }
 //        }
-        $this->messages[] = [$message, $level, $category, $time, $traces, memory_get_usage()];
+        $this->messages[] = [$message, $level, $category, $time, $traces];
 //        if ($this->flushInterval > 0 && count($this->messages) >= $this->flushInterval) {
             $this->flush();
 //        }
@@ -97,47 +96,49 @@ class FileTarget extends Target
             FileHelper::createDirectory($logPath, $this->dirMode, true);
         }
 
-//        $text = implode("\n", array_map([$this, 'formatMessage'], $this->messages)) . "\n";
+        $text = implode("\n", array_map([$this, 'formatMessage'], $this->messages)) . "\n";
 
-        $text = $this->messages;
-        $text = 'ppppp';
-        if (($fp = @fopen($this->logFile, 'a')) === false) {
-            throw new InvalidConfigException("Unable to append to log file: {$this->logFile}");
-        }
-        @flock($fp, LOCK_EX);
-        if ($this->enableRotation) {
-            // clear stat cache to ensure getting the real current file size and not a cached one
-            // this may result in rotating twice when cached file size is used on subsequent calls
-            clearstatcache();
-        }
-        if ($this->enableRotation && @filesize($this->logFile) > $this->maxFileSize * 1024) {
-            @flock($fp, LOCK_UN);
-            @fclose($fp);
-//            $this->rotateFiles();
-            $writeResult = @file_put_contents($this->logFile, $text, FILE_APPEND | LOCK_EX);
-            if ($writeResult === false) {
-                $error = error_get_last();
-                throw new LogRuntimeException("Unable to export log through file ({$this->logFile})!: {$error['message']}");
-            }
-            $textSize = strlen($text);
-            if ($writeResult < $textSize) {
-                throw new LogRuntimeException("Unable to export whole log through file ({$this->logFile})! Wrote $writeResult out of $textSize bytes.");
-            }
-        } else {
-            $writeResult = @fwrite($fp, $text);
-            if ($writeResult === false) {
-                $error = error_get_last();
-                throw new LogRuntimeException("Unable to export log through file ({$this->logFile})!: {$error['message']}");
-            }
-            $textSize = strlen($text);
-            if ($writeResult < $textSize) {
-                throw new LogRuntimeException("Unable to export whole log through file ({$this->logFile})! Wrote $writeResult out of $textSize bytes.");
-            }
-            @flock($fp, LOCK_UN);
-            @fclose($fp);
-        }
-        if ($this->fileMode !== null) {
-            @chmod($this->logFile, $this->fileMode);
-        }
+//        if (($fp = @fopen($this->logFile, 'a+')) === false) {
+//            throw new InvalidConfigException("Unable to append to log file: {$this->logFile}");
+//        }
+//        run(function () use ($text) {
+            $r = System::writeFile($this->logFile, $text, FILE_APPEND);
+//            var_dump($r);
+//        });
+//        @flock($fp, LOCK_EX);
+//        if ($this->enableRotation) {
+//            // clear stat cache to ensure getting the real current file size and not a cached one
+//            // this may result in rotating twice when cached file size is used on subsequent calls
+//            clearstatcache();
+//        }
+//        if ($this->enableRotation && @filesize($this->logFile) > $this->maxFileSize * 1024) {
+//            @flock($fp, LOCK_UN);
+//            @fclose($fp);
+////            $this->rotateFiles();
+//            $writeResult = @file_put_contents($this->logFile, $text, FILE_APPEND | LOCK_EX);
+//            if ($writeResult === false) {
+//                $error = error_get_last();
+//                throw new LogRuntimeException("Unable to export log through file ({$this->logFile})!: {$error['message']}");
+//            }
+//            $textSize = strlen($text);
+//            if ($writeResult < $textSize) {
+//                throw new LogRuntimeException("Unable to export whole log through file ({$this->logFile})! Wrote $writeResult out of $textSize bytes.");
+//            }
+//        } else {
+//            $writeResult = @fwrite($fp, $text);
+//            if ($writeResult === false) {
+//                $error = error_get_last();
+//                throw new LogRuntimeException("Unable to export log through file ({$this->logFile})!: {$error['message']}");
+//            }
+//            $textSize = strlen($text);
+//            if ($writeResult < $textSize) {
+//                throw new LogRuntimeException("Unable to export whole log through file ({$this->logFile})! Wrote $writeResult out of $textSize bytes.");
+//            }
+//            @flock($fp, LOCK_UN);
+//            @fclose($fp);
+//        }
+//        if ($this->fileMode !== null) {
+//            @chmod($this->logFile, $this->fileMode);
+//        }
     }
 }

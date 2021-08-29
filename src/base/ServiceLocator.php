@@ -64,8 +64,6 @@ class ServiceLocator extends Component
      */
     public function set($id, $definition = null)
     {
-        var_dump($id);
-        var_dump($definition);
         // Remove old component.
         unset($this->_components[$id]);
 

@@ -75,7 +75,6 @@ class GoblinLoader
             }
         }
         $this->config['components']['urlManager']['adapter'] = UrlManager::loadRoute($this->config);
-        var_dump($this->config);
     }
 
     /**

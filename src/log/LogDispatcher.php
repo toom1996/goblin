@@ -25,43 +25,22 @@ class LogDispatcher extends Component
      */
     const LEVEL_INFO = 0x04;
     /**
-     * Tracing message level. An tracing message is one that reveals the code execution flow.
-     */
-    const LEVEL_TRACE = 0x08;
-    /**
-     * Profiling message level. This indicates the message is for profiling purpose.
-     */
-    const LEVEL_PROFILE = 0x40;
-    /**
-     * Profiling message level. This indicates the message is for profiling purpose. It marks the
-     * beginning of a profiling block.
-     */
-    const LEVEL_PROFILE_BEGIN = 0x50;
-    /**
-     * Profiling message level. This indicates the message is for profiling purpose. It marks the
-     * end of a profiling block.
-     */
-    const LEVEL_PROFILE_END = 0x60;
-    /**
      * @var array|Target[] the log targets. Each array element represents a single [[Target|log target]] instance
      * or the configuration for creating the log target instance.
      */
     public $targets = [];
 
-    /**
-     * @var Logger the logger.
-     */
-    private $_logger;
 
     /**
-     * Default targer class.
+     * Default target class.
      * @var
      */
-    public $defaultTargerClass = 'toom1996\log\FileTarget';
-    
+    public $defaultTargetClass = 'toom1996\log\FileTarget';
+
 
     /**
      * {@inheritdoc}
+     * @throws \ReflectionException
      */
     public function init()
     {
@@ -71,11 +50,18 @@ class LogDispatcher extends Component
             if (!$target instanceof Target) {
                 // Set default target class if target dont have class.
                 if (!isset($target['class'])) {
-                    $this->targets[$name] = Goblin::createObject($this->defaultTargerClass, [$target]);
+                    $this->targets[$name] = Goblin::createObject($this->defaultTargetClass, [$target]);
                 }else{
                     $this->targets[$name] = Goblin::createObject($target['class'], [$target]);
                 }
             }
+        }
+    }
+
+    public function flush()
+    {
+        foreach ($this->targets as $target) {
+            $target->flush();
         }
     }
 
@@ -85,7 +71,7 @@ class LogDispatcher extends Component
      *
      * @return mixed|\toom1996\log\Target
      */
-    public function getTarget($target)
+    public function getTarget($target = 'app')
     {
         return $this->targets[$target];
     }
@@ -134,22 +120,19 @@ class LogDispatcher extends Component
 
 
     /**
-     * Generate target error message
+     * Get log level name.
+     * @param $level
      *
-     * @param Target $target log target object
-     * @param \Throwable|\Exception $throwable catched exception
-     * @param string $method full method path
-     * @return array generated error message data
-     * @since 2.0.32
+     * @return mixed|string
      */
-    protected function generateTargetFailErrorMessage($target, $throwable, $method)
+    public static function getLevelName($level)
     {
-        return [
-            'Unable to send log via ' . get_class($target) . ': ' . ErrorHandler::convertExceptionToVerboseString($throwable),
-            Logger::LEVEL_WARNING,
-            $method,
-            microtime(true),
-            [],
+        static $levels = [
+            self::LEVEL_ERROR => 'error',
+            self::LEVEL_WARNING => 'warning',
+            self::LEVEL_INFO => 'info',
         ];
+
+        return isset($levels[$level]) ? $levels[$level] : 'unknown';
     }
 }

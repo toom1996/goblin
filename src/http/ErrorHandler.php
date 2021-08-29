@@ -67,8 +67,8 @@ class ErrorHandler extends \toom1996\base\ErrorHandler
     {
         // TODO: Implement renderException() method.
 
+        $response = Goblin::$app->getResponse();
         try {
-            $response = Goblin::$app->getResponse();
             $response->setStatusCodeByException($exception);
 
             $useErrorView = $response->format === Response::FORMAT_HTML;
