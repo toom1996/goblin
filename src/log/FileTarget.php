@@ -4,6 +4,7 @@
 namespace toom1996\log;
 
 
+use Swoole\Coroutine;
 use Swoole\Coroutine\System;
 use toom1996\base\InvalidConfigException;
 use toom1996\helpers\FileHelper;
@@ -71,6 +72,7 @@ class FileTarget extends Target
 //        if ($this->traceLevel > 0) {
 //            $count = 0;
 //            $ts = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
+//            var_dump($ts);
 //            array_pop($ts); // remove the last trace since it would be the entry script, not very useful
 //            foreach ($ts as $trace) {
 //                if (isset($trace['file'], $trace['line']) && strpos($trace['file'], YII2_PATH) !== 0) {
@@ -83,9 +85,9 @@ class FileTarget extends Target
 //            }
 //        }
         $this->messages[] = [$message, $level, $category, $time, $traces];
-//        if ($this->flushInterval > 0 && count($this->messages) >= $this->flushInterval) {
+        if ($this->flushInterval > 0 && count($this->messages) >= $this->flushInterval) {
             $this->flush();
-//        }
+        }
     }
 
     public function export()
@@ -98,47 +100,74 @@ class FileTarget extends Target
 
         $text = implode("\n", array_map([$this, 'formatMessage'], $this->messages)) . "\n";
 
-//        if (($fp = @fopen($this->logFile, 'a+')) === false) {
-//            throw new InvalidConfigException("Unable to append to log file: {$this->logFile}");
-//        }
-//        run(function () use ($text) {
-            $r = System::writeFile($this->logFile, $text, FILE_APPEND);
-//            var_dump($r);
-//        });
-//        @flock($fp, LOCK_EX);
-//        if ($this->enableRotation) {
-//            // clear stat cache to ensure getting the real current file size and not a cached one
-//            // this may result in rotating twice when cached file size is used on subsequent calls
-//            clearstatcache();
-//        }
-//        if ($this->enableRotation && @filesize($this->logFile) > $this->maxFileSize * 1024) {
-//            @flock($fp, LOCK_UN);
-//            @fclose($fp);
-////            $this->rotateFiles();
-//            $writeResult = @file_put_contents($this->logFile, $text, FILE_APPEND | LOCK_EX);
-//            if ($writeResult === false) {
-//                $error = error_get_last();
-//                throw new LogRuntimeException("Unable to export log through file ({$this->logFile})!: {$error['message']}");
-//            }
-//            $textSize = strlen($text);
-//            if ($writeResult < $textSize) {
-//                throw new LogRuntimeException("Unable to export whole log through file ({$this->logFile})! Wrote $writeResult out of $textSize bytes.");
-//            }
-//        } else {
-//            $writeResult = @fwrite($fp, $text);
-//            if ($writeResult === false) {
-//                $error = error_get_last();
-//                throw new LogRuntimeException("Unable to export log through file ({$this->logFile})!: {$error['message']}");
-//            }
-//            $textSize = strlen($text);
-//            if ($writeResult < $textSize) {
-//                throw new LogRuntimeException("Unable to export whole log through file ({$this->logFile})! Wrote $writeResult out of $textSize bytes.");
-//            }
-//            @flock($fp, LOCK_UN);
-//            @fclose($fp);
-//        }
-//        if ($this->fileMode !== null) {
-//            @chmod($this->logFile, $this->fileMode);
-//        }
+        if (($fp = @fopen($this->logFile, 'a+')) === false) {
+            throw new InvalidConfigException("Unable to append to log file: {$this->logFile}");
+        }
+
+        @flock($fp, LOCK_EX);
+        if ($this->enableRotation) {
+            // clear stat cache to ensure getting the real current file size and not a cached one
+            // this may result in rotating twice when cached file size is used on subsequent calls
+            clearstatcache();
+        }
+
+        if ($this->enableRotation && @filesize($this->logFile) > $this->maxFileSize * 1024) {
+            @flock($fp, LOCK_UN);
+            @fclose($fp);
+            $this->rotateFiles();
+            $writeResult = @file_put_contents($this->logFile, $text, FILE_APPEND | LOCK_EX);
+            if ($writeResult === false) {
+                $error = error_get_last();
+                throw new LogRuntimeException("Unable to export log through file ({$this->logFile})!: {$error['message']}");
+            }
+            $textSize = strlen($text);
+            if ($writeResult < $textSize) {
+                throw new LogRuntimeException("Unable to export whole log through file ({$this->logFile})! Wrote $writeResult out of $textSize bytes.");
+            }
+        } else {
+            $writeResult = @fwrite($fp, $text);
+            if ($writeResult === false) {
+                $error = error_get_last();
+                throw new LogRuntimeException("Unable to export log through file ({$this->logFile})!: {$error['message']}");
+            }
+            $textSize = strlen($text);
+            if ($writeResult < $textSize) {
+                throw new LogRuntimeException("Unable to export whole log through file ({$this->logFile})! Wrote $writeResult out of $textSize bytes.");
+            }
+            @flock($fp, LOCK_UN);
+            @fclose($fp);
+        }
+        if ($this->fileMode !== null) {
+            @chmod($this->logFile, $this->fileMode);
+        }
+    }
+
+
+    protected function rotateFiles()
+    {
+        $file = $this->logFile;
+        for ($i = $this->maxLogFiles; $i >= 0; --$i) {
+            // $i == 0 is the original log file
+            $rotateFile = $file . ($i === 0 ? '' : '.' . $i);
+            if (is_file($rotateFile)) {
+                // suppress errors because it's possible multiple processes enter into this section
+                if ($i === $this->maxLogFiles) {
+                    @unlink($rotateFile);
+                } else {
+                    if ($this->rotateByCopy) {
+                        @copy($rotateFile, $file . '.' . ($i + 1));
+                        if ($fp = @fopen($rotateFile, 'a')) {
+                            @ftruncate($fp, 0);
+                            @fclose($fp);
+                        }
+                        if ($this->fileMode !== null) {
+                            @chmod($file . '.' . ($i + 1), $this->fileMode);
+                        }
+                    } else {
+                        @rename($rotateFile, $file . '.' . ($i + 1));
+                    }
+                }
+            }
+        }
     }
 }
