@@ -4,12 +4,9 @@
 namespace toom1996\log;
 
 
-use Swoole\Coroutine;
-use Swoole\Coroutine\System;
 use toom1996\base\InvalidConfigException;
 use toom1996\helpers\FileHelper;
 use toom1996\http\Goblin;
-use function Swoole\Coroutine\run;
 
 class FileTarget extends Target
 {

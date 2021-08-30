@@ -5,7 +5,8 @@ namespace toom1996;
 use toom1996\base\InvalidConfigException;
 use toom1996\http\Goblin;
 use toom1996\http\UrlManager;
-use toom1996\log\FileTarget;
+
+require __DIR__ . '/http/Goblin.php';
 
 /**
  * This constant defines the framework installation directory.
@@ -40,7 +41,7 @@ class GoblinLoader
     {
         // Set alias and init config.
         $this->config = $config;
-        Goblin::setAlias('@goblin', __DIR__);
+        Goblin::setAlias('@goblin.php', __DIR__);
         $this->initInitialize();
     }
 

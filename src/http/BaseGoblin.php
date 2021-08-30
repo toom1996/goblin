@@ -204,4 +204,9 @@ class BaseGoblin extends Module
 
         return $object;
     }
+
+    public static function getVersion()
+    {
+        return "0.0.1";
+    }
 }
