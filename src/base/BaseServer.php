@@ -9,7 +9,6 @@ use toom1996\http\Goblin;
 
 abstract class BaseServer extends Component
 {
-
     /**
      * @var
      */
