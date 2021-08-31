@@ -68,15 +68,12 @@ class Goblin extends BaseGoblin
     /**
      * Runs goblin application.
      *
-     * @param  \Swoole\Http\Request   $request   Swoole request object.
-     * @param  \Swoole\Http\Response  $response  Swoole response object.
-     *
      * @return void
      * @throws InvalidConfigException
      * @throws UnknownClassException
      * @throws \ReflectionException
      */
-    public function run(Request $request, Response $response)
+    public function run()
     {
         try {
             self::$app->getLog()->messages = '21123123';

@@ -19,17 +19,13 @@ class HttpServer extends BaseServer
 {
     const HTTP_EVENT = [
         'start',
-//        'request',
     ];
 
     public function init()
     {
-        $http = new \Swoole\Http\Server($this->host, $this->port);
+        $this->application = new \Swoole\Http\Server($this->host, $this->port);
         foreach (self::HTTP_EVENT as $event) {
-            $http->on($event, call_user_func([$this, $event]));
+            $this->application->on($event, [$this, $event]);
         }
     }
-
-
-
 }

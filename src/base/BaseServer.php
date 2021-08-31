@@ -4,13 +4,14 @@
 namespace toom1996\base;
 
 
+use Swoole\Http\Server;
 use toom1996\helpers\ConsoleHelper;
 use toom1996\http\Goblin;
 
 abstract class BaseServer extends Component
 {
     /**
-     * @var
+     * @var Server
      */
     public $application;
 
@@ -89,10 +90,10 @@ EOL;
     {
         return SWOOLE_VERSION;
     }
-    
-    public function start() {
-        var_dump('123');
+
+    public function start($http)
+    {
+        swoole_set_process_name("eazy {$http->master_pid}");
+        $this->welcome();
     }
-
-
 }

@@ -29,8 +29,6 @@ class Application
      * Application constructor.
      *
      * @param  array  $config
-     *
-     * @throws \toom1996\base\InvalidConfigException
      */
     public function __construct(&$config = [])
     {
@@ -43,7 +41,6 @@ class Application
     /**
      * Init config for Application
      *
-     * @throws InvalidConfigException
      */
     public function initInitialize()
     {
@@ -68,10 +65,24 @@ class Application
     }
 
     /**
+     *
+     *
+     * @return HttpServer
+     */
+    public function createServer()
+    {
+        $server = new HttpServer($this->config['swoole']);
+        $server->application->on('request', function(\Swoole\Http\Request $request, \Swoole\Http\Response $response) {
+            (new Goblin($this->config, $request, $response))->run();
+        });
+        return $server;
+    }
+
+    /**
      * returns goblin application.
      * @param $app
      *
-     * @return \toom1996\http\Goblin
+     * @return Goblin
      */
     public function load($app, $request = null, $response = null)
     {
