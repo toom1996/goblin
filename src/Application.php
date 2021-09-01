@@ -17,13 +17,19 @@ defined('EAZY_PATH') or define('EAZY_PATH', __DIR__);
  * Register autoload function.
  */
 spl_autoload_register(['toom1996\Application', 'autoload'], true, true);
+
+/**
+ * Class Application
+ *
+ * @author: TOOM1996
+ */
 class Application
 {
     /**
      * Application config.
      * @var array
      */
-    public $config;
+    public static $applicationConfig;
 
     /**
      * Application constructor.
@@ -33,10 +39,11 @@ class Application
     public function __construct(&$config = [])
     {
         // Set alias and init config.
-        $this->config = $config;
+        self::$applicationConfig = $config;
         Goblin::setAlias('@goblin', __DIR__);
         $this->initInitialize();
     }
+
 
     /**
      * Init config for Application
@@ -45,48 +52,32 @@ class Application
     public function initInitialize()
     {
         // Set aliases.
-        if (isset($this->config['aliases']) && is_array($this->config['aliases'])) {
-            foreach ($this->config['aliases'] as $alias => $path) {
+        if (isset(self::$applicationConfig['aliases']) && is_array(self::$applicationConfig['aliases'])) {
+            foreach (self::$applicationConfig['aliases'] as $alias => $path) {
                 Goblin::setAlias($alias, $path);
             }
         }
 
         // merge core components with custom components.
         foreach ($this->httpBaseComponents() as $id => $component) {
-            if (!isset($this->config['components'][$id])) {
-                $this->config['components'][$id] = $component;
+            if (!isset(self::$applicationConfig['components'][$id])) {
+                self::$applicationConfig['components'][$id] = $component;
             }
 
-            if (!isset($this->config['components'][$id]['class'])) {
-                $this->config['components'][$id]['class'] = $component['class'];
+            if (!isset(self::$applicationConfig['components'][$id]['class'])) {
+                self::$applicationConfig['components'][$id]['class'] = $component['class'];
             }
         }
-        $this->config['components']['urlManager']['adapter'] = UrlManager::loadRoute($this->config);
+        self::$applicationConfig['components']['urlManager']['adapter'] = UrlManager::loadRoute(self::$applicationConfig);
     }
 
     /**
-     *
-     *
+     * Return swoole server.
      * @return HttpServer
      */
     public function createServer()
     {
-        $server = new HttpServer($this->config['swoole']);
-        $server->application->on('request', function(\Swoole\Http\Request $request, \Swoole\Http\Response $response) {
-            (new Goblin($this->config, $request, $response))->run();
-        });
-        return $server;
-    }
-
-    /**
-     * returns goblin application.
-     * @param $app
-     *
-     * @return Goblin
-     */
-    public function load($app, $request = null, $response = null)
-    {
-        return new $app($this->config, $request, $response);
+        return new HttpServer(self::$applicationConfig['swoole']);
     }
 
     /**
