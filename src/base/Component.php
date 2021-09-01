@@ -14,12 +14,6 @@ class Component extends BaseObject
      */
     protected $component;
 
-    
-    public function init()
-    {
-        parent::init();
-    }
-
     /**
      *
      * @param $name

@@ -12,7 +12,7 @@ use toom1996\base\Exception;
 
 class Redis extends Component
 {
-    protected $pools;
+    public $pools;
 
     public $host;
     public $port;
@@ -23,18 +23,18 @@ class Redis extends Component
 
     private static $instance;
 
-    private function __construct(array $config)
+    public function init()
     {
+        echo 'init';
         if (empty($this->pools)) {
-            $this->config = array_replace_recursive($this->config, $config);
             $this->pools = new RedisPool(
                 (new RedisConfig())
-                    ->withHost($this->config['host'])
-                    ->withPort($this->config['port'])
-                    ->withAuth($this->config['auth'])
-                    ->withDbIndex($this->config['db_index'])
-                    ->withTimeout($this->config['time_out']),
-                $this->config['size']
+                    ->withHost($this->host)
+                    ->withPort($this->port)
+                    ->withAuth($this->auth)
+                    ->withDbIndex($this->db_index)
+                    ->withTimeout($this->time_out),
+                $this->size
             );
         }
     }

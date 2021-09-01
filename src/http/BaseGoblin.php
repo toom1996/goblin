@@ -158,6 +158,17 @@ class BaseGoblin extends Module
 
     /**
      * Create object.
+     * You can choose any way to create the object.
+     * ```
+     * Eazy::createObject(`classname`, ['foo' => 'bar']);
+     *
+     * Eazy::createObject([
+     *      'class' => 'classname',
+     *      'foo' => 'bar',
+     * ]);
+     *
+     * Eazy::createObject(ReflectionClass, ['foo' => 'bar']);
+     * ```
      *
      * @param         $type string|\ReflectionClass
      * @param  array  $params

@@ -42,6 +42,7 @@ class Application
         self::$applicationConfig = $config;
         Goblin::setAlias('@goblin', __DIR__);
         $this->initInitialize();
+        $this->bootstrap();
     }
 
 
@@ -58,6 +59,7 @@ class Application
             }
         }
 
+
         // merge core components with custom components.
         foreach ($this->httpBaseComponents() as $id => $component) {
             if (!isset(self::$applicationConfig['components'][$id])) {
@@ -69,6 +71,15 @@ class Application
             }
         }
         self::$applicationConfig['components']['urlManager']['adapter'] = UrlManager::loadRoute(self::$applicationConfig);
+    }
+
+    public function bootstrap()
+    {
+        foreach (Application::$applicationConfig['bootstrap'] as $component) {
+            $def = self::$applicationConfig['components'][$component];
+            unset($def['class']);
+            self::$applicationConfig['components'][$component] = Goblin::createObject(self::$applicationConfig['components'][$component]['class'], [$def]);
+        }
     }
 
     /**

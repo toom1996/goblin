@@ -15,10 +15,6 @@ class ServiceLocator extends Component
     private $_components;
 
 
-    public function init()
-    {
-    }
-
     /**
      *
      *
@@ -82,12 +78,16 @@ class ServiceLocator extends Component
             }
         }
 
-        // e.g YiiS::$app->set('foo', ['a' => 'b'])
-        if (!isset(Goblin::$config['components'][$id]['class'])) {
-            throw new InvalidConfigException("Unexpected configuration type for the \"$id\" component: " . gettype($definition));
-        }
+//        // e.g YiiS::$app->set('foo', ['a' => 'b'])
+//        if (!isset(Goblin::$config['components'][$id]['class'])) {
+//            throw new InvalidConfigException("Unexpected configuration type for the \"$id\" component: " . gettype($definition));
+//        }
 
-        $this->_components[$id] = Goblin::createObject(Goblin::$config['components'][$id]['class'], [$definition]);;
+        if (in_array($id, Goblin::$config['bootstrap'])) {
+            $this->_components[$id] = Goblin::$config['components'][$id];
+        }else{
+            $this->_components[$id] = Goblin::createObject(Goblin::$config['components'][$id]['class'], [$definition]);
+        }
 
         return $this->_components[$id];
     }
