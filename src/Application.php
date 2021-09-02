@@ -77,8 +77,7 @@ class Application
     {
         foreach (Application::$applicationConfig['bootstrap'] as $component) {
             $def = self::$applicationConfig['components'][$component];
-            unset($def['class']);
-            self::$applicationConfig['components'][$component] = Goblin::createObject(self::$applicationConfig['components'][$component]['class'], [$def]);
+            self::$applicationConfig['components'][$component] = Goblin::createObject($def);
         }
     }
 
