@@ -22,7 +22,6 @@ use toom1996\log\Target;
  */
 class Goblin extends BaseGoblin
 {
-
     /**
      * [[网页编码格式。也许应该把他放到response里。]]
      * @var string
@@ -76,7 +75,6 @@ class Goblin extends BaseGoblin
     public function run()
     {
         try {
-            self::$app->getLog()->messages = '21123123';
             $this->handleRequest($this->getRequest())
                 ->send();
         }catch (\Swoole\ExitException $e){

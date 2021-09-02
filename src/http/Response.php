@@ -53,6 +53,11 @@ class Response extends Component
      */
     public $isSend;
 
+    /**
+     * @var 
+     */
+    public $charset;
+
 
     const FORMAT_HTML = 'html';
 

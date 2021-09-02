@@ -20,7 +20,7 @@ class ServiceLocator extends Component
      *
      * @param  string  $id
      *
-     * @return mixed
+     * @return \toom1996\db\Redis
      * @throws InvalidConfigException
      * @throws \ReflectionException
      */
@@ -66,19 +66,18 @@ class ServiceLocator extends Component
         if (is_array($definition)) {
             // e.g Goblin::$app->set('foo', ['class' => foo\bar, 'a' => 'b'])
             // If has class, it will be overwrite all component attributes.
-            unset($definition['class']);
             if (isset($definition['class'])) {
-                $this->_components[$id] = Goblin::createObject($definition['class'], [$definition]);
+                $this->_components[$id] = Goblin::createObject($definition);
             }
         }
 
-        if (is_object($definition)) {
-            if (isset($definition->class)) {
-                $this->_components[$id] = Goblin::createObject($definition->class, [$definition]);
-            }
-        }
+//        if (is_object($definition)) {
+//            if (isset($definition->class)) {
+//                $this->_components[$id] = Goblin::createObject($definition);
+//            }
+//        }
 
-//        // e.g YiiS::$app->set('foo', ['a' => 'b'])
+        // e.g YiiS::$app->set('foo', ['a' => 'b'])
 //        if (!isset(Goblin::$config['components'][$id]['class'])) {
 //            throw new InvalidConfigException("Unexpected configuration type for the \"$id\" component: " . gettype($definition));
 //        }

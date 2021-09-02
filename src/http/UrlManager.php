@@ -30,12 +30,11 @@ class UrlManager extends BaseUrlManager
 
     /**
      *
-     *
      * @return array
-     * @throws MethodNotAllowedHttpException
-     * @throws NotFoundHttpException
      * @throws \ReflectionException
-     * @throws InvalidConfigException
+     * @throws \toom1996\base\InvalidConfigException
+     * @throws \toom1996\http\MethodNotAllowedHttpException
+     * @throws \toom1996\http\NotFoundHttpException
      */
     public function parseRequest(): array
     {
@@ -77,10 +76,9 @@ class UrlManager extends BaseUrlManager
 
     /**
      *
-     *
      * @return array
      * @throws \ReflectionException
-     * @throws InvalidConfigException
+     * @throws \toom1996\base\InvalidConfigException
      */
     protected function matchRoute()
     {
@@ -112,16 +110,16 @@ class UrlManager extends BaseUrlManager
         ) {
             foreach ($webRoute as $prefix => $rules) {
                 if (count($rules) == count($rules, COUNT_RECURSIVE)) {
-                    list($method, $route, $handler) = self::parseRule($rules);
+                    [$method, $route, $handler] = self::parseRule($rules);
                     $controller->addRoute($method, $route, $handler);
                 } else {
                     if (is_int($prefix)) {
-                        list($method, $route, $handler) = self::parseRule($rules);
+                        [$method, $route, $handler] = self::parseRule($rules);
                         $controller->addRoute($method, $route, $handler);
                     }else{
                         $controller->addGroup($prefix, function (RouteCollector $controller) use ($rules) {
                             foreach ($rules as $rulesChild) {
-                                list($method, $route, $handler) = self::parseRule($rulesChild);
+                                [$method, $route, $handler] = self::parseRule($rulesChild);
                                 $controller->addRoute($method, $route, $handler);
                             }
                         });
@@ -132,7 +130,6 @@ class UrlManager extends BaseUrlManager
     }
 
     /**
-     * Parse route and add to handlerMap.
      *
      * @param $rule
      *
@@ -141,7 +138,7 @@ class UrlManager extends BaseUrlManager
      */
     private static function parseRule($rule)
     {
-        list($method, $route, $handler) = [$rule[0], $rule[1], $rule[2]];
+        [$method, $route, $handler] = [$rule[0], $rule[1], $rule[2]];
         if (strpos($handler, '@') === 0) {
             Goblin::createController($handler);
         }

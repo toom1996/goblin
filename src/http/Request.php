@@ -109,12 +109,12 @@ class Request extends Component
      * @return array
      * @throws \ReflectionException
      * @throws \toom1996\base\InvalidConfigException
-     * @throws \toom1996\http\NotFoundHttpException
      * @throws \toom1996\http\MethodNotAllowedHttpException
+     * @throws \toom1996\http\NotFoundHttpException
      */
     public function resolve()
     {
-        list($handler, $param) = Goblin::$app->getUrlManager()->parseRequest();
+        [$handler, $param] = Goblin::$app->getUrlManager()->parseRequest();
         return [$handler, array_merge($this->getQueryParams(), $param)];
     }
 

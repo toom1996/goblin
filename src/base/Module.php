@@ -80,12 +80,13 @@ class Module extends ServiceLocator
 
     /**
      *
-     *
-     * @param        $actionPath
-     *
+     * @param $actionPath
      * @param  bool  $setToHandlerMap
      *
+     * @return object
      * @throws \ReflectionException
+     * @throws \toom1996\base\InvalidConfigException
+     * @throws \toom1996\base\UnknownClassException
      */
     public static function createController($actionPath, $setToHandlerMap = true)
     {

@@ -5,6 +5,7 @@ namespace toom1996\http;
 
 
 use toom1996\base\Module;
+use toom1996\base\UnknownClassException;
 
 /**
  * Class BaseGoblin
@@ -157,17 +158,17 @@ class BaseGoblin extends Module
     }
 
     /**
-     * Create object.
-     * You can choose any way to create the object.
+     * Create Eazy object.
+     * You can choose any way to create the Eazy object.
      * ```
-     * Eazy::createObject(`classname`, ['foo' => 'bar']);
+     *   Eazy::createObject(`classname`, ['foo' => 'bar']);
      *
-     * Eazy::createObject([
-     *      'class' => 'classname',
-     *      'foo' => 'bar',
-     * ]);
+     *   Eazy::createObject([
+     *        'class' => 'classname',
+     *        'foo' => 'bar',
+     *   ]);
      *
-     * Eazy::createObject(ReflectionClass, ['foo' => 'bar']);
+     *   Eazy::createObject(ReflectionClass, ['foo' => 'bar']);
      * ```
      *
      * @param         $type string|\ReflectionClass
@@ -178,27 +179,25 @@ class BaseGoblin extends Module
      */
     public static function createObject($type, array $params = [])
     {
-        // instance of ReflectionClass
-        if (is_object($type)) {
+        $class = '';
+        if (is_string($type) && class_exists($type)) {
+            $class = $type;
+        }elseif(is_array($type) && isset($type['class'])){
+            $class = $type['class'];
+            unset($type['class']);
+            $params[] = $type;
+        }elseif ($type instanceof \ReflectionClass) {
             return $type->newInstanceArgs($params);
         }
 
-        if (is_string($type)) {
-            $ref = new \ReflectionClass($type);
-            return $ref->newInstanceArgs($params);
+        if ($class === '') {
+            throw new UnknownClassException("unknown class");
         }
 
-        if (is_array($type) && isset($type['class'])) {
-            $ref = new \ReflectionClass($type['class']);
-            return $ref->newInstanceArgs($params);
-        }
+        $ref = new \ReflectionClass($class);
+        return $ref->newInstanceArgs($params);
     }
-
-    public static function getLogger()
-    {
-
-    }
-
+    
     /**
      * Configures an object with the initial property values.
      *
