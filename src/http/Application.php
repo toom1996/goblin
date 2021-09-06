@@ -56,7 +56,7 @@ class Application
                 Goblin::setAlias($alias, $path);
             }
         }
-        $this->config['components']['urlManager']['adapter'] = UrlManager::loadRoute($this->config);
+//        $this->config['components']['urlManager']['adapter'] = UrlManager::loadRoute($this->config);
     }
 
     /**

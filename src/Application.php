@@ -16,7 +16,7 @@ defined('EAZY_PATH') or define('EAZY_PATH', __DIR__);
 /**
  * Register autoload function.
  */
-spl_autoload_register(['toom1996\Application', 'autoload'], true, true);
+//spl_autoload_register(['toom1996\Application', 'autoload'], true, true);
 
 /**
  * Class Application
@@ -41,8 +41,8 @@ class Application
         // Set alias and init config.
         self::$applicationConfig = $config;
         Goblin::setAlias('@goblin', __DIR__);
-        $this->initInitialize();
-        $this->bootstrap();
+//        $this->initInitialize();
+//        $this->bootstrap();
     }
 
 
@@ -52,25 +52,25 @@ class Application
      */
     public function initInitialize()
     {
-        // Set aliases.
-        if (isset(self::$applicationConfig['aliases']) && is_array(self::$applicationConfig['aliases'])) {
-            foreach (self::$applicationConfig['aliases'] as $alias => $path) {
-                Goblin::setAlias($alias, $path);
-            }
-        }
-
-
-        // merge core components with custom components.
-        foreach ($this->httpBaseComponents() as $id => $component) {
-            if (!isset(self::$applicationConfig['components'][$id])) {
-                self::$applicationConfig['components'][$id] = $component;
-            }
-
-            if (!isset(self::$applicationConfig['components'][$id]['class'])) {
-                self::$applicationConfig['components'][$id]['class'] = $component['class'];
-            }
-        }
-        self::$applicationConfig['components']['urlManager']['adapter'] = UrlManager::loadRoute(self::$applicationConfig);
+//        // Set aliases.
+//        if (isset(self::$applicationConfig['aliases']) && is_array(self::$applicationConfig['aliases'])) {
+//            foreach (self::$applicationConfig['aliases'] as $alias => $path) {
+//                Goblin::setAlias($alias, $path);
+//            }
+//        }
+//
+//
+//        // merge core components with custom components.
+//        foreach ($this->httpBaseComponents() as $id => $component) {
+//            if (!isset(self::$applicationConfig['components'][$id])) {
+//                self::$applicationConfig['components'][$id] = $component;
+//            }
+//
+//            if (!isset(self::$applicationConfig['components'][$id]['class'])) {
+//                self::$applicationConfig['components'][$id]['class'] = $component['class'];
+//            }
+//        }
+//        self::$applicationConfig['components']['urlManager']['adapter'] = UrlManager::loadRoute(self::$applicationConfig);
     }
 
     public function bootstrap()
@@ -87,7 +87,8 @@ class Application
      */
     public function createServer()
     {
-        return new HttpServer(self::$applicationConfig['swoole']);
+        $httpServer = new HttpServer();
+        return $httpServer;
     }
 
     /**

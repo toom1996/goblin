@@ -3,6 +3,7 @@
 namespace toom1996\base;
 
 use toom1996\http\Controller;
+use toom1996\http\Eazy;
 use toom1996\http\Goblin;
 /**
  * Class Module
@@ -91,7 +92,7 @@ class Module extends ServiceLocator
     public static function createController($actionPath, $setToHandlerMap = true)
     {
         // If route is `@controllers/site/index`, will be convert @controller to BathPath
-        $handlerAlias = Goblin::getAlias($actionPath);
+        $handlerAlias = Eazy::getAlias($actionPath);
         $ex = explode('/', $handlerAlias);
 
         // Find controller and action.
@@ -110,7 +111,8 @@ class Module extends ServiceLocator
         $handlerFile = implode('/',
             array_merge(array_slice($ex, 0, count($ex) - 2),
                 [$controller . '.php']));
-
+        var_dump('@@@@@@@@@@@@@@@@');
+        var_dump($handlerFile);
         if (!file_exists($handlerFile)) {
             throw new UnknownClassException("{Unknown class {$actionPath}");
         }
@@ -124,14 +126,14 @@ class Module extends ServiceLocator
         }
 
         // Create controller object.
-        $controllerInstance = Goblin::createObject($className, [$action]);
+        $controllerInstance = Eazy::createObject($className, [$action]);
 
         /**
          * Set to handlerMap.
          * @see Goblin::$handlerMap
          */
         if ($setToHandlerMap) {
-            Goblin::setHandlerMap($actionPath, $controllerInstance);
+            Eazy::setHandlerMap($actionPath, $controllerInstance);
         }
         return $controllerInstance;
     }

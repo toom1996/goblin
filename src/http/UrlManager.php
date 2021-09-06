@@ -140,7 +140,7 @@ class UrlManager extends BaseUrlManager
     {
         [$method, $route, $handler] = [$rule[0], $rule[1], $rule[2]];
         if (strpos($handler, '@') === 0) {
-            Goblin::createController($handler);
+            Eazy::createController($handler);
         }
         return [$method, $route, $handler];
     }
