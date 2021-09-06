@@ -5,7 +5,7 @@ namespace toom1996\log;
 
 
 use toom1996\base\Component;
-use toom1996\http\Goblin;
+use toom1996\http\Eazy;
 
 class LogDispatcher extends Component
 {
@@ -50,9 +50,9 @@ class LogDispatcher extends Component
             if (!$target instanceof Target) {
                 // Set default target class if target dont have class.
                 if (!isset($target['class'])) {
-                    $this->targets[$name] = Goblin::createObject($this->defaultTargetClass, [$target]);
+                    $this->targets[$name] = Eazy::createObject($this->defaultTargetClass, [$target]);
                 }else{
-                    $this->targets[$name] = Goblin::createObject($target['class'], [$target]);
+                    $this->targets[$name] = Eazy::createObject($target['class'], [$target]);
                 }
             }
         }

@@ -11,7 +11,6 @@ use toom1996\Application;
 use toom1996\base\BaseServer;
 use toom1996\base\InvalidConfigException;
 use toom1996\base\UnknownClassException;
-use toom1996\GoblinLoader;
 use toom1996\http\Eazy;
 use toom1996\http\Goblin;
 use toom1996\http\UrlManager;
@@ -23,6 +22,8 @@ use toom1996\http\UrlManager;
  */
 class HttpServer extends BaseServer
 {
+    use ServerHttpTrait;
+
     const HTTP_EVENT = [
         'start',
         'request',
@@ -31,7 +32,7 @@ class HttpServer extends BaseServer
 
     public function init()
     {
-        $this->server = new \Swoole\Http\Server('0.0.0.0', 9502);
+        $this->server = new \Swoole\Http\Server($this->host, $this->port);
         foreach (self::HTTP_EVENT as $event) {
             $this->server->on($event, [$this, $event]);
         }
@@ -50,9 +51,8 @@ class HttpServer extends BaseServer
      */
     public function request(Request $request, Response $response)
     {
-//        (new Goblin(Application::$applicationConfig, $request, $response))->run();
-        var_dump($this->config);
-        echo 123;
+//        return $response->end('123');
+        (new Eazy($this->config, $request, $response))->run();
     }
 
     public function workerStart()
@@ -63,9 +63,8 @@ class HttpServer extends BaseServer
 
         $this->config = require APP_PATH . '/config/config.php';
         spl_autoload_register(function($className) {
-            var_dump($className);
             if (strpos($className, '\\') !== false) {
-                $classFile = \toom1996\http\Eazy::getAlias('@' . str_replace('\\', '/', $className) . '.php', false);
+                $classFile = Eazy::getAlias('@' . str_replace('\\', '/', $className) . '.php', false);
                 if ($classFile === false || !is_file($classFile)) {
                     return;
                 }
@@ -82,7 +81,6 @@ class HttpServer extends BaseServer
             }
         }
 
-
         // merge core components with custom components.
         foreach ($this->httpBaseComponents() as $id => $component) {
             if (!isset($this->config['components'][$id])) {
@@ -94,9 +92,6 @@ class HttpServer extends BaseServer
             }
         }
         $this->config['components']['urlManager']['adapter'] = UrlManager::loadRoute($this->config);
-        
-//        var_dump($this->config);
-        echo '----------------------';
     }
 
 

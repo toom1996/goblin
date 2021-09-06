@@ -89,7 +89,7 @@ class FileTarget extends Target
 
     public function export()
     {
-        $this->logFile = Goblin::getAlias($this->logFile);
+        $this->logFile = Eazy::getAlias($this->logFile);
         if (strpos($this->logFile, '://') === false || strncmp($this->logFile, 'file://', 7) === 0) {
             $logPath = dirname($this->logFile);
             FileHelper::createDirectory($logPath, $this->dirMode, true);

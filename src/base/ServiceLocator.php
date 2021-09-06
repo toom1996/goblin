@@ -4,6 +4,7 @@
 namespace toom1996\base;
 
 
+use toom1996\http\Eazy;
 use toom1996\http\Goblin;
 
 class ServiceLocator extends Component
@@ -30,8 +31,8 @@ class ServiceLocator extends Component
             return $this->_components[$id];
         }
 
-        if (isset(Goblin::$config['components'][$id])) {
-            return $this->set($id, Goblin::$config['components'][$id]);
+        if (isset(Eazy::$config['components'][$id])) {
+            return $this->set($id, Eazy::$config['components'][$id]);
         }else{
             throw new InvalidConfigException("Unknown component ID: $id");
         }
@@ -64,28 +65,28 @@ class ServiceLocator extends Component
         unset($this->_components[$id]);
 
         if (is_array($definition)) {
-            // e.g Goblin::$app->set('foo', ['class' => foo\bar, 'a' => 'b'])
+            // e.g Eazy::$app->set('foo', ['class' => foo\bar, 'a' => 'b'])
             // If has class, it will be overwrite all component attributes.
             if (isset($definition['class'])) {
-                $this->_components[$id] = Goblin::createObject($definition);
+                $this->_components[$id] = Eazy::createObject($definition);
             }
         }
 
 //        if (is_object($definition)) {
 //            if (isset($definition->class)) {
-//                $this->_components[$id] = Goblin::createObject($definition);
+//                $this->_components[$id] = Eazy::createObject($definition);
 //            }
 //        }
 
         // e.g YiiS::$app->set('foo', ['a' => 'b'])
-//        if (!isset(Goblin::$config['components'][$id]['class'])) {
+//        if (!isset(Eazy::$config['components'][$id]['class'])) {
 //            throw new InvalidConfigException("Unexpected configuration type for the \"$id\" component: " . gettype($definition));
 //        }
 
-        if (in_array($id, Goblin::$config['bootstrap'])) {
-            $this->_components[$id] = Goblin::$config['components'][$id];
+        if (in_array($id, Eazy::$config['bootstrap'])) {
+            $this->_components[$id] = Eazy::$config['components'][$id];
         }else{
-            $this->_components[$id] = Goblin::createObject(Goblin::$config['components'][$id]['class'], [$definition]);
+            $this->_components[$id] = Eazy::createObject(Eazy::$config['components'][$id]['class'], [$definition]);
         }
 
         return $this->_components[$id];

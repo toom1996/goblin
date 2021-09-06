@@ -4,6 +4,7 @@
 namespace toom1996\helpers;
 
 
+use toom1996\http\Eazy;
 use toom1996\http\Goblin;
 
 class HtmlHelper
@@ -21,6 +22,6 @@ class HtmlHelper
      */
     public static function encode($content, $doubleEncode = true)
     {
-        return htmlspecialchars($content, ENT_QUOTES | ENT_SUBSTITUTE, Goblin::$app ? Goblin::$app->charset : 'UTF-8', $doubleEncode);
+        return htmlspecialchars($content, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8', $doubleEncode);
     }
 }

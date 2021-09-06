@@ -114,7 +114,7 @@ class Request extends Component
      */
     public function resolve()
     {
-        [$handler, $param] = Goblin::$app->getUrlManager()->parseRequest();
+        [$handler, $param] = Eazy::$app->getUrlManager()->parseRequest();
         return [$handler, array_merge($this->getQueryParams(), $param)];
     }
 

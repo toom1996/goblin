@@ -71,7 +71,7 @@ EOL;
      */
     public function getEazyVersion()
     {
-        return $this->consoleString(Goblin::getVersion(),[ConsoleHelper::BOLD, ConsoleHelper::FG_GREEN]);
+        return $this->consoleString(Eazy::getVersion(),[ConsoleHelper::BOLD, ConsoleHelper::FG_GREEN]);
     }
 
     /**
@@ -147,7 +147,7 @@ EOL;
     public function start($http)
     {
         swoole_set_process_name("eazy {$http->master_pid}");
-//        $this->welcome();
+        $this->welcome();
     }
     
     

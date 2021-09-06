@@ -67,13 +67,13 @@ class ErrorHandler extends \toom1996\base\ErrorHandler
     {
         // TODO: Implement renderException() method.
 
-        $response = Goblin::$app->getResponse();
+        $response = Eazy::$app->getResponse();
         try {
             $response->setStatusCodeByException($exception);
 
             $useErrorView = $response->format === Response::FORMAT_HTML;
             if ($useErrorView && $this->errorAction !== null) {
-                $result = Goblin::$app->runAction($this->errorAction);
+                $result = Eazy::$app->runAction($this->errorAction);
                 $response->setContent($result);
             } elseif ($response->format === Response::FORMAT_HTML) {
                 if ($this->shouldRenderSimpleHtml()) {
@@ -198,16 +198,16 @@ class ErrorHandler extends \toom1996\base\ErrorHandler
     public function renderFile($_file_, $_params_)
     {
         $_params_['handler'] = $this;
-        if ($this->exception instanceof \ErrorException || !Goblin::$app->has('view')) {
+        if ($this->exception instanceof \ErrorException || !Eazy::$app->has('view')) {
             ob_start();
             ob_implicit_flush(false);
             extract($_params_, EXTR_OVERWRITE);
-            require Goblin::getAlias($_file_);
+            require Eazy::getAlias($_file_);
 
             return ob_get_clean();
         }
 
-        $view = Goblin::$app->getView();
+        $view = Eazy::$app->getView();
 
         return $view->renderFile($_file_, $_params_, $this);
     }

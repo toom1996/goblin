@@ -4,7 +4,7 @@
 namespace toom1996\base;
 
 
-use toom1996\http\Goblin;
+use toom1996\http\Eazy;
 
 class BaseObject
 {
@@ -18,7 +18,7 @@ class BaseObject
     {
         // TODO configure attributes.
         if (!empty($config)) {
-            Goblin::configure($this, $config);
+            Eazy::configure($this, $config);
         }
         $this->init();
     }

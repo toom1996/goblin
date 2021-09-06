@@ -25,10 +25,10 @@ class Module extends ServiceLocator
     public function runAction($path)
     {
         // If is register
-        if (isset(Goblin::$handlerMap[$path])) {
-            $controller = Goblin::$handlerMap[$path];
+        if (isset(Eazy::$handlerMap[$path])) {
+            $controller = Eazy::$handlerMap[$path];
         }else{
-            $controller = Goblin::createController($path, true);
+            $controller = Eazy::createController($path, true);
         }
 
         if (is_object($controller) && $controller instanceof Controller) {
@@ -111,13 +111,11 @@ class Module extends ServiceLocator
         $handlerFile = implode('/',
             array_merge(array_slice($ex, 0, count($ex) - 2),
                 [$controller . '.php']));
-        var_dump('@@@@@@@@@@@@@@@@');
-        var_dump($handlerFile);
         if (!file_exists($handlerFile)) {
             throw new UnknownClassException("{Unknown class {$actionPath}");
         }
         
-        $classNamespace = Goblin::getNamespace($handlerFile);
+        $classNamespace = Eazy::getNamespace($handlerFile);
         $className = '\\' . $classNamespace . '\\' . basename(str_replace('.php', '', $handlerFile));
 
         $ref = new \ReflectionClass($className);
@@ -130,7 +128,7 @@ class Module extends ServiceLocator
 
         /**
          * Set to handlerMap.
-         * @see Goblin::$handlerMap
+         * @see Eazy::$handlerMap
          */
         if ($setToHandlerMap) {
             Eazy::setHandlerMap($actionPath, $controllerInstance);

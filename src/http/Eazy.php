@@ -33,7 +33,7 @@ class Eazy extends BaseEazy
      * @throws \ReflectionException
      * @throws \toom1996\base\InvalidConfigException
      */
-    public function __construct(&$config = [], \Swoole\Http\Request $request, \Swoole\Http\Response $response)
+    public function __construct(&$config, \Swoole\Http\Request $request, \Swoole\Http\Response $response)
     {
         self::$config = $config;
         $this->bootstrap();
@@ -44,6 +44,7 @@ class Eazy extends BaseEazy
     public function __destruct()
     {
        // TODO something.
+        echo 'd';
     }
 
     /**

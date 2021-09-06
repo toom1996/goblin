@@ -32,7 +32,7 @@ class Controller extends Component
      */
     public function render($view, $params = [])
     {
-        $content = Goblin::$app->getView()->render($view, $params);
+        $content = Eazy::$app->getView()->render($view, $params);
         return $this->renderContent($content);
     }
 
@@ -48,9 +48,9 @@ class Controller extends Component
      */
     public function renderContent($content)
     {
-        $layoutFile = $this->findLayoutFile(Goblin::$app->getView());
+        $layoutFile = $this->findLayoutFile(Eazy::$app->getView());
         if ($layoutFile !== false) {
-            return Goblin::$app->getView()->renderFile($layoutFile, ['content' => $content], $this);
+            return Eazy::$app->getView()->renderFile($layoutFile, ['content' => $content], $this);
         }
 
         return $content;
@@ -75,7 +75,7 @@ class Controller extends Component
         }
 
         if (strncmp($layout, '@', 1) === 0) {
-            $file = Goblin::getAlias($layout);
+            $file = Eazy::getAlias($layout);
         }
 //        elseif (strncmp($layout, '/', 1) === 0) {
 //            $file = YiiS::$app->getLayoutPath() . DIRECTORY_SEPARATOR . substr($layout, 1);

@@ -82,7 +82,7 @@ class UrlManager extends BaseUrlManager
      */
     protected function matchRoute()
     {
-        $request = Goblin::$app->getRequest();
+        $request = Eazy::$app->getRequest();
         $httpMethod = $request->getMethod();
         $uri = self::trimSlashes($request->getUrl());
         if (false !== $pos = strpos($uri, '?')) {
