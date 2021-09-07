@@ -25,6 +25,7 @@ class Redis extends Component
 
     public function init()
     {
+        var_dump($this);
         echo 'init';
         if (empty($this->pools)) {
             $this->pools = new RedisPool(

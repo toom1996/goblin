@@ -182,7 +182,9 @@ class BaseEazy extends Module
 
         if (is_array($type) && isset($type['class'])) {
             $ref = new \ReflectionClass($type['class']);
-            return $ref->newInstanceArgs($params);
+            $params = $type;
+            unset($params['class']);
+            return $ref->newInstanceArgs([$params]);
         }
     }
 
