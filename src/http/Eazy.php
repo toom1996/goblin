@@ -11,7 +11,6 @@ use toom1996\log\LogDispatcher;
 
 class Eazy extends BaseEazy
 {
-
     /**
      * @var
      */
@@ -36,6 +35,7 @@ class Eazy extends BaseEazy
     public function __construct(&$config, \Swoole\Http\Request $request, \Swoole\Http\Response $response)
     {
         self::$config = $config;
+//        var_dump(self::$config);
         $this->bootstrap();
         $this->getResponse($response);
         $this->getRequest($request);
@@ -44,7 +44,7 @@ class Eazy extends BaseEazy
     public function __destruct()
     {
        // TODO something.
-        echo 'd';
+//        echo 'd';
     }
 
     /**
