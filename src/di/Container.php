@@ -13,6 +13,8 @@ class Container
      * @var
      */
     private array $_components;
+    
+    public static $test;
 
     /**
      *

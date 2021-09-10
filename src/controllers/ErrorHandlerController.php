@@ -22,7 +22,7 @@ class ErrorHandlerController extends Controller
      */
     public function actionError()
     {
-        return $this->render('@goblin/views/errorHandler/exception', [
+        return $this->render('@eazy/views/errorHandler/exception', [
             'exception' => Eazy::$app->getErrorHandler()->exception,
             'handler' => Eazy::$app->getErrorHandler(),
         ]);

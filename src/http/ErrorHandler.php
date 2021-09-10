@@ -14,7 +14,7 @@ class ErrorHandler extends \toom1996\base\ErrorHandler
      * ErrorHandler render error page action.
      * @var
      */
-    public $errorAction = '@goblin/controllers/errorHandler/error';
+    public $errorAction = '@eazy/controllers/errorHandler/error';
 
     /**
      * @var
@@ -27,9 +27,9 @@ class ErrorHandler extends \toom1996\base\ErrorHandler
 
     public $maxTraceSourceLines = 13;
 
-    public $previousExceptionView = '@goblin/views/errorHandler/previousException.php';
+    public $previousExceptionView = '@eazy/views/errorHandler/previousException.php';
 
-    public $callStackItemView = '@goblin/views/errorHandler/callStackItem.php';
+    public $callStackItemView = '@eazy/views/errorHandler/callStackItem.php';
 
     public $traceLine = '{html}';
 

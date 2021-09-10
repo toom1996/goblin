@@ -33,36 +33,12 @@ abstract class BaseServer extends Component
     
     
     public $config;
+    
+    public $event;
 
     public function init()
     {
         $this->server->set($this->setting);
-    }
-
-    public function welcome()
-    {
-        ConsoleHelper::beginAnsiFormat([ConsoleHelper::BOLD, ConsoleHelper::FG_YELLOW]);
-        echo <<<EOL
-
-███████╗ █████╗ ███████╗██╗   ██╗
-██╔════╝██╔══██╗╚══███╔╝╚██╗ ██╔╝
-█████╗  ███████║  ███╔╝  ╚████╔╝ 
-██╔══╝  ██╔══██║ ███╔╝    ╚██╔╝  
-███████╗██║  ██║███████╗   ██║   
-╚══════╝╚═╝  ╚═╝╚══════╝   ╚═╝   
-
-EOL;
-        ConsoleHelper::endAnsiFormat();
-        echo <<<EOL
-{$this->consoleString('Eazy version')}    {$this->getEazyVersion()}
-{$this->consoleString('Listen address')}  {$this->consoleString($this->host, [ConsoleHelper::BOLD, ConsoleHelper::FG_GREEN])}
-{$this->consoleString('Listen port')}     {$this->consoleString($this->port, [ConsoleHelper::BOLD, ConsoleHelper::FG_GREEN])}
-{$this->consoleString('Worker num')}      {$this->getWorkerNum()}
-{$this->consoleString('Task worker num')} {$this->getTaskWorderNum()}
-{$this->consoleString('Daemonize')}       {$this->getDaemonize()}
-{$this->consoleString('Php version')}     {$this->getPhpVersion()}
-{$this->consoleString('Swoole version')}  {$this->getSwooleVersion()}
-EOL;
     }
 
     /**
@@ -139,16 +115,10 @@ EOL;
     {
         return ConsoleHelper::ansiFormat($string, $format);
     }
-
-    /**
-     * Swoole event start.
-     * @param $http
-     */
-    public function start($http)
-    {
-        swoole_set_process_name("eazy {$http->master_pid}");
-        $this->welcome();
-    }
     
+    public function bindEvent($event, array $callback)
+    {
+        $this->server->on($event, $callback);
+    }
     
 }

@@ -13,11 +13,17 @@ use Swoole\Http\Server as swooleServer;
 use Swoole\Runtime;
 use toom1996\Application;
 use toom1996\base\BaseServer;
+use toom1996\base\Event;
 use toom1996\base\InvalidConfigException;
 use toom1996\base\UnknownClassException;
+use toom1996\db\Redis;
+use toom1996\di\Container;
+use toom1996\event\SwooleEvent;
 use toom1996\http\Eazy;
 use toom1996\http\Goblin;
+use toom1996\http\RequestCallback;
 use toom1996\http\UrlManager;
+use toom1996\http\WorkerStartCallback;
 
 /**
  * Class HttpServer
@@ -30,17 +36,22 @@ class Server extends BaseServer
 {
     use HttpTrait;
 
+    /**
+     * Defined core swoole http event.
+     * It's not be overwrite.
+     */
     const HTTP_EVENT = [
-        'start',
-        'request',
-        'workerStart',
+        SwooleEvent::SWOOLE_ON_REQUEST => [RequestCallback::class, 'onRequest'],
+        SwooleEvent::SWOOLE_ON_WORKER_START => [WorkerStartCallback::class, 'onWorkerStart'],
     ];
 
     public function init()
     {
         $this->server = new swooleServer($this->host, $this->port);
-        foreach (self::HTTP_EVENT as $event) {
-            $this->server->on($event, [$this, $event]);
+        foreach (array_merge($this->event, self::HTTP_EVENT) as $event => $callback) {
+//            list($class, $handler) = $callback;
+            $this->server->on($event, $callback);
+//            var_dump($event);
         }
         parent::init();
     }
@@ -57,6 +68,7 @@ class Server extends BaseServer
      */
     public function request(Request $request, Response $response)
     {
+//        $response->end('123');
 //        $pool = new RedisPool((new RedisConfig())
 //            ->withHost('172.17.0.3')
 //            ->withPort(6379)
@@ -88,8 +100,11 @@ class Server extends BaseServer
 //        (new Eazy($this->config, $request, $response))->run();
     }
 
-    public function workerStart()
+    public function workerStart($server, int $workerId)
     {
+        echo 'set';
+        Container::$test = ($workerId + 1) * 3;
+
         register_shutdown_function(function() {
             var_dump(error_get_last());
         });
@@ -107,7 +122,6 @@ class Server extends BaseServer
 
             require $classFile;
         }, true, true);
-
         $this->initConfigure();
     }
 

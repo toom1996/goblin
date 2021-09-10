@@ -21,6 +21,7 @@ class Eazy extends BaseEazy
      * @var array
      */
     public static $config;
+    public static $test;
 
     /**
      * Initializer Eazy request and response.

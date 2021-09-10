@@ -128,11 +128,11 @@ class LogDispatcher extends Component
     public static function getLevelName($level)
     {
         static $levels = [
-            self::LEVEL_ERROR => 'error',
-            self::LEVEL_WARNING => 'warning',
-            self::LEVEL_INFO => 'info',
+            self::LEVEL_ERROR => 'ERROR',
+            self::LEVEL_WARNING => 'WARNING',
+            self::LEVEL_INFO => 'INFO',
         ];
 
-        return isset($levels[$level]) ? $levels[$level] : 'unknown';
+        return isset($levels[$level]) ? $levels[$level] : 'UNKNOWN';
     }
 }

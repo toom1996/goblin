@@ -21,13 +21,13 @@ defined('EAZY_PATH') or define('EAZY_PATH', __DIR__);
  */
 class Application
 {
-
     /**
      * Return swoole server.
      * @return HttpServer
      */
     public function createServer(array $config)
     {
+        Eazy::setAlias('@eazy', __DIR__);
         return new Server($config);
     }
 }
