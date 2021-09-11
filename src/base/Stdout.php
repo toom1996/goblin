@@ -7,7 +7,7 @@ namespace toom1996\base;
 use toom1996\helpers\ConsoleHelper;
 use toom1996\log\LogDispatcher;
 
-class Stdout extends Component
+class Stdout
 {
     const STYLE = [
         LogDispatcher::LEVEL_INFO => [ConsoleHelper::BG_GREEN, ConsoleHelper::FG_BLACK],
@@ -15,24 +15,27 @@ class Stdout extends Component
         LogDispatcher::LEVEL_ERROR => [ConsoleHelper::BG_RED, ConsoleHelper::FG_BLACK],
     ];
 
-    private static function out(string $message, string $level)
+    private static function out($message, string $level)
     {
         $style = self::STYLE[$level];
         $levelString = self::string('[' . LogDispatcher::getLevelName($level) . ']', $style);
-        echo $levelString, ' ', $message, PHP_EOL;
+        if (!is_string($message)) {
+            $message = print_r($message, true);
+        }
+        echo $levelString, $message, PHP_EOL;
     }
 
-    public static function info(string $message)
+    public static function info($message)
     {
         self::out($message,LogDispatcher::LEVEL_INFO);
     }
 
-    public static function warnning(string $message)
+    public static function warnning($message)
     {
         self::out($message,LogDispatcher::LEVEL_WARNING);
     }
 
-    public static function error(string $message)
+    public static function error($message)
     {
         self::out($message,LogDispatcher::LEVEL_ERROR);
     }

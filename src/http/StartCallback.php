@@ -18,9 +18,7 @@ class StartCallback extends BaseConsole
 {
     public static function onStart(\Swoole\Server $server)
     {
-        Stdout::info('Eazy framework!');
-        Stdout::warnning('Eazy framework!');
-        Stdout::error('Eazy framework!');
+        Stdout::info('Eazy framework is running!');
         // https://wiki.swoole.com/#/functions?id=swoole_set_process_name
         swoole_set_process_name("Master {$server->master_pid}");
     }

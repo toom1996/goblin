@@ -4,6 +4,8 @@
 namespace toom1996\http;
 
 
+use toom1996\base\Exception;
+use toom1996\base\Stdout;
 use toom1996\di\Container;
 
 class WorkerStartCallback
@@ -17,11 +19,12 @@ class WorkerStartCallback
             $workerAlias = "Worker#{$workerId}";
         }
 
-        echo $workerAlias . PHP_EOL;
+        Stdout::info($workerAlias);
         swoole_set_process_name($workerAlias);
         register_shutdown_function(function() {
-            var_dump(error_get_last());
+            Stdout::error(error_get_last());
         });
+        
         Eazy::$config = require APP_PATH . '/config/config.php';
         spl_autoload_register(function($className) {
             if (strpos($className, '\\') !== false) {
