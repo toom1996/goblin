@@ -7,6 +7,7 @@ namespace toom1996\http;
 use toom1996\base\Exception;
 use toom1996\base\Stdout;
 use toom1996\di\Container;
+use toom1996\helpers\ConsoleHelper;
 
 class WorkerStartCallback
 {
@@ -19,6 +20,7 @@ class WorkerStartCallback
             $workerAlias = "Worker#{$workerId}";
         }
 
+        
         Stdout::info($workerAlias);
         swoole_set_process_name($workerAlias);
         register_shutdown_function(function() {

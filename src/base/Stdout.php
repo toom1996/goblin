@@ -4,15 +4,15 @@
 namespace toom1996\base;
 
 
-use toom1996\helpers\ConsoleHelper;
+use toom1996\helpers\Console;
 use toom1996\log\LogDispatcher;
 
 class Stdout
 {
     const STYLE = [
-        LogDispatcher::LEVEL_INFO => [ConsoleHelper::BG_GREEN, ConsoleHelper::FG_BLACK],
-        LogDispatcher::LEVEL_WARNING => [ConsoleHelper::BG_YELLOW, ConsoleHelper::FG_BLACK],
-        LogDispatcher::LEVEL_ERROR => [ConsoleHelper::BG_RED, ConsoleHelper::FG_BLACK],
+        LogDispatcher::LEVEL_INFO => [Console::BG_GREEN, Console::FG_BLACK],
+        LogDispatcher::LEVEL_WARNING => [Console::BG_YELLOW, Console::FG_BLACK],
+        LogDispatcher::LEVEL_ERROR => [Console::BG_RED, Console::FG_BLACK],
     ];
 
     private static function out($message, string $level)
@@ -22,7 +22,7 @@ class Stdout
         if (!is_string($message)) {
             $message = print_r($message, true);
         }
-        echo $levelString, $message, PHP_EOL;
+        Console::stdout($levelString . ' ' . $message . PHP_EOL);
     }
 
     public static function info($message)
@@ -42,7 +42,7 @@ class Stdout
 
     public static function string($string, $format = [])
     {
-        return ConsoleHelper::ansiFormat($string, $format);
+        return Console::ansiFormat($string, $format);
     }
 
 }

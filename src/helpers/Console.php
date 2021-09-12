@@ -4,7 +4,7 @@
 namespace toom1996\helpers;
 
 
-class ConsoleHelper
+class Console
 {
     // foreground color control codes
     const FG_BLACK = 30;
