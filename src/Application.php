@@ -31,26 +31,6 @@ class Application extends BaseApplication
         parent::__construct();
     }
 
-
-    public function selectCommand()
-    {
-        switch ($this->params){
-            case isset($this->params['start']) === true:
-
-        }
-
-    }
-
-    /**
-     * Return swoole server.
-     * @return HttpServer
-     */
-    public function createServer($config)
-    {
-        Eazy::setAlias('@eazy', __DIR__);
-        return new Server($config);
-    }
-
     public function stopServer($pidFile)
     {
         $pid = file_get_contents($pidFile);
