@@ -24,48 +24,11 @@ defined('EAZY_PATH') or define('EAZY_PATH', __DIR__);
  */
 class Application extends BaseApplication
 {
-
-    public $params = [];
-
-    protected $config = [];
-
-
-
+    
     public function __construct(array $config)
     {
         $this->config = $config;
-        $this->params = $this->getParams();
-        if (empty($this->params)) {
-            $this->stdout('Usage: [SERVER] [OPTION]...' . PHP_EOL);
-            $this->stdout('List of [OPTION]' . PHP_EOL);
-            $maxLength = 0;
-            foreach ($this->commands as $command => $description) {
-                $maxLength = max($maxLength, strlen($command));
-            }
-            foreach ($this->commands as $command => $description){
-                $this->stdout('  '.$command);
-                $this->stdout(str_repeat(' ', $maxLength + 4 - strlen($command)));
-                $this->stdout(Console::wrapText($description, $maxLength + 4 + 2), Console::BOLD);
-                $this->stdout("\n");
-            }
-        }else{
-            if (!isset($this->config[$this->params[0]])) {
-                $this->stdout("Cant find server called `{$this->params[0]}`");
-                $this->stdout("\n");
-                exit;
-            }
-            if (isset($this->params['start'])) {
-                if ($this->params['d'] === true) {
-                    echo '-----';
-                    $this->config[$this->params[0]]['setting']['daemonize'] = true;
-                }
-                $this->createServer($this->config[$this->params[0]])->run();
-            }elseif(isset($this->params['reload'])) {
-                
-            }elseif (isset($this->params['stop'])) {
-                $this->stopServer($this->config[$this->params[0]]['setting']['pid_file']);
-            }
-        }
+        parent::__construct();
     }
 
 
