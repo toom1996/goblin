@@ -5,6 +5,9 @@ namespace toom1996\base;
 
 
 use toom1996\helpers\Console;
+use toom1996\http\Eazy;
+use toom1996\server\http\Server;
+use toom1996\server\HttpServer;
 
 class BaseApplication extends Console
 {
@@ -23,10 +26,10 @@ class BaseApplication extends Console
     protected array $config = [];
 
     protected $usageCommands = [
-        '--server=[server] --start' => 'Start server.',
-        '--server=[server] --start -d ' => 'Start server and used daemonize mode.',
-        '--server=[server] --stop' => 'Stop server.',
-        '--server=[server] --reload' => 'Reload server.',
+        '--start' => 'Start server.',
+        '--start -d ' => 'Start server and used daemonize mode.',
+        '--stop' => 'Stop server.',
+        '--reload' => 'Reload server.',
     ];
     
     public function __construct()
@@ -34,41 +37,31 @@ class BaseApplication extends Console
         $this->consoleParams = $this->getParams();
         $this->getConsoleServer();
         if (!in_array(['start', 'reload', 'stop'], $this->consoleParams)) {
-            $this->stdout('List of [OPTION]' . PHP_EOL);
+            $this->getUsage();
             exit(0);
         }
 
-        if (empty($this->consoleParams)) {
-            $this->stdout('Usage: [SERVER] [OPTION]...' . PHP_EOL);
-            $this->stdout('List of [OPTION]' . PHP_EOL);
-            $maxLength = 0;
-            foreach ($this->commands as $command => $description) {
-                $maxLength = max($maxLength, strlen($command));
+        if (isset($this->consoleParams['start'])) {
+            if (isset($this->consoleParams['d']) && $this->consoleParams['d'] === true) {
+                $this->config[$this->startParams['server']]['setting']['daemonize'] = true;
             }
-            foreach ($this->commands as $command => $description){
-                $this->stdout('  '.$command);
-                $this->stdout(str_repeat(' ', $maxLength + 4 - strlen($command)));
-                $this->stdout(Console::wrapText($description, $maxLength + 4 + 2), Console::BOLD);
-                $this->stdout("\n");
-            }
-        }else{
-            if (!isset($this->config[$this->consoleParams[0]])) {
-                $this->stdout("Cant find server called `{$this->consoleParams[0]}`");
-                $this->stdout("\n");
-                exit;
-            }
-            if (isset($this->consoleParams['start'])) {
-                if ($this->consoleParams['d'] === true) {
-                    echo '-----';
-                    $this->config[$this->consoleParams[0]]['setting']['daemonize'] = true;
-                }
-                $this->createServer($this->config[$this->consoleParams[0]])->run();
-            }elseif(isset($this->consoleParams['reload'])) {
+            $this->createServer($this->config[$this->startParams['server']])->run();
+        }elseif(isset($this->consoleParams['reload'])) {
 
-            }elseif (isset($this->consoleParams['stop'])) {
-                $this->stopServer($this->config[$this->consoleParams[0]]['setting']['pid_file']);
-            }
+        }elseif (isset($this->consoleParams['stop'])) {
+            $this->stopServer($this->config[$this->consoleParams[0]]['setting']['pid_file']);
         }
+    }
+
+    /**
+     * Return swoole server.
+     * @return HttpServer
+     */
+    public function createServer($config)
+    {
+
+        Eazy::setAlias('@eazy', __DIR__);
+        return new $config['server']($config);
     }
 
     /**
@@ -79,9 +72,12 @@ class BaseApplication extends Console
     {
         $server = (isset($this->consoleParams['server']) ? $this->consoleParams['server'] : (isset($this->consoleParams[0]) ? $this->consoleParams[0] : ''));
         if (!$server || !isset($this->config[$server])) {
-            $this->stdout("Cant find server called `{$server}`");
+            $allServer = implode('|',array_keys($this->config));
+            $this->stdout("Usage: {{$allServer}} [OPTION]");
+            $this->stdout("\n");
             exit(0);
         }
+
         $this->startParams['server'] = $server;
     }
 
@@ -109,8 +105,18 @@ class BaseApplication extends Console
         return $params;
     }
 
-    protected function getUsage(): ?int
+    protected function getUsage(): void
     {
-        
+        $this->stdout('List of [OPTION]' . PHP_EOL);
+        $maxLength = 0;
+        foreach ($this->usageCommands as $command => $description) {
+            $maxLength = max($maxLength, strlen($command));
+        }
+        foreach ($this->usageCommands as $command => $description){
+            $this->stdout('  '.$command);
+            $this->stdout(str_repeat(' ', $maxLength + 4 - strlen($command)));
+            $this->stdout(Console::wrapText($description, $maxLength + 4 + 2), Console::BOLD);
+            $this->stdout("\n");
+        }
     }
 }
