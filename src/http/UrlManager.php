@@ -14,11 +14,14 @@ use function FastRoute\simpleDispatcher;
  */
 class UrlManager extends BaseUrlManager
 {
-
     /**
      * @var Dispatcher
      */
     public $adapter;
+
+    public $route;
+    
+    private $_adapter;
 
     /**
      * Init UrlManager
@@ -26,6 +29,7 @@ class UrlManager extends BaseUrlManager
     public function init()
     {
         parent::init();
+        $this->_adapter = $this->getAdapter();
     }
 
     /**
@@ -90,7 +94,7 @@ class UrlManager extends BaseUrlManager
         }
         $uri = rawurldecode($uri);
 
-        return $this->adapter->dispatch($httpMethod, $uri);
+        return $this->_adapter->dispatch($httpMethod, $uri);
     }
 
 
@@ -101,25 +105,22 @@ class UrlManager extends BaseUrlManager
      *
      * @return Dispatcher
      */
-    public static function loadRoute($config)
+    private function getAdapter()
     {
-        $webRoute = $config['route'];
-
-        return simpleDispatcher(function (RouteCollector $controller) use (
-            $webRoute
-        ) {
+        $webRoute = $this->route;
+        return simpleDispatcher(function (RouteCollector $controller) use ($webRoute) {
             foreach ($webRoute as $prefix => $rules) {
                 if (count($rules) == count($rules, COUNT_RECURSIVE)) {
-                    [$method, $route, $handler] = self::parseRule($rules);
+                    [$method, $route, $handler] = $this->parseRule($rules);
                     $controller->addRoute($method, $route, $handler);
                 } else {
                     if (is_int($prefix)) {
-                        [$method, $route, $handler] = self::parseRule($rules);
+                        [$method, $route, $handler] = $this->parseRule($rules);
                         $controller->addRoute($method, $route, $handler);
                     }else{
                         $controller->addGroup($prefix, function (RouteCollector $controller) use ($rules) {
                             foreach ($rules as $rulesChild) {
-                                [$method, $route, $handler] = self::parseRule($rulesChild);
+                                [$method, $route, $handler] = $this->parseRule($rulesChild);
                                 $controller->addRoute($method, $route, $handler);
                             }
                         });
@@ -136,7 +137,7 @@ class UrlManager extends BaseUrlManager
      * @return array
      * @throws \ReflectionException
      */
-    private static function parseRule($rule)
+    private function parseRule($rule)
     {
         [$method, $route, $handler] = [$rule[0], $rule[1], $rule[2]];
         if (strpos($handler, '@') === 0) {

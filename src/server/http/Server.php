@@ -22,6 +22,7 @@ use toom1996\event\SwooleEvent;
 use toom1996\http\Eazy;
 use toom1996\http\Goblin;
 use toom1996\http\RequestCallback;
+use toom1996\http\StartCallback;
 use toom1996\http\UrlManager;
 use toom1996\http\WorkerStartCallback;
 
@@ -39,6 +40,7 @@ class Server extends BaseServer
      * It's not be overwrite.
      */
     const HTTP_EVENT = [
+        SwooleEvent::SWOOLE_ON_START => [StartCallback::class, 'onStart'],
         SwooleEvent::SWOOLE_ON_REQUEST => [RequestCallback::class, 'onRequest'],
         SwooleEvent::SWOOLE_ON_WORKER_START => [WorkerStartCallback::class, 'onWorkerStart'],
     ];
@@ -47,26 +49,9 @@ class Server extends BaseServer
     {
         $this->server = new swooleServer($this->host, $this->port);
         foreach (array_merge($this->event, self::HTTP_EVENT) as $event => $callback) {
-//            list($class, $handler) = $callback;
             $this->server->on($event, $callback);
-//            var_dump($event);
         }
         parent::init();
-    }
-
-    /**
-     *
-     *
-     * @param  Request   $request
-     * @param  Response  $response
-     *
-     * @throws \ReflectionException
-     * @throws InvalidConfigException
-     * @throws UnknownClassException
-     */
-    public function request(Request $request, Response $response)
-    {
-        (new Eazy($this->config, $request, $response))->run();
     }
 
     /**

@@ -21,8 +21,7 @@ class Eazy extends BaseEazy
      * @var array
      */
     public static $config;
-    public static $test;
-
+    
     /**
      * Initializer Eazy request and response.
      *
@@ -33,10 +32,9 @@ class Eazy extends BaseEazy
      * @throws \ReflectionException
      * @throws \toom1996\base\InvalidConfigException
      */
-    public function __construct(&$config, \Swoole\Http\Request $request, \Swoole\Http\Response $response)
+    public function __construct(\Swoole\Http\Request $request, \Swoole\Http\Response $response)
     {
-        self::$config = $config;
-//        var_dump(self::$config);
+        self::$config = Eazy::$config;
         $this->bootstrap();
         $this->getResponse($response);
         $this->getRequest($request);

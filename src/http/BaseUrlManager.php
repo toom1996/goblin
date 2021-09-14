@@ -27,13 +27,5 @@ abstract class BaseUrlManager extends Component
      * @return mixed
      */
     abstract protected function parseRequest(): array ;
-
-    /**
-     *
-     * @param $config
-     *
-     * @return mixed
-     */
-    abstract static function loadRoute($config);
     
 }

@@ -4,7 +4,9 @@
 namespace toom1996\helpers;
 
 
-class Console
+use toom1996\base\Component;
+
+class Console extends Component
 {
     // foreground color control codes
     const FG_BLACK = 30;

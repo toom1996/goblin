@@ -14,6 +14,6 @@ class RequestCallback
 
     public static function onRequest(Request $request, Response $response)
     {
-        (new Eazy(Eazy::$config, $request, $response))->run();
+        (new Eazy($request, $response))->run();
     }
 }

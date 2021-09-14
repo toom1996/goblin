@@ -7,13 +7,6 @@ use yii\base\UnknownPropertyException;
 
 class Component extends BaseObject
 {
-
-    /**
-     * Application component
-     * @var
-     */
-    protected $component;
-
     /**
      *
      * @param $name
@@ -23,7 +16,6 @@ class Component extends BaseObject
      */
     public function __get(string $name)
     {
-        // TODO: Implement __get() method.
         $getter = 'get' . $name;
         if (method_exists($this, $getter)) {
             // read property, e.g. getName()
