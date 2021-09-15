@@ -4,31 +4,44 @@ namespace toom1996\http;
 
 use FastRoute\Dispatcher;
 use FastRoute\RouteCollector;
+use toom1996\base\Component;
 use toom1996\base\InvalidConfigException;
+use toom1996\base\UnknownClassException;
+use toom1996\helpers\FileHelper;
 use function FastRoute\simpleDispatcher;
 
 /**
  * Class UrlManager
  *
+ * @property array $controllerMap urlManager controller map.
+ *
  * @author: TOOM1996
+ * @since 1.0.0
+ * @license http://www.apache.org/licenses/LICENSE-2.0
  */
-class UrlManager extends BaseUrlManager
+class UrlManager extends Component
 {
-    /**
-     * @var Dispatcher
-     */
-    public $adapter;
 
-    public $route;
-    
+    /**
+     * @var array
+     */
+    public array $route;
+
+    /**
+     * @var
+     */
     private $_adapter;
+
+    /**
+     * @var array 
+     */
+    private array $_controllerMap;
 
     /**
      * Init UrlManager
      */
     public function init()
     {
-        parent::init();
         $this->_adapter = $this->getAdapter();
     }
 
@@ -140,11 +153,63 @@ class UrlManager extends BaseUrlManager
     private function parseRule($rule)
     {
         [$method, $route, $handler] = [$rule[0], $rule[1], $rule[2]];
-        if (strpos($handler, '@') === 0) {
-            Eazy::createController($handler);
+        if (strpos($handler, '@') !== 0) {
+            $handler = '@controllers' . $handler;
         }
+        $this->setControllerMap($handler);
+
         return [$method, $route, $handler];
     }
 
+    /**
+     * Set to controller map.
+     * @param $handler
+     *
+     * @throws \ReflectionException
+     * @throws \toom1996\base\InvalidConfigException
+     * @throws \toom1996\base\UnknownClassException
+     */
+    public function setControllerMap($handler)
+    {
+        // If route is `@controllers/site/index`, will be convert @controller to BathPath
+        $handlerAlias = Eazy::getAlias($handler);
+        $ex = explode('/', $handlerAlias);
 
+        // Find controller and action.
+        [$controller, $action] = array_slice($ex, -2, 2);
+
+        if (strpos($controller, 'Controller') === false) {
+            $controller = ucfirst($controller).'Controller';
+        }
+
+        if (strpos($action, 'action') === false) {
+            $action = 'action'.ucfirst($action);
+        }
+
+        $handlerFile = implode('/',
+            array_merge(array_slice($ex, 0, count($ex) - 2),
+                [$controller . '.php']));
+        if (!file_exists($handlerFile)) {
+            throw new UnknownClassException("{Unknown class {$handler}");
+        }
+        
+        $classNamespace = FileHelper::getNamespace($handlerFile);
+        $className = '\\' . $classNamespace . '\\' . basename(str_replace('.php', '', $handlerFile));
+
+        $ref = new \ReflectionClass($className);
+        if (!$ref->hasMethod($action)) {
+            throw new InvalidConfigException("class {$className} does not have a method {$action}, please check your config.");
+        }
+
+        $this->_controllerMap[$handler] = Eazy::createObject($className, [$action]);
+    }
+
+    /**
+     * Return controller map.
+     * @return array
+     */
+    public function getControllerMap()
+    {
+        return $this->_controllerMap;
+    }
 }

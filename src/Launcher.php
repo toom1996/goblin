@@ -1,5 +1,6 @@
 <?php
 
+
 namespace toom1996;
 
 use toom1996\base\BaseApplication;

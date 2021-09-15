@@ -25,10 +25,10 @@ class Module extends ServiceLocator
     public function runAction($path)
     {
         // If is register
-        if (isset(Eazy::$handlerMap[$path])) {
-            $controller = Eazy::$handlerMap[$path];
+        if (isset(Eazy::$app->getUrlManager()->controllerMap[$path])) {
+            $controller = Eazy::$app->getUrlManager()->controllerMap[$path];
         }else{
-            $controller = Eazy::createController($path, true);
+            $controller = Eazy::$app->getUrlManager()->setControllerMap($path);
         }
 
         if (is_object($controller) && $controller instanceof Controller) {
@@ -77,62 +77,5 @@ class Module extends ServiceLocator
         }
 
         return $this->_basePath;
-    }
-
-    /**
-     *
-     * @param $actionPath
-     * @param  bool  $setToHandlerMap
-     *
-     * @return object
-     * @throws \ReflectionException
-     * @throws \toom1996\base\InvalidConfigException
-     * @throws \toom1996\base\UnknownClassException
-     */
-    public static function createController($actionPath, $setToHandlerMap = true)
-    {
-        // If route is `@controllers/site/index`, will be convert @controller to BathPath
-        $handlerAlias = Eazy::getAlias($actionPath);
-        $ex = explode('/', $handlerAlias);
-
-        // Find controller and action.
-        [$controller, $action] = array_slice($ex, -2, 2);
-
-        // will be convert to `$bathPath/SiteController/index`
-        if (strpos($controller, 'Controller') === false) {
-            $controller = ucfirst($controller).'Controller';
-        }
-
-        // will be convert to `$bathPath/SiteController/actionIndex`
-        if (strpos($action, 'action') === false) {
-            $action = 'action'.ucfirst($action);
-        }
-
-        $handlerFile = implode('/',
-            array_merge(array_slice($ex, 0, count($ex) - 2),
-                [$controller . '.php']));
-        if (!file_exists($handlerFile)) {
-            throw new UnknownClassException("{Unknown class {$actionPath}");
-        }
-        
-        $classNamespace = Eazy::getNamespace($handlerFile);
-        $className = '\\' . $classNamespace . '\\' . basename(str_replace('.php', '', $handlerFile));
-
-        $ref = new \ReflectionClass($className);
-        if (!$ref->hasMethod($action)) {
-            throw new InvalidConfigException("class {$className} does not have a method {$action}, please check your config.");
-        }
-
-        // Create controller object.
-        $controllerInstance = Eazy::createObject($className, [$action]);
-
-        /**
-         * Set to handlerMap.
-         * @see Eazy::$handlerMap
-         */
-        if ($setToHandlerMap) {
-            Eazy::setHandlerMap($actionPath, $controllerInstance);
-        }
-        return $controllerInstance;
     }
 }

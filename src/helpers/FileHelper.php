@@ -871,4 +871,18 @@ class FileHelper extends BaseFileHelper
 
         return $options;
     }
+
+    /**
+     *
+     * @return string
+     */
+    public static function getNamespace(string $file)
+    {
+        $file = file_get_contents($file);
+        if (!$r = preg_match('/namespace(.*);/', $file, $matches)) {
+            return '';
+        }
+
+        return trim($matches[1]);
+    }
 }

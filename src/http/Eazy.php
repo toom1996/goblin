@@ -9,10 +9,18 @@ use toom1996\base\InvalidConfigException;
 use toom1996\base\UnknownClassException;
 use toom1996\log\LogDispatcher;
 
+/**
+ * Class Eazy
+ *
+ * 
+ * @author: TOOM1996
+ * @since 1.0.0
+ * @license http://www.apache.org/licenses/LICENSE-2.0
+ */
 class Eazy extends BaseEazy
 {
     /**
-     * @var
+     * @var \toom1996\http\Eazy
      */
     public static $app;
 
@@ -34,7 +42,6 @@ class Eazy extends BaseEazy
      */
     public function __construct(\Swoole\Http\Request $request, \Swoole\Http\Response $response)
     {
-        self::$config = Eazy::$config;
         $this->bootstrap();
         $this->getResponse($response);
         $this->getRequest($request);

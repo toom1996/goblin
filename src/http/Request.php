@@ -102,8 +102,7 @@ class Request extends Component
     {
         parent::__construct($id, $params);
     }
-
-
+    
     /**
      *
      * @return array
@@ -176,11 +175,7 @@ class Request extends Component
      */
     public function getMethod()
     {
-        if ($this->_method === null) {
-            return $this->server['request_method'];
-        }
-
-        return $this->_method;
+        return $this->server['request_method'];
     }
 
     /**
@@ -213,6 +208,4 @@ class Request extends Component
 
         return isset($params[$name]) ? $params[$name] : $defaultValue;
     }
-    
-    
 }
