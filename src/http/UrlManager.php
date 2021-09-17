@@ -43,6 +43,7 @@ class UrlManager extends Component
     public function init()
     {
         $this->_adapter = $this->getAdapter();
+        var_dump($this->_controllerMap);
     }
 
     /**
@@ -192,7 +193,7 @@ class UrlManager extends Component
         if (!file_exists($handlerFile)) {
             throw new UnknownClassException("{Unknown class {$handler}");
         }
-        
+
         $classNamespace = FileHelper::getNamespace($handlerFile);
         $className = '\\' . $classNamespace . '\\' . basename(str_replace('.php', '', $handlerFile));
 

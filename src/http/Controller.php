@@ -7,7 +7,7 @@ namespace toom1996\http;
 use toom1996\base\Component;
 use toom1996\base\InvalidConfigException;
 use toom1996\base\Module;
-
+#[Attribute(Attribute::TARGET_FUNCTION)]
 class Controller extends Component
 {
     public $layout = '@app/views/layouts/main';
