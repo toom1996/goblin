@@ -42,7 +42,7 @@ class Stdout
 
     public static function string($string, $format = [])
     {
-        return Console::ansiFormat($string, $format);
+        Console::stdout($string);
     }
 
 }

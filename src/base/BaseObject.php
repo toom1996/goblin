@@ -14,7 +14,7 @@ class BaseObject
      *
      * @param  array  $config
      */
-    public function __construct($config = [])
+    public function __construct(array $config = [])
     {
         // TODO configure attributes.
         if (!empty($config)) {
@@ -22,7 +22,7 @@ class BaseObject
         }
         $this->init();
     }
-    
+
     public function init()
     {
     }

@@ -4,8 +4,10 @@ namespace toom1996\base;
 
 interface BootstrapInterface
 {
-    public function bootstrap();
+    public function getName(): string;
     
-    public function getId();
+    public function getUsage(): array;
+    
+    public function bootstrap(): void;
     
 }
