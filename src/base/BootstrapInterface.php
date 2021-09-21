@@ -8,6 +8,6 @@ interface BootstrapInterface
     
     public function getUsage(): array;
     
-    public function bootstrap(): void;
+    public function bootstrap(array $params): void;
     
 }

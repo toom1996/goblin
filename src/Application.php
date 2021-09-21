@@ -63,13 +63,13 @@ class Application extends BaseConsole
     {
         $params = $this->getParams();
         if (isset($params[0])) {
-            $class = $this->extensions[$params[0]];
+            $class = $this->extensions[$params[0]] ?? '';
             if (!in_array($params[0], array_keys($this->extensions))) {
                 Console::stdout("{$this->getSuggestionCommand($params[0])}");
+                Console::stdout("\n");
                 exit(0);
             }
-
-            $class->bootstrap();
+            $class->bootstrap($params);
         }else{
             $this->getHelpful();
         }

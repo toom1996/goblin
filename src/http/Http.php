@@ -4,6 +4,7 @@ namespace toom1996\http;
 
 use toom1996\base\BootstrapInterface;
 use toom1996\base\Component;
+use toom1996\helpers\Console;
 
 
 class Http extends Component implements BootstrapInterface
@@ -53,22 +54,60 @@ class Http extends Component implements BootstrapInterface
      */
     public function getUsage(): array
     {
-        return [
+        $useage = [
             '-install' => 'Initialization http server. If you use this extension for the first time, please execute this command first.',
             '-start' => 'Start server.',
             '-start -d ' => 'Start server and used daemonize mode.',
             '-stop' => 'Stop server.',
             '-reload' => 'Reload server.',
         ];
+        $maxLength = 0;
+        foreach ($usage as $command => $class) {
+            $maxLength = max($maxLength, strlen($command));
+        }
+        foreach ($usage as $command => $class){
+            Console::stdout('  ' . $command);
+            Console::stdout(str_repeat(' ', $maxLength + 4 - strlen($command)));
+            Console::stdout(Console::wrapText($class, $maxLength + 4 + 2), Console::BOLD);
+            Console::stdout("\n");
+        }
     }
 
+    /**
+     *
+     *
+     * @return string
+     */
     public function getDescription()
     {
         return 'Swoole http server extension.';
     }
 
-    public function bootstrap(): void
+    /**
+     *
+     *
+     * @param  array  $params
+     */
+    public function bootstrap(array $params): void
     {
+        var_dump($params);
+        if (!in_array('start', $params)) {
+            $this->getUsage();
+            exit(0);
+        }
+
+//        if (isset($this->consoleParams['start'])) {
+//            if (isset($this->consoleParams['d']) && $this->consoleParams['d'] === true) {
+//                $this->servers[$this->startParams['server']]['setting']['daemonize'] = true;
+//            }
+//
+//            $this->createServer($this->servers[$this->startParams['server']])->run();
+//        }elseif(isset($this->consoleParams['reload'])) {
+//            $this->reloadServer();
+//        }elseif (isset($this->consoleParams['stop'])) {
+//            $this->stopServer();
+//        }
+
         // TODO: Implement bootstrap() method.
     }
 }
