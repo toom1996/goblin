@@ -1,1 +1,1 @@
-"# goblin" 
+"# goblin" .
